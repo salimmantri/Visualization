@@ -10,7 +10,7 @@
         Surface.call(this);
 
         this.handleWidth = 8;
-        this.handles = [{ loc: "NW" }, { loc: "N" }, { loc: "NE" }, { loc: "E" }, { loc: "SE" }, { loc: "S" }, { loc: "SW" }, { loc: "W" }];
+        this.handles = [{ loc: "NW" }, { loc: "N" }, { loc: "NE" }, { loc: "E" }, { loc: "SE" }, { loc: "S" }, { loc: "SW" }, { loc: "W" }, {loc: "D" }];
 
         this._allowResize = true;
 
@@ -74,7 +74,11 @@
                         case "W":
                             delta.x = _dx / 2;
                             delta.w = -_dx;
-                            break;
+                        break;
+                    case "D":
+                        delta.x = _dx;
+                        delta.y = _dy;
+                        break;
                     }
                     var posSize = {
                         x: context._dragStartPos.x + delta.x,
@@ -197,6 +201,13 @@
                         d.y = t + context.handleWidth / 2;
                         d.width = context.handleWidth;
                         d.height = h - context.handleWidth;
+                        break;
+                    case "D":
+                        d.x = l + context.handleWidth / 2;
+                        d.y = t + context.handleWidth / 2;
+                        d.width = w - context.handleWidth;
+                        var titleBBox = context._titleRect.getBBox();
+                        d.height = titleBBox.height - context.handleWidth;
                         break;
                 }
                 d3.select(this)

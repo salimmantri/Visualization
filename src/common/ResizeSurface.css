@@ -37,3 +37,8 @@
     cursor: nw-resize;
     opacity: 0;
 }
+
+.resizeD {
+    cursor: move;
+    opacity: 0;
+}
