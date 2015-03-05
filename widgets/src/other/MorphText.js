@@ -16,6 +16,22 @@
     };
     MorphText.prototype = Object.create(SVGWidget.prototype);
 
+    MorphText.prototype.publish("reverse", false, "boolean", "Reverse");
+
+    MorphText.prototype.testData = function () {
+        var context = this;
+        var i = 0;
+        var interval = setInterval(function () {
+            context.text(context.dateTime())
+                .render()
+            ;
+            if (++i > 10) {
+                clearInterval(interval);
+            }
+        }, 1000)
+        return this;
+    };
+
     MorphText.prototype.text = function (_) {
         if (!arguments.length) return this._text;
         this._text = _;
@@ -72,7 +88,6 @@
             days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         return days[d.getDay()] + ' ' + months[d.getMonth()] + ' ' + d.getDate() + ' ' + d.getFullYear() + ' ' + hours + ':' + minutes + ':' + seconds + ampm;
     }
-
 
     MorphText.prototype.update = function (domNode, element) {
         var context = this;

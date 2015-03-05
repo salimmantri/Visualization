@@ -12,6 +12,37 @@
     ITree.prototype._palette = Palette.ordinal("default");
 
     //  Data ---
+    ITree.prototype.testData2 = function () {
+        var data = {
+            label: "root", children: [{
+                label: "A",
+                children: [{
+                    label: "AA",
+                    children: [{
+                        label: "AAA"
+                    }]
+                }, {
+                    label: "AB",
+                    children: [{
+                        label: "ABA"
+                    }]
+                }]
+            }, {
+                label: "B",
+                children: [{
+                    label: "BA",
+                    children: [{
+                        label: "BAA"
+                    }]
+                }, {
+                    label: "BB"
+                }]
+            }]
+        };
+        this.data(data);
+        return this;
+    };
+
     ITree.prototype.testData = function () {
         var data = {label: "root", children: [{
             label: "A",
@@ -31,7 +62,27 @@
             children: [{
                 label: "BA",
                 children: [{
-                    label: "BAA"
+                    label: "BAA",
+                    children: [{
+                        label: "BAAA"
+                    }, {
+                        label: "BAAB"
+                    }, {
+                        label: "BAAC"
+                    }, {
+                        label: "BAAD"
+                    }, {
+                        label: "BAAE",
+                        children: [{
+                            label: "BAAEA"
+                        }, {
+                            label: "BAAEC"
+                        }]
+                    }, {
+                        label: "BAAF"
+                    }, {
+                        label: "BAAG"
+                    }]
                 }]
             }, {
                 label: "BB"

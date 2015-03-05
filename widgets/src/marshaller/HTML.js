@@ -17,6 +17,7 @@
 
     HTML.prototype.testData = function () {
         //this.ddl_url("http://10.239.227.24:8010/WsWorkunits/WUResult?Wuid=W20150311-200229&ResultName=leeddx_issue_652_nestedfunctions_Comp_Ins002_DDL");
+        this.ddl_url("http://10.173.147.1:8010/WsWorkunits/WUResult?Wuid=W20150316-101333&ResultName=leeddx_issue_689_average_Comp_Ins002_DDL");
         return this;
     };
 

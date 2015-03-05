@@ -33,7 +33,7 @@
         SVGWidget.prototype.update.apply(this, arguments);
 		
         this._palette = this._palette.switch(this._paletteID);
-        var width = this.width() - 60;  //  Pad to allow text to display
+        var width = this.width() - 120;  //  Pad to allow text to display
         this.layout
             .size([this.height(), width])
         ;

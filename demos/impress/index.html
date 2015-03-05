@@ -1,0 +1,993 @@
+﻿<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>impress.js | presentation tool based on the power of CSS3 transforms and transitions in modern browsers | by Bartek Szopka @bartaz</title>
+
+    <meta name="description" content="impress.js is a presentation tool based on the power of CSS3 transforms and transitions in modern browsers and inspired by the idea behind prezi.com." />
+    <meta name="author" content="Bartek Szopka" />
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic" rel="stylesheet" />
+
+    <link href="css/impress-demo.css" rel="stylesheet" />
+
+    <link rel="shortcut icon" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+    <script src="../../widgets/lib/requirejs/require.js"></script>
+    <script src="../../widgets/config.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: "../../widgets"
+        });
+        events = {};
+        function createEdge(Edge, source, target, label) {
+            return new Edge()
+                .sourceVertex(source)
+                .targetVertex(target)
+                .sourceMarker("circleFoot")
+                .targetMarker("arrowHead")
+                .text(label || "")
+            ;
+        }
+    </script>
+
+</head>
+
+<body class="impress-not-supported">
+
+    <div class="fallback-message">
+        <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented with a simplified version of this presentation.</p>
+        <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+    </div>
+
+    <div id="impress">
+        <div id="welcome" class="step slide" data-x="-4500" data-y="1000" style="position:relative">
+            <div id="badge" style="position:absolute;width:100px; height:100px;text-align:center;overflow:hidden"></div>
+            <q style="text-align:center"><strong>HPCC</strong> Visualization Framework</q>
+            <br />
+            <br />
+            <br />
+            <p style="text-align:center">
+                <strong>Gordon Smith</strong> - Manager Super Computer Clients
+            </p>
+            <br />
+            <br />
+            <p style="text-align:right">
+                March 24, 2015
+                <br />
+                Delray Beach, FL
+            </p>
+            <br />
+            <br />
+            <p style="text-align:center">
+                <i>LexisNexis<sup style="vertical-align: super;font-size: smaller;">®</sup> Risk Solutions Visual Analytics 2015 Symposium</i>
+            </p>
+            <script>
+                events["welcome"] = {
+                    enter: function () {
+                        var context = this;
+                        require(["../demos/impress/HPCCBadge"], function (HPCCBadge) {
+                            context.badge = new HPCCBadge()
+                                .target("badge")
+                                .animation("none")
+                                .render()
+                            ;
+                            //context.timoutHandle = setInterval(function () { context.badge.render(); }, 13000);
+                        });
+                    },
+                    exit: function () {
+                        //clearTimeout(this.timoutHandle);
+                        if (this.badge) {
+                            this.badge.target(null);
+                            this.badge = null;
+                        }
+                    }
+                }
+            </script>
+        </div>
+        <div class="step slide" data-x="-3000" data-y="1000">
+            <q style="text-align:center;margin-top:50px"><strong>Overview:</strong>  Architecture</q>
+            <q style="margin-left:100px;margin-top:50px">
+                <ul style="list-style-type:disc">
+                    <li>HTML5 / CSS3 / SVG / JavaScript</li>
+                    <li>100% Front-end Web</li>
+                    <li>Zero Technology Stack</li>
+                    <li>No 3rd Party Dependencies<sup>*</sup></li>
+                </ul>
+                <br />
+                <span class="footnote"><sup>*</sup>Specific visualizations will have specific dependencies</span>
+            </q>
+        </div>
+
+        <div class="step slide" data-x="-1500" data-y="1000">
+            <q style="text-align:center;margin-top:50px"><strong>Overview:</strong>  Composition</q>
+            <q style="margin-left:100px;margin-top:50px">
+                <ul style="list-style-type:disc">
+                    <li>Everything is a "Widget"</li>
+                    <li>Widgets on Web Pages</li>
+                    <li>Widgets in Widgets</li>
+                    <li>Position and Sizing</li>
+                    <li>Render Pipeline</li>
+                </ul>
+                <br />
+            </q>
+        </div>
+
+        <div class="step slide" data-x="0" data-y="1000">
+            <q style="text-align:center;margin-top:50px"><strong>Widget:</strong>  Properties</q>
+            <q style="margin-left:100px;margin-top:50px">
+                <ul style="list-style-type:disc">
+                    <li>
+                        Publish <br />
+                        <span style="font-family:'Courier New'; font-size:18px">publish("shape", "circle", "set", "Shape Type", ["circle", "square", ...]);</span>
+                    </li>
+                    <li>Discoverable</li>
+                    <li><strong>Editable:</strong>  Setters / Getters</li>
+                    <li>Persistable</li>
+                </ul>
+                <br />
+            </q>
+        </div>
+
+        <div class="step slide" data-x="1500" data-y="1000">
+            <q style="text-align:center;margin-top:50px"><strong>But there's more...</strong></q>
+            <q style="margin-left:100px;margin-top:50px">
+                <ul style="list-style-type:disc">
+                    <li><strong>Palettes:</strong>  Ordinal/Rainbow/Custom</li>
+                    <li><strong>Layouts:</strong>  Surface / Grids / Graphs</li>
+                    <li><strong>Comms:</strong>  Talks to HPCC Platform</li>
+                    <li><strong>Evented:</strong>  Clicks, Mouse, etc.</li>
+                    <li><strong>Marshallers:</strong>  HIPIE Generated DDL</li>
+                </ul>
+                <br />
+            </q>
+        </div>
+
+        <div id="primatives" class="step slide" data-x="3000" data-y="1000">
+            <q style="text-align:center;margin-top:50px"><strong>Primatives / Composition</strong></q>
+            <div id="primativesGraph" style="width:100%;height:500px;font-size:12px"></div>
+        </div>
+        <script>
+            events["primatives"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/graph/Graph", "src/graph/Vertex", "src/graph/Edge", "src/common/Shape", "src/common/FAChar", "src/common/Icon", "src/common/Text", "src/common/TextBox", "src/common/ResizeSurface", "src/tree/Dendrogram"], function (Graph, Vertex, Edge, Shape, FAChar, Icon, Text, TextBox, ResizeSurface, Dendrogram) {
+                        var vertices = [];
+                        var edges = [];
+                        context.widget = new Graph()
+                            .target("primativesGraph")
+                            .render()
+                        ;
+                        var tickCount = 0;
+                        context.intervalHandle = setInterval(function () {
+                            switch (tickCount++) {
+                                case 0:
+                                    vertices.push(new Shape());
+                                    break;
+                                case 1:
+                                    vertices.push(new FAChar().char("\uf080"));
+                                    break;
+                                case 2:
+                                    vertices.push(new Icon().faChar("\uf080"));
+                                    edges.push(createEdge(Edge, vertices[0], vertices[2], "Shape"));
+                                    edges.push(createEdge(Edge, vertices[1], vertices[2], "Image"));
+                                    break;
+                                case 3:
+                                    vertices.push(new Shape().shape("rect").color_fill("#dcf1ff").color_stroke("#1f77b4"));
+                                    break;
+                                case 4:
+                                    vertices.push(new Text().text("Hello\nand\nWelcome!"));
+                                    break;
+                                case 5:
+                                    vertices.push(new TextBox().text("Hello\nand\nWelcome!"));
+                                    edges.push(createEdge(Edge, vertices[3], vertices[5], "Shape"));
+                                    edges.push(createEdge(Edge, vertices[4], vertices[5], "Text"));
+                                    break;
+                                case 6:
+                                    vertices.push(new Vertex().faChar("\uf080").text("Hello\nand\nWelcome!"));
+                                    edges.push(createEdge(Edge, vertices[2], vertices[6], "Icon"));
+                                    edges.push(createEdge(Edge, vertices[5], vertices[6], "TextBox"));
+                                    break;
+                                case 7:
+                                    vertices[6].annotation_icons([{
+                                        "faChar": "",
+                                        "tooltip": "Test A",
+                                        "shape_color_fill": "white",
+                                        "image_color_fill": "Red"
+                                    }, {
+                                        "faChar": "",
+                                        "tooltip": "Test B",
+                                        "shape_color_fill": "green",
+                                        "shape_color_stroke": "green",
+                                        "image_color_fill": "white"
+                                    }, {
+                                        "faChar": "",
+                                        "tooltip": "Test C",
+                                        "shape_color_fill": "navy",
+                                        "shape_color_stroke": "navy",
+                                        "image_color_fill": "white"
+                                    }])
+                                    ;
+                                    break;
+                                case 8:
+                                    vertices.push(new ResizeSurface().size({ width: 200, height: 100 }).title("Resize Me!!!").menu(["aaa", "bbb", "ccc"]).icon_faChar("\uf047").content(new Dendrogram().paletteID("default").testData2()));
+                                    context.widget
+                                        .data({ vertices: vertices, edges: edges, merge: true })
+                                        //.layout("Hierarchy")
+                                        .render()
+                                    ;
+                                    break;
+                                default:
+                                    return;
+                            }
+                            context.widget
+                                .data({ vertices: vertices, edges: edges, merge: true })
+                                .layout("Hierarchy", 750)
+                                //.render()
+                            ;
+                            setTimeout(function () {
+                                context.widget.render();
+                            }, 750);
+                        }, 1000);
+                    });
+                },
+                exit: function () {
+                    clearInterval(this.intervalHandle);
+                    if (this.widget) {
+                        this.widget.target(null);
+                        this.widget = null;
+                    }
+
+                }
+            }
+        </script>
+
+        <div class="step title" data-x="-1200" data-y="-1300" data-scale="4">
+            <h1>Charts</h1>
+        </div>
+
+        <div id="Pies" class="step charts" data-x="-3500" data-y="-200" data-z="-2000" data-scale="2">
+            <h1 style="top:250px">Pies</h1>
+            <div id="pie" class="chart" style="left:500px;top:100px"></div>
+            <div id="googlepie" class="chart" style="left:100px;top:250px"></div>
+            <div id="c3pie" class="chart" style="top:-100px"></div>
+        </div>
+        <script>
+            events["Pies"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/chart/Pie"], function (Pie) {
+                        context.pie = new Pie()
+                            .target("pie")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                    require(["src/google/Pie"], function (GooglePie) {
+                        context.googlePie = new GooglePie()
+                        .target("googlepie")
+                        .legendPosition("bottom")
+                        .testData()
+                        .render()
+                        ;
+                    });
+                    require(["src/c3/Pie"], function (C3Pie) {
+                        context.c3Pie = new C3Pie()
+                            .target("c3pie")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.pie) {
+                        this.pie.target(null);
+                        this.pie = null;
+                    }
+                    if (this.googlePie) {
+                        this.googlePie.target(null);
+                        this.googlePie = null;
+                    }
+                    if (this.c3Pie) {
+                        this.c3Pie.target(null);
+                        this.c3Pie = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="BarCharts" class="step charts" data-x="-3800" data-y="-2500" data-z="-2000" data-rotate="-30" data-scale="2">
+            <h1 style="top:0px">Bar Charts</h1>
+            <div id="C3Bar" class="chart" style="top:150px;height:200px"></div>
+            <div id="GoogleColumn" class="chart" style="left:33px;top:400px;height:200px"></div>
+            <div id="C3Column" class="chart" style="left:450px;top:-50px;height:200px;width:500px"></div>
+            <div id="Column" class="chart" style="left:450px;top:150px;height:200px"></div>
+            <div id="GoogleBar" class="chart" style="left:500px;top:400px;height:200px"></div>
+        </div>
+        <script>
+            events["BarCharts"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/chart/Column", "src/c3/Column", "src/c3/Bar"], function (Column, C3Column, C3Bar) {
+                        context.Column = new Column()
+                            .target("Column")
+                            .testData()
+                            .render()
+                        ;
+                        context.C3Column = new C3Column()
+                            .target("C3Column")
+                            .testData()
+                            .render()
+                        ;
+                        context.C3Bar = new C3Bar()
+                            .target("C3Bar")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                    require(["src/google/Column", "src/google/Bar"], function (GoogleColumn, GoogleBar) {
+                        context.GoogleColumn = new GoogleColumn()
+                            .target("GoogleColumn")
+                            .legendPosition("top")
+                            .testData()
+                            .render()
+                        ;
+                        context.GoogleBar = new GoogleBar()
+                            .target("GoogleBar")
+                            .legendPosition("bottom")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.Column) {
+                        this.Column.target(null);
+                        this.Column = null;
+                    }
+                    if (this.C3Column) {
+                        this.C3Column.target(null);
+                        this.C3Column = null;
+                    }
+                    if (this.C3Bar) {
+                        this.C3Bar.target(null);
+                        this.C3Bar = null;
+                    }
+                    if (this.GoogleColumn) {
+                        this.GoogleColumn.target(null);
+                        this.GoogleColumn = null;
+                    }
+                    if (this.GoogleBar) {
+                        this.GoogleBar.target(null);
+                        this.GoogleBar = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="_1DCharts" class="step charts" data-x="-2000" data-y="-3000" data-z="-2000" data-rotate="00" data-scale="2">
+            <h1 style="top:0px">1D Charts</h1>
+            <div id="gauge" class="chart" style="left:433px;top:-100px;height:300px;font-size:12px"></div>
+            <div id="slider" class="chart" style="left:0px;top:250px;width:90%;height:90px;font-size:12px"></div>
+            <div id="range" class="chart" style="left:0px;top:350px;width:90%;height:90px;font-size:12px"></div>
+        </div>
+        <script>
+            events["_1DCharts"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/c3/Gauge", "src/other/Slider"], function (Gauge, Slider) {
+                        context.gauge = new Gauge()
+                            .target("gauge")
+                            .testData()
+                            .render()
+                        ;
+                        context.slider = new Slider()
+                            .target("slider")
+                            .testData()
+                            .render()
+                        ;
+                        context.slider.click = function (row, col) {
+                            context.gauge.data(row).render();
+                        }
+                        context.range = new Slider()
+                            .target("range")
+                            .testData2()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.gauge) {
+                        this.gauge.target(null);
+                        this.gauge = null;
+                    }
+                    if (this.slider) {
+                        this.slider.target(null);
+                        this.slider = null;
+                    }
+                    if (this.range) {
+                        this.range.target(null);
+                        this.range = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Pies2" class="step charts" data-x="-500" data-y="-2100" data-z="-2000" data-rotate="30" data-scale="2">
+            <h1 style="top:450px">Donuts / Bubble</h1>
+            <div id="c3donut" class="chart"></div>
+            <div id="bubble" class="chart" style="left:400px;top:-100px"></div>
+            <div id="googledonut" class="chart" style="left:500px;top:250px"></div>
+        </div>
+        <script>
+            events["Pies2"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/chart/Bubble", "src/c3/Donut"], function (Bubble, Donut) {
+                        context.pie = new Bubble()
+                            .target("bubble")
+                            .testData()
+                            .render()
+                        ;
+                        context.c3Pie = new Donut()
+                            .target("c3donut")
+                            .arc_width(70)
+                            .testData()
+                            .title("No Sprinkles :(")
+                            .render()
+                        ;
+                    });
+                    require(["src/google/Pie"], function (Pie) {
+                        context.googlePie = new Pie()
+                            .target("googledonut")
+                            .is3D(false)
+                            .pieHole(0.5)
+                            .legendPosition("bottom")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.pie) {
+                        this.pie.target(null);
+                        this.pie = null;
+                    }
+                    if (this.googlePie) {
+                        this.googlePie.target(null);
+                        this.googlePie = null;
+                    }
+                    if (this.c3Pie) {
+                        this.c3Pie.target(null);
+                        this.c3Pie = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="LineCharts" class="step charts" data-x="-900" data-y="-100" data-z="-2000" data-rotate="0" data-scale="2">
+            <h1 style="text-align:right;top:250px;width:100%">Line Charts</h1>
+            <div id="C3Line" class="chart" style="height:200px"></div>
+            <div id="GoogleLine" class="chart" style="left:33px;top:222px;height:200px"></div>
+            <div id="Line" class="chart" style="left:550px;top:-50px;height:200px"></div>
+            <div id="C3Step" class="chart" style="left:-50px;top:450px;height:200px"></div>
+            <div id="C3Area" class="chart" style="left:500px;top:400px;height:200px"></div>
+        </div>
+        <script>
+            events["LineCharts"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/chart/Line", "src/c3/Line", "src/c3/Step", "src/c3/Area"], function (Line, C3Line, C3Step, C3Area) {
+                        context.Line = new Line()
+                            .target("Line")
+                            .testData()
+                            .render()
+                        ;
+                        context.C3Line = new C3Line()
+                            .target("C3Line")
+                            .testData()
+                            .render()
+                        ;
+                        context.C3Step = new C3Step()
+                            .target("C3Step")
+                            .testData()
+                            .render()
+                        ;
+                        context.C3Area = new C3Area()
+                            .target("C3Area")
+                            .testData()
+                            .subchart(true)
+                            .render()
+                        ;
+                    });
+                    require(["src/google/Line"], function (GoogleLine) {
+                        context.GoogleLine = new GoogleLine()
+                            .target("GoogleLine")
+                            .legendPosition("bottom")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.Line) {
+                        this.Line.target(null);
+                        this.Line = null;
+                    }
+                    if (this.C3Line) {
+                        this.C3Line.target(null);
+                        this.C3Line = null;
+                    }
+                    if (this.C3Step) {
+                        this.C3Step.target(null);
+                        this.C3Step = null;
+                    }
+                    if (this.C3Area) {
+                        this.C3Area.target(null);
+                        this.C3Area = null;
+                    }
+                    if (this.GoogleLine) {
+                        this.GoogleLine.target(null);
+                        this.GoogleLine = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Choropleths" class="step title" data-x="2500" data-y="-1000" data-scale="3">
+            <h1 style="text-align:center">Choropleths</h1>
+        </div>
+
+        <div id="States" class="step charts" data-x="2000" data-y="-200" data-z="-2000" data-scale="2">
+        </div>
+        <script>
+            events["States"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/map/ChoroplethStates"], function (ChoroplethStates) {
+                        context.States = new ChoroplethStates()
+                            .target("States")
+                            .testData()
+                            .render()
+                        ;
+                        if (!events["Counties"].loaded) {
+                            events["Counties"].loaded = true;
+                            events["Counties"].enter();
+                        }
+                    });
+                },
+                exit: function () {
+                    if (this.States) {
+                        this.States.target(null);
+                        this.States = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Counties" class="step charts" data-x="2000" data-y="-2100" data-z="-2000" data-scale="2">
+        </div>
+        <script>
+            events["Counties"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/map/ChoroplethCounties"], function (ChoroplethCounties) {
+                        context.Counties = new ChoroplethCounties()
+                            .target("Counties")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.Counties) {
+                        this.Counties.target(null);
+                        this.Counties = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="World" class="step charts" data-x="4500" data-y="-2200" data-z="-2000" data-scale="2">
+        </div>
+        <script>
+            events["World"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/map/ChoroplethCountries"], function (ChoroplethCountries) {
+                        context.World = new ChoroplethCountries()
+                            .target("World")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.World) {
+                        this.World.target(null);
+                        this.World = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Map" class="step charts" data-x="4500" data-y="-200" data-z="-2000" data-scale="2">
+            <div id="GMap" style="width:900px;height:600px"></div>
+        </div>
+        <script>
+            events["Map"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/map/GMap"], function (GMap) {
+                        context.gmap = new GMap()
+                            .target("GMap")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.GMap) {
+                        this.GMap.target(null);
+                        this.GMap = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="other" class="step title" data-x="00" data-y="1800" data-scale="4">
+            <h1 style="text-align:center">Other</h1>
+        </div>
+
+        <div id="table" class="step chart" data-x="-3400" data-y="2700" data-z="-2000" data-rotate="-90" data-scale="2">
+            <h1 style="position:absolute;top:-30px;left:300px">Table</h1>
+            <div id="tableWidget" class="chart" style="padding:0px;left:200px;top:0px;width:600px;height:600px;font-size:24px"></div>
+        </div>
+        <script>
+            events["table"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/other/Table"], function (Table) {
+                        context.table = new Table()
+                            .target("tableWidget")
+                            .columns(["Lat", "Long", "Pin"])
+                            .data([
+                                [37.665074, -122.384375, "green-dot.png"],
+                                [32.690680, -117.178540, ""],
+                                [39.709455, -104.969859, ""],
+                                [41.244123, -95.961610, ""],
+                                [32.688980, -117.192040, ""],
+                                [45.786490, -108.526600, ""],
+                                [45.796180, -108.535652, ""],
+                                [45.774320, -108.494370, ""],
+                                [45.777062, -108.549835, "red-dot.png"]
+                            ])
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.table) {
+                        this.table.target(null);
+                        this.table = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Hierarchies" class="step charts" data-x="-2000" data-y="3000" data-z="-2000" data-rotate="-45" data-scale="2">
+            <h1 style="text-align:right;top:250px;width:100%">Hierarchies</h1>
+            <div id="dendrogram" class="chart" style="height:200px;width:500px;font-size:12px;padding:0px"></div>
+            <div id="graphTree" class="chart" style="left:533px;top:333px;height:200px"></div>
+            <div id="sunburst" class="chart" style="left:550px;top:-50px;height:300px;font-size:12px"></div>
+            <div id="circlePacking" class="chart" style="left:0px;top:300px;height:300px;font-size:12px"></div>
+        </div>
+        <script>
+            events["Hierarchies"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/tree/Dendrogram", "src/graph/Graph", "src/graph/Edge", "src/common/TextBox", "src/tree/SunburstPartition", "src/tree/CirclePacking"], function (Dendrogram, Graph, Edge, TextBox, SunburstPartition, CirclePacking) {
+                        context.dendrogram = new Dendrogram()
+                            .target("dendrogram")
+                            .testData()
+                            .render()
+                        ;
+                        var vertices = [
+                            new TextBox().text("G'Pa"),
+                            new TextBox().text("G'Ma"),
+                            new TextBox().text("Mother"),
+                            new TextBox().text("Father"),
+                            new TextBox().text("Child")
+                        ];
+                        var edges = [
+                            createEdge(Edge, vertices[0], vertices[2]), createEdge(Edge, vertices[1], vertices[2]),
+                            createEdge(Edge, vertices[2], vertices[4]),
+                            createEdge(Edge, vertices[3], vertices[4])
+                        ];
+                        context.graphTree = new Graph()
+                            .target("graphTree")
+                            .hierarchyOptions({ rankSep: 18 })
+                            .data({ vertices: vertices, edges: edges })
+                            .layout("Hierarchy")
+                            .render()
+                        ;
+                        context.sunburst = new SunburstPartition()
+                            .target("sunburst")
+                            .testData()
+                            .render()
+                        ;
+                        context.circlePacking = new CirclePacking()
+                            .target("circlePacking")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.dendrogram) {
+                        this.dendrogram.target(null);
+                        this.dendrogram = null;
+                    }
+                    if (this.graphTree) {
+                        this.graphTree.target(null);
+                        this.graphTree = null;
+                    }
+                    if (this.sunburst) {
+                        this.sunburst.target(null);
+                        this.sunburst = null;
+                    }
+                    if (this.circlePacking) {
+                        this.circlePacking.target(null);
+                        this.circlePacking = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="novelty" class="step chart" data-x="0" data-y="3200" data-z="-2000" data-rotate="0" data-scale="2">
+            <h1 style="position:absolute;top:-30px;left:0px">Word Cloud</h1>
+            <div id="wordCloud" class="chart" style="padding:0px;left:-40px;top:0px;width:944px;height:600px"></div>
+        </div>
+        <script>
+            events["novelty"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/other/WordCloud"], function (WordCloud) {
+                        context.wordCloud = new WordCloud()
+                            .target("wordCloud")
+                            .testData()
+                            .render()
+                        ;
+                        var i = 0;
+                        var interval = setInterval(function () {
+                            if (++i % 2) {
+                                context.wordCloud
+                                    .angleFrom(-90)
+                                    .angleTo(90)
+                                    .angleCount(3)
+                                    .render()
+                                ;
+                            } else {
+                                context.wordCloud
+                                    .angleFrom(-60)
+                                    .angleTo(50)
+                                    .angleCount(5)
+                                    .render()
+                                ;
+                            }
+                            if (i > 3) {
+                                clearInterval(interval);
+                            }
+                        }, 3000);
+                    });
+                },
+                exit: function () {
+                    if (this.wordCloud) {
+                        this.wordCloud.target(null);
+                        this.wordCloud = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="Graphs" class="step chart" data-x="2000" data-y="3000" data-z="-2000" data-rotate="45" data-scale="2">
+            <h1 style="position:absolute;top:-30px;left:0px">Graphs</h1>
+            <div style="position:absolute;top:-30px;right:0px">
+                <button type="button" onclick="doLayout('Circle')">Circle</button>
+                <button type="button" onclick="doLayout('ForceDirected')">Force Directed</button>
+                <button type="button" onclick="doLayout('ForceDirected2')">Spring</button>
+                <button type="button" onclick="doLayout('Hierarchy')">Hierarchy</button>
+            </div>
+            <div id="graph" class="slide chart" style="padding:0px;left:-40px;top:0px;width:944px;height:600px;background-color:white"></div>
+        </div>
+        <script>
+            doLayout = function (layout) {
+                if (events["Graphs"].graph) {
+                    events["Graphs"].graph
+                        .layout(layout, 750)
+                        //.render();
+                    ;
+                }
+            }
+            events["Graphs"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/graph/Graph", "../demos/impress/GraphData"], function (Graph, GraphData) {
+                        var data = new GraphData();
+                        context.graph = new Graph()
+                            .target("graph")
+                            .hierarchyOptions({ rankSep: 18 })
+                            .data({ vertices: data.vertices, edges: data.edges })
+                            .layout("Circle")
+                            .shrinkToFitOnLayout(true)
+                            .highlightOnMouseOverVertex(true)
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.graph) {
+                        this.graph.target(null);
+                        this.graph = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="morphText" class="step chart" data-x="4000" data-y="2700" data-z="-2000" data-rotate="90" data-scale="2">
+            <div id="morphTextWidget" class="chart" style="padding:0px;left:400px;top:400px;width:900px;height:600px"></div>
+        </div>
+        <script>
+            events["morphText"] = {
+                enter: function () {
+                    var context = this;
+                    require(["src/other/MorphText"], function (MorphText) {
+                        context.morphTextWidget = new MorphText()
+                            .target("morphTextWidget")
+                            .testData()
+                            .render()
+                        ;
+                    });
+                },
+                exit: function () {
+                    if (this.morphTextWidget) {
+                        this.morphTextWidget.target(null);
+                        this.morphTextWidget = null;
+                    }
+                }
+            }
+        </script>
+
+        <div id="overview" class="overview step" data-x="0" data-y="0" data-scale="10">
+        </div>
+        <script>
+            events["overview"] = {
+                enter: function () {
+                    for (var key in events) {
+                        if (["overview", "dermatology", "wuStats"].indexOf(key) < 0 && events[key] && events[key].enter && !events[key].loaded) {
+                            events[key].enter();
+                            events[key].loaded = true;
+                        }
+                    }
+                },
+                exit: function () {
+                    for (var key in events) {
+                        if (key !== "overview" && events[key] && events[key].exit) {
+                            //events[key].exit();
+                            //events[key].loaded = false;
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <div class="step title" data-x="5000" data-y="-600" data-z="-1000" data-rotate-x="0" data-rotate-y="90" data-scale="3">
+            <q>Back to the Framework!</q>
+        </div>
+
+        <div id="dermatology" class="step title" data-x="-5000" data-y="1800" data-z="-1800" data-rotate-x="0" data-rotate-y="90" data-scale="3">
+            <iframe id="dermatologyFrame" src="../dermatology.html?src/common/Icon" style="width: 1024px; height: 680px; opacity:0"></iframe>
+        </div>
+        <script>
+            events["dermatology"] = {
+                enter: function () {
+                    require(["d3/d3"], function (d3) {
+                        //d3.select("#dermatologyFrame").style("opacity", 1);
+                        d3.select("#dermatologyFrame").transition().duration(750).style("opacity", 1);
+                    });
+                },
+                exit: function () {
+                    require(["d3/d3"], function (d3) {
+                        d3.select("#dermatologyFrame").style("opacity", 0);
+                    });
+                }
+            }
+        </script>
+
+        <div id="wuStats" class="step title" data-x="-5000" data-y="-1800" data-z="-675" data-rotate-x="0" data-rotate-y="90" data-scale="3">
+            <iframe id="wuStatsFrame" src="http://192.168.56.101:8010/?Wuid=W20150318-103059&Widget=WUDetailsWidget" style="width: 1024px; height: 680px; opacity:0"></iframe>
+        </div>
+        <script>
+            events["wuStats"] = {
+                enter: function () {
+                    var context = this;
+                    require(["d3/d3"], function (d3) {
+                        d3.select("#wuStatsFrame").transition().duration(750).style("opacity", 1);
+                    });
+                },
+                exit: function () {
+                    require(["d3/d3"], function (d3) {
+                        d3.select("#wuStatsFrame").transition().style("opacity", 0);
+                    });
+                }
+            }
+        </script>
+
+        <div id="finale" class="overview step" data-x="2000" data-y="-1000" data-rotate-x="33" data-rotate-y="33" data-scale="10">
+        </div>
+        <div id="finale2" class="overview step" data-x="-2000" data-y="1000" data-rotate-x="-33" data-rotate-y="-33" data-scale="10">
+        </div>
+        <div id="finale3" class="overview step" data-x="-2000" data-y="-1000" data-rotate-x="33" data-rotate-y="-33" data-scale="10">
+        </div>
+        <div id="finale3a" class="overview step" data-x="0" data-y="0" data-scale="10">
+        </div>
+        <div id="finale4" class="overview step" data-x="2000" data-y="1000" data-rotate-x="-33" data-rotate-y="33" data-scale="10">
+        </div>
+        <div id="finale5" class="overview step" data-x="2000" data-y="-1000" data-rotate-x="33" data-rotate-y="33" data-scale="10">
+        </div>
+    </div>
+
+    <div class="hint">
+        <p>Use a spacebar or arrow keys to navigate</p>
+    </div>
+    <script>
+        if ("ontouchstart" in document.documentElement) {
+            document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
+        }
+    </script>
+
+    <script src="js/impress.js"></script>
+    <script>
+        impress().init();
+        var timing = null;
+        window.addEventListener('impress:stepenter', function (evt) {
+            console.log("Enter:  " + evt.target.id);
+            if (events[evt.target.id] && events[evt.target.id].enter && !events[evt.target.id].loaded) {
+                events[evt.target.id].enter();
+                events[evt.target.id].loaded = true;
+            }
+            if (evt.target.id === "finale") {
+                var tour = ["finale2", "finale3", "finale3a", "finale4", "finale5"]
+                var tourIdx = 0;
+                timing = setInterval(function () {
+                    if (!timing) {
+                        return;
+                    }
+                    impress().goto(tour[tourIdx++]);
+                    if (tourIdx >= tour.length) {
+                        tourIdx = 0;
+                    }
+                }, 3000);
+            } else {
+                var d = 0;
+            }
+            if (timing && evt.target.id.indexOf("finale") !== 0) {
+                clearInterval(timing);
+                timing = null;
+            }
+        });
+        window.addEventListener('impress:stepleave', function (evt) {
+            if (evt.target.id === "overview" && events[evt.target.id] && events[evt.target.id].exit) {
+                events[evt.target.id].exit();
+                events[evt.target.id].loaded = false;
+            }
+            console.log("Exit:  " + evt.target.id);
+        });
+    </script>
+
+</body>
+</html>
