@@ -138,8 +138,8 @@
     GMap.prototype._class += " map_GMap";
 
     GMap.prototype.publish("type", "road", "set", "Map Type", ["terrain", "road", "satellite", "hybrid"], { tags: ["Basic"] });
-    GMap.prototype.publish("centerLat", 42.877742, "number", "Center Latitude", null, { tags: ["Basic"] });
-    GMap.prototype.publish("centerLong", -97.380979, "number", "Center Longtitude", null, { tags: ["Basic"] });
+    GMap.prototype.publish("centerLat", 39.833333, "number", "Center Latitude", null, { tags: ["Basic"] });
+    GMap.prototype.publish("centerLong", -98.583333, "number", "Center Longtitude", null, { tags: ["Basic"] });
     GMap.prototype.publish("zoom", 4, "number", "Zoom Level", null, { tags: ["Basic"] });
 
     GMap.prototype.publish("panControl", true, "boolean", "Pan Controls", null, { tags: ["Basic"] });
@@ -306,9 +306,12 @@
         });
     };
 
-    GMap.prototype.createIcon = function (pinObj) {
+    var svgPin = "M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30";
+    var svgCircle = "M-5,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0";
+    GMap.prototype.createIcon = function (pinObj, shape) {
+        shape = shape || svgPin;
         return {
-            path: "M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30", // a 2,2 0 1,1 4,0 2,2 0 1,1",
+            path: shape,
             fillColor: pinObj.fillColor,
             fillOpacity: pinObj.fillOpacity || 0.8,
             scale: 0.5,
@@ -317,12 +320,12 @@
         };
     };
 
-    GMap.prototype.createMarker = function (lat, lng, pinObj) {
+    GMap.prototype.createMarker = function (lat, lng, pinObj, circle) {
         return new google.maps.Marker({
             position: new google.maps.LatLng(lat, lng),
             animation: google.maps.Animation.DROP,
             title: pinObj.title || "",
-            icon: this.createIcon(pinObj),
+            icon: this.createIcon(pinObj, circle ? svgCircle : svgPin),
             map: this._googleMap,
         });
     };
@@ -352,6 +355,9 @@
             if (this._googleMap.getZoom() > 12) {
                 this._googleMap.setZoom(12);
             }
+        } else {
+            this._googleMap.setCenter(new google.maps.LatLng(this.centerLat(), this.centerLong()));
+            this._googleMap.setZoom(this.zoom());
         }
         return this;
     };

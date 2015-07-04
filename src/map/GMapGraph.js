@@ -29,7 +29,7 @@
                 var pos2 = context._viewportSurface.project(row[0], row[1]);
                 var newAddr = new Shape()
                     .shape("circle")
-                    .radius(3)
+                    .radius(5)
                     .data(row)
                     .pos(pos2)
                 ;

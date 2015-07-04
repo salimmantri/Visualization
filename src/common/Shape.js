@@ -13,7 +13,8 @@
     Shape.prototype.constructor = Shape;
     Shape.prototype._class += " common_Shape";
 
-    Shape.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square", "rect", "ellipse"],{tags:["Private"]});
+    Shape.prototype.publish("tooltip", "", "string", "Tooltip", null, { tags: ["Private"] });
+    Shape.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square", "rect", "ellipse"], { tags: ["Private"] });
     Shape.prototype.publish("width", 24, "number", "Width",null,{tags:["Private"]});
     Shape.prototype.publish("height", 24, "number", "Height",null,{tags:["Private"]});
     Shape.prototype.publish("colorStroke", null, "html-color", "Stroke Color", null, {tags:["Private"]});
@@ -44,45 +45,49 @@
 
         shape.enter().append(this.shape() === "square" ? "rect" : this.shape())
             .attr("class", "common_Shape")
+            .append("title")
         ;
         var context = this;
         shape
             .attr("fill", context.colorFill())
             .attr("stroke", context.colorStroke())
             .each(function (d) {
-            var element = d3.select(this);
-            switch (context.shape()) {
-                case "circle":
-                    var radius = context.radius();
-                    element
-                        .attr("r", radius)
-                    ;
-                    break;
-                case "square":
-                    var width = Math.max(context.width(), context.height());
-                    element
-                        .attr("x", -width / 2)
-                        .attr("y", -width / 2)
-                        .attr("width", width)
-                        .attr("height", width)
-                    ;
-                    break;
-                case "rect":
-                    element
-                        .attr("x", -context.width() / 2)
-                        .attr("y", -context.height() / 2)
-                        .attr("width", context.width())
-                        .attr("height", context.height())
-                    ;
-                    break;
-                case "ellipse":
-                    element
-                        .attr("rx", context.width() / 2)
-                        .attr("ry", context.height() / 2)
-                    ;
-                    break;
-            }
-        });
+                var element = d3.select(this);
+                switch (context.shape()) {
+                    case "circle":
+                        var radius = context.radius();
+                        element
+                            .attr("r", radius)
+                        ;
+                        break;
+                    case "square":
+                        var width = Math.max(context.width(), context.height());
+                        element
+                            .attr("x", -width / 2)
+                            .attr("y", -width / 2)
+                            .attr("width", width)
+                            .attr("height", width)
+                        ;
+                        break;
+                    case "rect":
+                        element
+                            .attr("x", -context.width() / 2)
+                            .attr("y", -context.height() / 2)
+                            .attr("width", context.width())
+                            .attr("height", context.height())
+                        ;
+                        break;
+                    case "ellipse":
+                        element
+                            .attr("rx", context.width() / 2)
+                            .attr("ry", context.height() / 2)
+                        ;
+                        break;
+                }
+            })
+            .select("title")
+                .text("'Ello")
+        ;
         shape.exit().remove();
     };
 
