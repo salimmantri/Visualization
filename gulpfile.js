@@ -18,12 +18,14 @@ const filter = require('gulp-filter');
 const tag_version = require('gulp-tag-version');
 const jscs = require('gulp-jscs');
 const jshint = require('gulp-jshint');
+const mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 // Consts
 const cfg = {
   src: 'src',
   dist: 'dist',
   distamd: 'dist-amd',
+  test: 'test',
   prefix: "hpcc-viz"
 };
 
@@ -102,6 +104,15 @@ gulp.task('lint', function () {
         .pipe(jshint.reporter('fail'))
     ;
 });
+
+gulp.task('unitTest', function () {
+    return gulp
+        .src(cfg.test + '/*.html')  //  This will fail if any HTML file has a BOM.
+        .pipe(mochaPhantomJS({ reporter: 'spec' }))
+    ;
+});
+
+gulp.task("test", ["lint", "unitTest"]);
 
 gulp.task('build-nonamd', ['build-css', 'optimize-css'], function (cb) {
     async.each(bundles, buildModule, cb);

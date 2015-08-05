@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Mocha</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+    </head>
+    <body>
+        <script src="../node_modules/should/should.js"></script>
+        <script src="../node_modules/mocha/mocha.js"></script>
+        <script>mocha.setup('bdd')</script>
+
+        <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
+        <script src="../src/config.js"></script>
+        <script>
+            describe('AMD Load', function () {
+                var widgets = ["src/common/TextBox", "src/common/Surface"];
+                widgets.forEach(function (path) {
+                    it(path, function (done) {
+                        require([path], function (Widget) {
+                            true.should.equal(typeof Widget === "function");
+                            done();
+                        });
+                    });
+                });
+                it('Missing File', function (done) {
+                    require(["src/common/TextBoxXXX"], function (TextBox) {
+                    }, function (err) {
+                        done();
+                    });
+                });
+            });
+        </script>
+
+        <script>
+            mocha.run();
+        </script>
+    </body>
+</html>

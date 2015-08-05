@@ -23,14 +23,17 @@
     "yargs": "^3.8.0",
     "jshint-stylish": "~1.0.2",
     "gulp-jshint": "~1.10.0",
-    "gulp-jscs": "~1.6.0"
+    "gulp-jscs": "~1.6.0",
+    "gulp-mocha-phantomjs": "~0.8.1",
+    "mocha": "~2.2.4",
+    "should": "~7.0.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/hpcc-systems/Visualization"
   },
   "scripts": {
-    "test": "gulp lint"
+    "test": "gulp test"
   },
   "author": "HPCC Systems",
   "license": "Apache",
