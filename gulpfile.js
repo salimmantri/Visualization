@@ -16,7 +16,6 @@ const bump = require('gulp-bump');
 const argv = require('yargs').argv;
 const filter = require('gulp-filter');
 const tag_version = require('gulp-tag-version');
-const jscs = require('gulp-jscs');
 const jshint = require('gulp-jshint');
 const mochaPhantomJS = require('gulp-mocha-phantomjs');
 
@@ -87,14 +86,6 @@ gulp.task('build-css', css.bind(null, false));
 
 gulp.task('optimize-css', css.bind(null, true));
 
-gulp.task('jscs', function() {
-    gutil.log("JSCS the files...." + '\n');
-    var lintFilter = filter(["**", "!config.js", "!map/us-counties.js", "!map/us-states.js", "!map/countries.js"]);
-    return gulp.src(cfg.src + '/**/*.js')
-        .pipe(jscs())
-    ;
-});
-
 gulp.task('lint', function () {
     var lintFilter = filter(["**", "!config.js", "!map/us-counties.js", "!map/us-states.js", "!map/countries.js"]);
     return gulp.src(cfg.src + '/**/*.js')
@@ -107,8 +98,8 @@ gulp.task('lint', function () {
 
 gulp.task('unitTest', function () {
     return gulp
-        .src(cfg.test + '/*.html')  //  This will fail if any HTML file has a BOM.
-        .pipe(mochaPhantomJS({ reporter: 'spec' }))
+        .src(cfg.test + '/oop.html')  //  This will fail if any HTML file has a BOM.
+        .pipe(mochaPhantomJS({ reporter: 'dot' }))
     ;
 });
 

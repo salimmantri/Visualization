@@ -52,6 +52,7 @@
         }
     }
     Widget.prototype._class = " common_Widget";
+    Widget.prototype.__meta_events = {};
 
     Widget.prototype.ieVersion = (function () {
         var ua = navigator.userAgent, tem,
@@ -146,12 +147,36 @@
         }
     };
 
+    Widget.prototype.overrides = function (id, func) {
+        var prototype = this;
+        if (prototype[id] === undefined) {
+            throw "Overrides:  Method '" + id + "' does not exist.";
+        } else {
+            var context = prototype;
+            var origFunc = prototype[id];
+            prototype[id] = function () {
+                var tmp = window.__super;
+                window.__super = function () {
+                    var tmp = window.__super;
+                    delete (window.__super);
+                    var retVal = origFunc.apply(this, arguments);
+                    window.__super = tmp;
+                    return retVal;
+                };
+                var retVal = func.apply(this, arguments);
+                window.__super = tmp;
+                return retVal;
+            }
+        }
+    };
+
     // Serialization  ---
     Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
-        if (this["__meta_" + id] !== undefined) {
+        var prototype = this;
+        if (prototype["__meta_" + id] !== undefined) {
             throw id + " is already published.";
         }
-        this["__meta_" + id] = {
+        prototype["__meta_" + id] = {
             id: id,
             type: type,
             defaultValue: defaultValue,
@@ -159,7 +184,7 @@
             set: set,
             ext: ext || {}
         };
-        this[id] = function (_) {
+        prototype[id] = function (_) {
             var isPrototype = this._id === undefined;
             if (!arguments.length) {
                 return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
@@ -203,41 +228,46 @@
             }
             return this;
         };
-        this[id + "_modified"] = function () {
+        prototype[id + "_modified"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 return this["__meta_" + id].defaultValue !== defaultValue;
             }
             return this["__prop_" + id] !== undefined;
         };
-        this[id + "_reset"] = function () {
+        prototype[id + "_reset"] = function () {
             this["__prop_" + id] = undefined;
         };
-        this["__prop_" + id] = undefined;
+        prototype["__prop_" + id] = undefined;
+        return {
+            override: function (func) { prototype.overrides(id, func); }
+        };
     };
 
     Widget.prototype.publishWidget = function (prefix, WidgetType, id) {
+        var prototype = this;
         for (var key in WidgetType.prototype) {
             if (key.indexOf("__meta") === 0) {
                 var publishItem = WidgetType.prototype[key];
-                this.publishProxy(prefix + "__prop_" + publishItem.id, id, publishItem.method || publishItem.id);
+                prototype.publishProxy(prefix + "__prop_" + publishItem.id, id, publishItem.method || publishItem.id);
             }
         }
     };
 
     Widget.prototype.publishProxy = function (id, proxy, method, defaultValue) {
+        var prototype = this;
         method = method || id;
-        if (this["__meta_" + id] !== undefined) {
+        if (prototype["__meta_" + id] !== undefined) {
             throw id + " is already published.";
         }
-        this["__meta_" + id] = {
+        prototype["__meta_" + id] = {
             id: id,
             type: "proxy",
             proxy: proxy,
             method: method,
             defaultValue: defaultValue
         };
-        this[id] = function (_) {
+        prototype[id] = function (_) {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default value of proxied properties is not supported.";
@@ -250,19 +280,22 @@
             }
             return this;
         };
-        this[id + "_modified"] = function () {
+        prototype[id + "_modified"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default values of proxied properties is not supported.";
             }
             return this[proxy][method + "_modified"]() && (!defaultValue || this[proxy][method]() !== defaultValue);
         };
-        this[id + "_reset"] = function () {
+        prototype[id + "_reset"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default values of proxied properties is not supported.";
             }
             this[proxy][method + "_reset"]();
+        };
+        return {
+            override: function (func) { prototype.overrides(id, func); }
         };
     };
 
@@ -289,19 +322,62 @@
     };
 
     //  Events  ---
-    Widget.prototype.on = function (eventID, func, stopPropagation) {
-        if (this[eventID] === undefined) {
-            throw "Method:  " + eventID + " does not exist.";
+    Widget.prototype.event = function (id, func) {
+        var prototype = this;
+        if (prototype["__event_" + id] === undefined) {
+            prototype["__event_" + id] = function () {
+                if (typeof this[id] === "function" &&
+                    (id === "click" || id === "submit" || id === "clear")) {
+                    console.log("Deprecated (Legacy Event):  " + id);
+                    this[id].apply(this, arguments);
+                } else {
+                    try {
+                        console.log("Event:  " + id + "(" + JSON.stringify(arguments) + ")")
+                    } catch (e) {
+                        console.log("Event:  " + id)
+                    }
+                }
+            };
         }
-        var origFunc = this[eventID];
-        this[eventID] = function () {
-            if (stopPropagation) {
-                d3.event.stopPropagation();
-            } else {
-                origFunc.apply(this, arguments);
-            }
-            func.apply(this, arguments);
+        if (func) {
+            prototype.overrides("__event_" + id, func);
+        }
+        return {
+            override: function (func) { prototype.overrides("__event_" + id, func); }
         };
+    };
+
+    Widget.prototype.eventExists = function (id) {
+        return this["__event_" + id];
+    };
+
+    Widget.prototype.dispatch = function (id) {
+        if (this["__event_" + id] === undefined) {
+            throw "Event:  " + id + " does not exist.";
+        } else if (id) {
+            for (var i = 1; i < arguments.length; ++i) {
+                arguments[i - 1] = arguments[i];
+            }
+            delete arguments[--arguments.length];
+            this["__event_" + id].apply(this, arguments);
+        }
+        return this;
+    };
+
+    Widget.prototype.on = function (id, func, stopPropagation) {
+        if (this["__event_" + id] === undefined) {
+            throw "Event:  " + id + " does not exist.";
+        }
+        if (func) {
+            this.overrides("__event_" + id, function () {
+                if (stopPropagation) {
+                    d3.event.stopPropagation();
+                } else {
+                    __super.apply(this, arguments);
+                }
+                func.apply(this, arguments);
+            });
+        }
         return this;
     };
 

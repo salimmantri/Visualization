@@ -33,6 +33,8 @@
 
     Pie.prototype.publish("paletteID", "default", "set", "Palette ID", Pie.prototype._palette.switch(),{tags:['Basic','Shared']});
 
+    Pie.prototype.event("click");
+
     Pie.prototype.size = function (_) {
         var retVal = SVGWidget.prototype.size.apply(this, arguments);
         if (arguments.length) {
@@ -76,7 +78,7 @@
             .attr("class", "arc")
             .attr("opacity", 0)
             .on("click", function (d) {
-                context.click(context.rowToObj(d.data), context._columns[1]);
+                context.dispatch("click", context.rowToObj(d.data), context._columns[1]);
             })
             .each(function (d) {
                 var element = d3.select(this);
