@@ -23,8 +23,45 @@
         root.common_Widget = factory(root.d3);
     }
 }(this, function (d3) {
+    function Class() {
+    }
+    Class.prototype.__extend = function (constructor) {
+        var __Class = this.constructor;
+        var Extended = function () {
+            __Class.apply(this, arguments);
+            if (constructor) {
+                constructor.apply(this, arguments)
+            };
+        }
+        Extended.prototype = Object.create(__Class.prototype);
+        Extended.prototype.constructor = Extended;
+        return Extended;
+    };
+    Class.prototype.__proxy = function (id, func) {
+        var __Class = this.constructor;
+        if (__Class.prototype[id] === undefined) {
+            throw "__proxy:  Method '" + id + "' does not exist.";
+        } else {
+            var origFunc = __Class.prototype[id];
+            __Class.prototype[id] = function () {
+                var tmp = window.__proxy;
+                window.__proxy = function () {
+                    var tmp = window.__proxy;
+                    delete window.__proxy;
+                    var retVal = origFunc.apply(this, arguments);
+                    window.__proxy = tmp;
+                    return retVal;
+                };
+                var retVal = func.apply(this, arguments);
+                window.__proxy = tmp;
+                return retVal;
+            }
+        }
+        return this;
+    };
+
     var widgetID = 0;
-    function Widget() {
+    var Widget = Class.prototype.__extend(function () {
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
 
@@ -50,7 +87,7 @@
             }
             window.g_all[this._id] = this;
         }
-    }
+    });
     Widget.prototype._class = " common_Widget";
 
     Widget.prototype.ieVersion = (function () {
@@ -146,28 +183,6 @@
         }
     };
 
-    Widget.prototype.overrides = function (id, func) {
-        var prototype = this;
-        if (prototype[id] === undefined) {
-            throw "Overrides:  Method '" + id + "' does not exist.";
-        } else {
-            var origFunc = prototype[id];
-            prototype.__proto__[id] = function () {
-                var tmp = window.__super;
-                window.__super = function () {
-                    var tmp = window.__super;
-                    delete (window.__super);
-                    var retVal = origFunc.apply(this, arguments);
-                    window.__super = tmp;
-                    return retVal;
-                };
-                var retVal = func.apply(this, arguments);
-                window.__super = tmp;
-                return retVal;
-            }
-        }
-    };
-
     // Serialization  ---
     Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
         var prototype = this;
@@ -238,7 +253,7 @@
         };
         prototype["__prop_" + id] = undefined;
         return {
-            override: function (func) { prototype.overrides(id, func); }
+            __proxy: function (func) { prototype.__proxy(id, func); }
         };
     };
 
@@ -293,7 +308,7 @@
             this[proxy][method + "_reset"]();
         };
         return {
-            override: function (func) { prototype.overrides(id, func); }
+            __proxy: function (func) { prototype.__proxy(id, func); }
         };
     };
 
@@ -338,10 +353,10 @@
             };
         }
         if (func) {
-            prototype.overrides("__event_" + id, func);
+            prototype.__proxy("__event_" + id, func);
         }
         return {
-            override: function (func) { prototype.overrides("__event_" + id, func); }
+            __proxy: function (func) { prototype.__proxy("__event_" + id, func); }
         };
     };
 
@@ -367,11 +382,11 @@
             throw "Event:  " + id + " does not exist.";
         }
         if (func) {
-            this.overrides("__event_" + id, function () {
+            this.__proxy("__event_" + id, function () {
                 if (stopPropagation) {
                     d3.event.stopPropagation();
                 } else {
-                    __super.apply(this, arguments);
+                    __proxy.apply(this, arguments);
                 }
                 func.apply(this, arguments);
             });

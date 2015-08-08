@@ -1,40 +1,107 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Mocha</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
-    </head>
-    <body>
-        <script src="../node_modules/should/should.js"></script>
-        <script src="../node_modules/mocha/mocha.js"></script>
-        <script>mocha.setup('bdd')</script>
+<head>
+    <title>HPCC Visualization Unit Tests</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+</head>
+<body>
+    <div id="mocha"></div>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
 
-        <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
-        <script src="../src/config.js"></script>
-        <script>
-            describe('AMD Load', function () {
-                var widgets = ["src/common/TextBox", "src/common/Surface"];
-                widgets.forEach(function (path) {
-                    it(path, function (done) {
-                        require([path], function (Widget) {
-                            true.should.equal(typeof Widget === "function");
-                            done();
-                        });
-                    });
-                });
-                it('Missing File', function (done) {
-                    require(["src/common/TextBoxXXX"], function (TextBox) {
-                    }, function (err) {
-                        done();
-                    });
-                });
-            });
-        </script>
+    <script src="../bower_components/requirejs/require.js"></script>
+    <script src="../src/config.js"></script>
+    <script>
+        mocha.setup('bdd');
+        var assert = chai.assert;
+        var allWidgets = [
+            "src/common/FAChar",
+            "src/common/Icon",
+            "src/common/List",
+            "src/common/Menu",
+            "src/common/ResizeSurface",
+            "src/common/Shape",
+            "src/common/Surface",
+            "src/common/Text",
+            "src/common/TextBox",
 
-        <script>
+            "src/chart/Area",
+            "src/chart/Bubble",
+            "src/chart/Column",
+            "src/chart/Line",
+            "src/chart/MultiChart",
+            "src/chart/MultiChartSurface",
+            "src/chart/Pie",
+            "src/chart/Scatter",
+            "src/chart/Step",
+            "src/chart/Summary",
+
+            "src/form/Form",
+            "src/form/Input",
+            "src/form/Slider",
+
+            "src/map/ChoroplethCounties",
+            "src/map/ChoroplethCountries",
+            "src/map/ChoroplethStates",
+            "src/map/GMap",
+
+            "src/tree/CirclePacking",
+            "src/tree/Dendrogram",
+            "src/tree/SunburstPartition",
+
+            "src/graph/Edge",
+            "src/graph/Graph",
+            "src/graph/Vertex",
+
+            "src/other/MorphText",
+            "src/other/Table",
+            "src/other/WordCloud",
+
+            "src/marshaller/HTML",
+            "src/marshaller/Graph",
+
+            "src/layout/Surface",
+            "src/layout/Cell",
+            "src/layout/Grid",
+            "src/layout/Border",
+
+            "src/c3chart/Area",
+            "src/c3chart/Bar",
+            "src/c3chart/Column",
+            "src/c3chart/Donut",
+            "src/c3chart/Gauge",
+            "src/c3chart/Line",
+            "src/c3chart/Pie",
+            "src/c3chart/Scatter",
+            "src/c3chart/Step",
+
+            "src/google/Area",
+            "src/google/Bar",
+            "src/google/Column",
+            "src/google/Line",
+            "src/google/Pie",
+            "src/google/Scatter",
+            "src/google/Timeline",
+            "src/google/TreeMap",
+
+            "src/amchart/Area",
+            "src/amchart/Bar",
+            "src/amchart/Bubble",
+            "src/amchart/Candle",
+            "src/amchart/FloatingColumn",
+            "src/amchart/Funnel",
+            "src/amchart/Gauge",
+            "src/amchart/Line",
+            "src/amchart/Pie",
+            "src/amchart/Polar",
+            "src/amchart/Pyramid",
+            "src/amchart/Scatter"
+        ]
+        require(["./oop", "./widgets"], function () {
             mocha.run();
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>

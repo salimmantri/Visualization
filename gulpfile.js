@@ -98,7 +98,7 @@ gulp.task('lint', function () {
 
 gulp.task('unitTest', function () {
     return gulp
-        .src(cfg.test + '/oop.html')  //  This will fail if any HTML file has a BOM.
+        .src(cfg.test + '/runner.html')  //  This will fail if any HTML file has a BOM.
         .pipe(mochaPhantomJS({ reporter: 'dot' }))
     ;
 });
