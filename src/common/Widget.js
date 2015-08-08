@@ -52,7 +52,6 @@
         }
     }
     Widget.prototype._class = " common_Widget";
-    Widget.prototype.__meta_events = {};
 
     Widget.prototype.ieVersion = (function () {
         var ua = navigator.userAgent, tem,
@@ -152,9 +151,8 @@
         if (prototype[id] === undefined) {
             throw "Overrides:  Method '" + id + "' does not exist.";
         } else {
-            var context = prototype;
             var origFunc = prototype[id];
-            prototype[id] = function () {
+            prototype.__proto__[id] = function () {
                 var tmp = window.__super;
                 window.__super = function () {
                     var tmp = window.__super;
