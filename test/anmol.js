@@ -1,6 +1,6 @@
 "use strict";
 define(["d3", "src/form/Slider", "src/common/Icon", "src/other/Table", "src/other/Paginator"], function (d3, Slider, Icon, Table, Paginator) {
-    describe("functionality tests for individual widgets", function () {
+    describe.skip("functionality tests for individual widgets", function () {
         this.timeout(10000);
 
         describe("Slider Tests", function () {

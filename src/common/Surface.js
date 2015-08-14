@@ -143,10 +143,10 @@
                 var el = context._surfaceButtons[idx] = d3.select(this)
                     .attr("class", "surface-button " + (button.class ? button.class : ""))
                     .attr("id", button.id)
-                    .style("padding", button.padding)
-                    .style("width", button.width)
-                    .style("height", button.height)
-                    .style("cursor","pointer")
+                    //.style("padding", button.padding)
+                    //.style("width", button.width)
+                    //.style("height", button.height)
+                    //.style("cursor","pointer")
                     .on("click", function(d) { context.click(d); });
                 if (button.font === "FontAwesome") {
                     el
@@ -238,13 +238,13 @@
                 .attr("transform", "translate(" + (leftMargin / 2) + ", " + (titleRegionHeight / 2 - topMargin / 2) +")")
                 .each(function (d) {
                     var padding = {
-                        left: 4,
-                        top: 4,
-                        right: 4,
-                        bottom: 4
+                        left: 0,
+                        top: 0,
+                        right: 1,
+                        bottom: 1
                     };
                     d
-                        .size({
+                        .resize({
                             width: width - xOffset - (padding.left + padding.right),
                             height: height - yOffset - (padding.top + padding.bottom)
                         })

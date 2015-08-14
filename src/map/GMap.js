@@ -53,13 +53,6 @@
     };
 
     GMap.prototype.data = function (_) {
-        if (arguments.length) {
-            this.graphData.nodeValues().forEach(function (item) {
-                if (item._marker) {
-                    item._marker.setMap(null);
-                }
-            });
-        }
         var retVal = Graph.prototype.data.apply(this, arguments);
         return retVal;
     };

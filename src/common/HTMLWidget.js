@@ -92,7 +92,6 @@
         return retVal;
     };
 
-    //  Properties  ---
     HTMLWidget.prototype.target = function (_) {
         if (!arguments.length) return this._target;
         if (this._target && _) {
@@ -144,6 +143,15 @@
             this.exit();
         }
         return this;
+    };
+
+    HTMLWidget.prototype.enter = function (size) {
+        var retVal = Widget.prototype.enter.apply(this, arguments);
+        this._parentElement
+            //.style("width", this._size.width + "px")
+            //.style("height", this._size.height + "px")
+        ;
+        return retVal;
     };
 
     HTMLWidget.prototype.postUpdate = function (domeNode, element) {
