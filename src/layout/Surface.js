@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "../chart/MultiChart", "css!./Surface", "css!font-awesome",], factory);
+        define(["d3", "../common/HTMLWidget", "../common/TextBox", "css!./Surface", "css!font-awesome", ], factory);
     } else {
-        root.layout_Surface = factory(root.d3, root.common_HTMLWidget, root.chart_MultiChart);
+        root.layout_Surface = factory(root.d3, root.common_HTMLWidget, root.common_TextBox);
     }
-}(this, function (d3, HTMLWidget, MultiChart) {
+}(this, function (d3, HTMLWidget, TextBox) {
     function Surface() {
         HTMLWidget.call(this);
 
@@ -17,30 +17,29 @@
     Surface.prototype.constructor = Surface;
     Surface.prototype._class += " layout_Surface";
 
-   Surface.prototype.publish("title", "", "string", "Title",null,{tags:["Intermediate"]});
-   Surface.prototype.publish("widget", null, "widget", "Widget",null,{tags:["Basic"]});
+    Surface.prototype.publish("title", "", "string", "Title",null,{tags:["Intermediate"]});
+    Surface.prototype.publish("widget", null, "widget", "Widget",null,{tags:["Basic"]});
    
-   Surface.prototype.publish("surfaceTitlePadding", null, "number", "Title Padding (px)",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceTitleFontSize", null, "number", "Title Font Size (px)",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceTitleFontColor", null, "html-color", "Title Font Color",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceTitleFontFamily", null, "string", "Title Font Family",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceTitleFontBold", true, "boolean", "Enable Bold Title Font",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceTitleBackgroundColor", null, "html-color", "Title Background Color",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitlePadding", null, "number", "Title Padding (px)",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleFontSize", null, "number", "Title Font Size (px)",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleFontColor", null, "html-color", "Title Font Color",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleFontFamily", null, "string", "Title Font Family",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleFontBold", true, "boolean", "Enable Bold Title Font",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleBackgroundColor", null, "html-color", "Title Background Color",null,{tags:["Basic"]});
 
-   Surface.prototype.publish("surfacePadding", null, "string", "Surface Padding (px)", null, { tags: ["Intermediate"] });
-   Surface.prototype.publish("surfaceBackgroundColor", null, "html-color", "Surface Background Color",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceBorderWidth", null, "number", "Surface Border Width (px)",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceBorderColor", null, "html-color", "Surface Border Color",null,{tags:["Basic"]});
-   Surface.prototype.publish("surfaceBorderRadius", null, "number", "Surface Border Radius (px)",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfacePadding", null, "string", "Surface Padding (px)", null, { tags: ["Intermediate"] });
+    Surface.prototype.publish("surfaceBackgroundColor", null, "html-color", "Surface Background Color",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceBorderWidth", null, "number", "Surface Border Width (px)",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceBorderColor", null, "html-color", "Surface Border Color",null,{tags:["Basic"]});
+    Surface.prototype.publish("surfaceBorderRadius", null, "number", "Surface Border Radius (px)",null,{tags:["Basic"]});
 
-   Surface.prototype.publish("surfaceTitleAlignment", "center", "set", "Title Alignment", ["left","right","center"],{tags:["Basic"]});
+    Surface.prototype.publish("surfaceTitleAlignment", "center", "set", "Title Alignment", ["left","right","center"],{tags:["Basic"]});
 
-   Surface.prototype.publish("buttonAnnotations", [], "array", "Button Array",null,{tags:["Private"]});
-
+    Surface.prototype.publish("buttonAnnotations", [], "array", "Button Array",null,{tags:["Private"]});
 
     Surface.prototype.testData = function () {
         this.title("ABC");
-        this.widget(new Surface().widget(new MultiChart().testData()));
+        this.widget(new Surface().widget(new TextBox().testData()));
 
         this.buttonAnnotations([
             {

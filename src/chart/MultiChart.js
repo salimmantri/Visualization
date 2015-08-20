@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "../api/INDChart", "require"], factory);
+        define(["d3", "../layout/Border", "../common/Text", "../api/INDChart", "require", "css!./MultiChart"], factory);
     } else {
-        root.chart_MultiChart = factory(root.d3, root.common_SVGWidget, root.api_INDChart, root.require);
+        root.chart_MultiChart = factory(root.d3, root.layout_Border, root.common_Text, root.api_INDChart, root.require);
     }
-}(this, function (d3, SVGWidget, INDChart, require) {
+}(this, function (d3, Border, Text, INDChart, require) {
     var _1DChartTypes = [
         { id: "SUMMARY", display: "Summary", widgetClass: "chart_Summary" },
         { id: "C3_GAUGE", display: "Gauge (C3)", widgetClass: "c3chart_Gauge" }
@@ -46,10 +46,8 @@
     var _allChartTypes = _1DChartTypes.concat(_2DChartTypes.concat(_NDChartTypes.concat(_anyChartTypes)));
 
     function MultiChart() {
-        SVGWidget.call(this);
+        Border.call(this);
         INDChart.call(this);
-
-        this.chart(null);
 
         this._1DChartTypes = _1DChartTypes;
         this._2DChartTypes = _2DChartTypes;
@@ -68,38 +66,44 @@
         //  Backward compatability until we roll our own BAR  ---
         this._allCharts["BAR"] = this._allCharts["COLUMN"];
     }
-    MultiChart.prototype = Object.create(SVGWidget.prototype);
+    MultiChart.prototype = Object.create(Border.prototype);
     MultiChart.prototype.constructor = MultiChart;
     MultiChart.prototype._class += " chart_MultiChart";
     MultiChart.prototype.implements(INDChart.prototype);
 
-    MultiChart.prototype.publish("chartType", "BUBBLE", "set", "Chart Type", _allChartTypes.map(function (item) { return item.id; }),{tags:["Basic"]});
-    MultiChart.prototype.publish("chart", null, "widget", "Chart",null,{tags:["Basic"]});
+    MultiChart.prototype.publish("chartType", "COLUMN", "set", "Chart Type", _allChartTypes.map(function (item) { return item.id; }), { tags: ["Basic"] });
+    MultiChart.prototype.publish("axisTitleHeight", 18, "string", "Axis Title Height", null, { tags: ["Basic"] });
+    MultiChart.prototype.publish("xAxisTitle", "X-Axis", "string", "X-Axis", null, { tags: ["Basic"] });
+    MultiChart.prototype.publish("yAxisTitle", "Y-Axis", "string", "Y-Axis", null, { tags: ["Basic"] });
+
+    MultiChart.prototype.testData = function () {
+        return INDChart.prototype.testData.apply(this, arguments);
+    };
 
     MultiChart.prototype.columns = function (_) {
-        var retVal = SVGWidget.prototype.columns.apply(this, arguments);
-        if (arguments.length && this.chart()) {
-            this.chart().columns(_);
+        var retVal = Border.prototype.columns.apply(this, arguments);
+        if (arguments.length && this.getContent("centerSection")) {
+            this.getContent("centerSection").columns(_);
         }
         return retVal;
     };
 
     MultiChart.prototype.data = function (_) {
-        var retVal = SVGWidget.prototype.data.apply(this, arguments);
-        if (arguments.length && this.chart()) {
-            this.chart().data(_);
+        var retVal = Border.prototype.data.apply(this, arguments);
+        if (arguments.length && this.getContent("centerSection")) {
+            this.getContent("centerSection").data(_);
         }
         return retVal;
     };
 
     MultiChart.prototype.hasOverlay = function () {
-        return this.chart() && this.chart().hasOverlay();
+        return this.getContent("centerSection") && this.getContent("centerSection").hasOverlay();
     };
 
     MultiChart.prototype.visible = function (_) {
-        if (!arguments.length) return this.chart() && this.chart().visible();
-        if (this.chart()) {
-            this.chart().visible(_);
+        if (!arguments.length) return this.getContent("centerSection") && this.getContent("centerSection").visible();
+        if (this.getContent("centerSection")) {
+            this.getContent("centerSection").visible(_);
         }
         return this;
     };
@@ -112,7 +116,7 @@
     };
 
     MultiChart.prototype.switchChart = function (callback) {
-        var oldContent = this.chart();
+        var oldContent = this.getContent("centerSection");
         var context = this;
         this.requireContent(this.chartType(), function (newContent) {
             if (newContent !== oldContent) {
@@ -122,17 +126,10 @@
                     .data(context._data)
                     .size(size)
                 ;
-                context.chart(newContent);
+                context.setContent("centerSection", newContent);
                 newContent.click = function (row, column, selected) {
                     context.click(row, column, selected);
                 };
-                if (oldContent) {
-                    oldContent
-                        .data([])
-                        .size({ width: 1, height: 1 })
-                        .render()
-                    ;
-                }
             }
             if (callback) {
                 callback(this);
@@ -140,50 +137,41 @@
         });
     };
 
-    MultiChart.prototype.update = function (domNode, element) {
-        SVGWidget.prototype.update.apply(this, arguments);
-        var content = element.selectAll(".multiChart").data(this.chart() ? [this.chart()] : [], function (d) { return d._id; });
-        content.enter().append("g")
-            .attr("class", "multiChart")
-            .each(function (d) {
-                d.target(this);
-            })
-        ;
-
-        var size = this.size();
-        content
-            .each(function (d) {
-                d
-                    .size(size)
-                    .render()
-                ;
-            })
-        ;
-
-        content.exit().transition()
-            .each(function (d) { d.target(null); })
-            .remove()
-        ;
-    };
-
-    MultiChart.prototype.exit = function (domNode, element) {
-        if (this.chart()) {
-            this.chart().target(null);
-        }
-        SVGWidget.prototype.exit.apply(this, arguments);
-    };
-
-
     MultiChart.prototype.render = function (callback) {
-        if (this.chartType() && (!this.chart() || (this.chart().classID() !== this._allCharts[this.chartType()].widgetClass))) {
+        if (this._prevXAxisTitle !== this.xAxisTitle()) {
+            if (!this.hasContent("bottomSection")) {
+                this.setContent("bottomSection", this.xAxisTitle() ? new Text() : null);
+            }
+            this.getContent("bottomSection").text(this.xAxisTitle());
+            this._prevXAxisTitle = this.xAxisTitle();
+        }
+        if (this._prevYAxisTitle !== this.yAxisTitle()) {
+            if (!this.hasContent("leftSection")) {
+                this.setContent("leftSection", this.yAxisTitle() ? new Text().rotation(-90) : null);
+            }
+            this.getContent("leftSection").text(this.yAxisTitle());
+            this._prevYAxisTitle = this.yAxisTitle();
+        }
+        if (this._prevAxisTitleHeight !== this.axisTitleHeight()) {
+            if (this.hasContent("bottomSection")) {
+                this.getContent("bottomSection").fontSize(this.axisTitleHeight());
+                this.bottomCellSize(this.axisTitleHeight());
+            }
+            if (this.hasContent("leftSection")) {
+                this.getContent("leftSection").fontSize(this.axisTitleHeight());
+                this.leftCellSize(this.axisTitleHeight());
+            }
+            this._prevAxisTitleHeight = this.axisTitleHeight();
+        }
+        if (this.chartType() && (!this.getContent("centerSection") || (this.getContent("centerSection").classID() !== this._allCharts[this.chartType()].widgetClass))) {
             var context = this;
             var args = arguments;
             this.switchChart(function () {
-                SVGWidget.prototype.render.apply(context, args);
+                Border.prototype.render.apply(context, args);
             });
             return this;
         }
-        return SVGWidget.prototype.render.apply(this, arguments);
+        return Border.prototype.render.apply(this, arguments);
     };
 
     return MultiChart;

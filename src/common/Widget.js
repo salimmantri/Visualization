@@ -20,8 +20,45 @@
         root.common_Widget = factory(root.d3);
     }
 }(this, function (d3) {
+    function Class() {
+    }
+    Class.prototype.__extend = function (constructor) {
+        var __Class = this.constructor;
+        var Extended = function () {
+            __Class.apply(this, arguments);
+            if (constructor) {
+                constructor.apply(this, arguments)
+            };
+        }
+        Extended.prototype = Object.create(__Class.prototype);
+        Extended.prototype.constructor = Extended;
+        return Extended;
+    };
+    Class.prototype.__proxy = function (id, func) {
+        var __Class = this.constructor;
+        if (__Class.prototype[id] === undefined) {
+            throw "__proxy:  Method '" + id + "' does not exist.";
+        } else {
+            var origFunc = __Class.prototype[id];
+            __Class.prototype[id] = function () {
+                var tmp = window.__proxy;
+                window.__proxy = function () {
+                    var tmp = window.__proxy;
+                    delete window.__proxy;
+                    var retVal = origFunc.apply(this, arguments);
+                    window.__proxy = tmp;
+                    return retVal;
+                };
+                var retVal = func.apply(this, arguments);
+                window.__proxy = tmp;
+                return retVal;
+            }
+        }
+        return this;
+    };
+
     var widgetID = 0;
-    function Widget() {
+    var Widget = Class.prototype.__extend(function () {
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
 
@@ -47,21 +84,21 @@
             }
             window.g_all[this._id] = this;
         }
-        if(window.__hpcc_theme){
+        if (window.__hpcc_theme) {
             var clsArr = this._class.trim().split(" ").reverse();
-            for(var i in clsArr){
-                if(typeof (window.__hpcc_theme[clsArr[i]]) !== "undefined"){
-                    for(var paramName in window.__hpcc_theme[clsArr[i]]){
-                        if(typeof (this[paramName]) === "function"){
+            for (var i in clsArr) {
+                if (typeof (window.__hpcc_theme[clsArr[i]]) !== "undefined") {
+                    for (var paramName in window.__hpcc_theme[clsArr[i]]) {
+                        if (typeof (this[paramName]) === "function") {
                             var proto = Object.getPrototypeOf(this);
-                            proto["__meta_"+paramName].trueDefaultValue = this[paramName]();
-                            proto["__meta_"+paramName].defaultValue = window.__hpcc_theme[clsArr[i]][paramName];
+                            proto["__meta_" + paramName].trueDefaultValue = this[paramName]();
+                            proto["__meta_" + paramName].defaultValue = window.__hpcc_theme[clsArr[i]][paramName];
                         }
                     }
                 }
             }
         }
-    }
+    });
     Widget.prototype._class = " common_Widget";
 
     Widget.prototype.ieVersion = (function () {
@@ -159,10 +196,11 @@
 
     // Serialization  ---
     Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
-        if (this["__meta_" + id] !== undefined) {
+        var prototype = this;
+        if (prototype["__meta_" + id] !== undefined) {
             throw id + " is already published.";
         }
-        this["__meta_" + id] = {
+        prototype["__meta_" + id] = {
             id: id,
             type: type,
             defaultValue: defaultValue,
@@ -170,7 +208,7 @@
             set: set,
             ext: ext || {}
         };
-        this[id] = function (_) {
+        prototype[id] = function (_) {
             var isPrototype = this._id === undefined;
             if (!arguments.length) {
                 return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
@@ -222,14 +260,14 @@
             }
             return this;
         };
-        this[id + "_modified"] = function () {
+        prototype[id + "_modified"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 return this["__meta_" + id].defaultValue !== defaultValue;
             }
             return this["__prop_" + id] !== undefined;
         };
-        this[id + "_reset"] = function () {
+        prototype[id + "_reset"] = function () {
             switch (type) {
                 case "widget":
                     if (this["__prop_" + id]) {
@@ -246,31 +284,36 @@
             }
             this["__prop_" + id] = undefined;
         };
-        this["__prop_" + id] = undefined;
+        prototype["__prop_" + id] = undefined;
+        return {
+            __proxy: function (func) { prototype.__proxy(id, func); }
+        };
     };
 
     Widget.prototype.publishWidget = function (prefix, WidgetType, id) {
+        var prototype = this;
         for (var key in WidgetType.prototype) {
             if (key.indexOf("__meta") === 0) {
                 var publishItem = WidgetType.prototype[key];
-                this.publishProxy(prefix + "__prop_" + publishItem.id, id, publishItem.method || publishItem.id);
+                prototype.publishProxy(prefix + "__prop_" + publishItem.id, id, publishItem.method || publishItem.id);
             }
         }
     };
 
     Widget.prototype.publishProxy = function (id, proxy, method, defaultValue) {
+        var prototype = this;
         method = method || id;
-        if (this["__meta_" + id] !== undefined) {
+        if (prototype["__meta_" + id] !== undefined) {
             throw id + " is already published.";
         }
-        this["__meta_" + id] = {
+        prototype["__meta_" + id] = {
             id: id,
             type: "proxy",
             proxy: proxy,
             method: method,
             defaultValue: defaultValue
         };
-        this[id] = function (_) {
+        prototype[id] = function (_) {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default value of proxied properties is not supported.";
@@ -283,19 +326,22 @@
             }
             return this;
         };
-        this[id + "_modified"] = function () {
+        prototype[id + "_modified"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default values of proxied properties is not supported.";
             }
             return this[proxy][method + "_modified"]() && (!defaultValue || this[proxy][method]() !== defaultValue);
         };
-        this[id + "_reset"] = function () {
+        prototype[id + "_reset"] = function () {
             var isPrototype = this._id === undefined;
             if (isPrototype) {
                 throw "Setting default values of proxied properties is not supported.";
             }
             this[proxy][method + "_reset"]();
+        };
+        return {
+            __proxy: function (func) { prototype.__proxy(id, func); }
         };
     };
 

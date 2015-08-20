@@ -16,6 +16,7 @@
         this.transition = new Transition(this);
 
         this._drawStartPos = "center";
+        this._rotation = 0;
     }
     SVGWidget.prototype = Object.create(Widget.prototype);
     SVGWidget.prototype.constructor = SVGWidget;
@@ -118,6 +119,13 @@
         return this;
     };
 
+    SVGWidget.prototype.rotation = function (_) {
+        if (!arguments.length) return this._rotation;
+        this._rotation = _;
+        return this;
+    };
+
+
     SVGWidget.prototype.enter = function (domeNode, element) {
         Widget.prototype.enter.apply(this, arguments);
     };
@@ -129,9 +137,9 @@
     SVGWidget.prototype.postUpdate = function (domeNode, element) {
         Widget.prototype.postUpdate.apply(this, arguments);
         if (this._drawStartPos === "origin" && this._target instanceof SVGElement) {
-            this._element.attr("transform", "translate(" + (this._pos.x - this._size.width / 2) + "," + (this._pos.y - this._size.height / 2) + ")scale(" + this._scale + ")");
+            this._element.attr("transform", "translate(" + (this._pos.x - this._size.width / 2) + "," + (this._pos.y - this._size.height / 2) + ")scale(" + this._scale + ")rotate(" + this._rotation + ")");
         } else {
-            this._element.attr("transform", "translate(" + this._pos.x + "," + this._pos.y + ")scale(" + this._scale + ")");
+            this._element.attr("transform", "translate(" + this._pos.x + "," + this._pos.y + ")scale(" + this._scale + ")rotate(" + this._rotation + ")");
         }
     };
 

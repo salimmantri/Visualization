@@ -26,7 +26,7 @@
     PropertyEditor.prototype.publish("sectionTitle", "", "string", "Section Title",null,{tags:["Private"]});
     PropertyEditor.prototype.publish("defaultCollapsed", false, "boolean", "Default Collapsed Sections",null,{tags:["Private"]});
     PropertyEditor.prototype.publish("collapsibleSections", true, "boolean", "Collapsible Sections",null,{tags:["Private"]});
-    PropertyEditor.prototype.publish("excludeTags", ["Advanced","Private"], "array", "Array of publish parameter tags to exclude from PropertEditor",null,{tags:["Private"]});
+    PropertyEditor.prototype.publish("excludeTags", ["Advanced","Private"], "array", "Array of publish parameter tags to exclude from PropertEditor",null,{tags:["Basic"]});
 
     PropertyEditor.prototype.show_settings = function (_) {
         if (!arguments.length) {
