@@ -24,6 +24,7 @@ require.config({
         "amcharts.serial": "bower_components/amcharts/dist/amcharts/serial",
         "amcharts.xy": "bower_components/amcharts/dist/amcharts/xy",
         "amcharts.plugins.responsive": "bower_components/amcharts/dist/amcharts/plugins/responsive/responsive",
+        "simpleheat": "bower_components/simpleheat/simpleheat",
 
         "src": "./src"
     },
@@ -69,6 +70,12 @@ require.config({
             init: function() {
                 AmCharts.isReady = true;
             }
+        },
+        "simpleheat": {
+            exports: "simpleheat",
+            init: function() {
+                simpleheat.isReady = true;
+            }
         }
     }
 });
@@ -98,6 +105,7 @@ if (window.location.hostname === "rawgit.com") {
             "amcharts.serial": "http://rawgit.com/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/serial",
             "amcharts.xy": "http://rawgit.com/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/xy",
             "amcharts.plugins.responsive": "http://rawgit.com/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/plugins/responsive/responsive",
+            "simpleheat": "https://raw.githubusercontent.com/mourner/simpleheat/gh-pages/simpleheat.js",
 
             "src": "./src"
         }

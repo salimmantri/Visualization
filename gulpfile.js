@@ -27,7 +27,7 @@ const cfg = {
   prefix: "hpcc-viz"
 };
 
-const libs = ["d3", "c3", "colorbrewer", "dagre", "topojson", "d3.layout.cloud", "font-awesome", "amcharts", "amcharts.funnel", "amcharts.gauge", "amcharts.pie", "amcharts.radar", "amcharts.serial", "amcharts.xy", "amcharts.plugins.responsive"];
+const libs = ["d3", "c3", "colorbrewer", "dagre", "topojson", "d3.layout.cloud", "font-awesome", "amcharts", "amcharts.funnel", "amcharts.gauge", "amcharts.pie", "amcharts.radar", "amcharts.serial", "amcharts.xy", "amcharts.plugins.responsive", "simpleheat"];
 const bundles = ["common", "api", "chart", "c3chart", "google", "tree", "other", "layout", "graph", "map", "marshaller", "amchart"];  //  Order is important ---
 
 function buildModule(module, cb) {
