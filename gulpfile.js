@@ -16,19 +16,22 @@ const bump = require('gulp-bump');
 const argv = require('yargs').argv;
 const filter = require('gulp-filter');
 const tag_version = require('gulp-tag-version');
-const jscs = require('gulp-jscs');
 const jshint = require('gulp-jshint');
+const jscs = require('gulp-jscs');
+const mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 // Consts
 const cfg = {
   src: 'src',
   dist: 'dist',
   distamd: 'dist-amd',
+  test: 'test',
   prefix: "hpcc-viz"
 };
 
-const libs = ["d3", "c3", "colorbrewer", "dagre", "topojson", "d3.layout.cloud", "font-awesome", "amcharts", "amcharts.funnel", "amcharts.gauge", "amcharts.pie", "amcharts.radar", "amcharts.serial", "amcharts.xy", "amcharts.plugins.responsive", "simpleheat"];
-const bundles = ["common", "api", "chart", "c3chart", "google", "tree", "other", "layout", "graph", "map", "marshaller", "amchart"];  //  Order is important ---
+const libs = ["d3", "c3", "colorbrewer", "dagre", "topojson", "d3-cloud", "font-awesome", "amcharts", "amcharts.funnel", "amcharts.gauge", "amcharts.pie", "amcharts.radar", "amcharts.serial", "amcharts.xy", "amcharts.plugins.responsive", "simpleheat"];
+const bundles = ["common", "api", "chart", "c3chart", "google", "amchart", "tree", "form", "other", "graph", "map", "layout", "marshaller"];  //  Order is important ---
+const lintFilter = filter(["**", "!config.js", "!map/us-counties.js", "!map/us-states.js", "!map/countries.js"]);
 
 function buildModule(module, cb) {
   gutil.log('Building ' + module + '...')
@@ -73,7 +76,7 @@ function css(minify) {
 }
 
 function optimize(opts, cb) {
-  //opts.optimize = "none";
+  opts.optimize = "none";
   rjs.optimize(opts,
     function (text) { cb(null, text) },
     cb
@@ -85,21 +88,32 @@ gulp.task('build-css', css.bind(null, false));
 
 gulp.task('optimize-css', css.bind(null, true));
 
-gulp.task('jscs', function() {
-    gutil.log("JSCS the files...." + '\n');
-    var lintFilter = filter(["**", "!config.js", "!map/us-counties.js", "!map/us-states.js", "!map/countries.js"]);
-    return gulp.src(cfg.src + '/**/*.js')
-        .pipe(jscs())
-    ;
-});
-
 gulp.task('lint', function () {
-    var lintFilter = filter(["**", "!config.js", "!map/us-counties.js", "!map/us-states.js", "!map/countries.js"]);
     return gulp.src(cfg.src + '/**/*.js')
         .pipe(lintFilter)
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'))
         .pipe(jshint.reporter('fail'))
+    ;
+});
+
+gulp.task('jscs', function () {
+    return gulp.src(cfg.src + '/**/*.js')
+        .pipe(lintFilter)
+        .pipe(jscs())
+    ;
+});
+
+gulp.task('unitTest', function () {
+    return gulp.src(cfg.test + '/runner.html')
+        .pipe(mochaPhantomJS({ reporter: 'dot' }))    //  This will fail if any HTML file has a BOM.
+    ;
+});
+
+gulp.task("unitTestBuild", function () {
+    return gulp
+        .src(cfg.test + '/runner_build.html')
+        .pipe(mochaPhantomJS({ reporter: 'dot' }))    //  This will fail if any HTML file has a BOM.
     ;
 });
 
@@ -132,7 +146,7 @@ const amd_modules = bundles.map(function (bundle, idx) {
     var include = getJSFiles("src/" + bundle, "src").filter(function (item) { return excludeShallow.indexOf(item) < 0; });
     switch (bundle) {
         case "common":
-            include = ["d3", "d3.layout.cloud"].concat(include);
+            include = ["d3"].concat(include);
             break;
     }
     amd_bundles["src/" + name] = include;
@@ -160,7 +174,7 @@ gulp.task("build-amd-src", function (done) {
     optimize(opts, done);
 });
 
-gulp.task("build-amd", ["build-amd-src"], function (done) {
+gulp.task("build-amd", ["build-amd-src","copy-amchart-images"], function (done) {
     var requireConfig = {
         bundles: amd_bundles
     };
@@ -223,4 +237,9 @@ gulp.task("tag-release", ["tag"], function (cb) {
     var version = require("./package.json").version;
     var target = argv.upstream ? "upstream" : "origin"
     git.push(target, 'v' + version, cb);
+});
+
+gulp.task("copy-amchart-images", function() {
+   gulp.src("./bower_components/amcharts/dist/amcharts/images/**/*.*")
+   .pipe(gulp.dest(cfg.distamd + "/" + "img/amcharts"));
 });

@@ -15,9 +15,11 @@
 
         this.transition = new Transition(this);
 
-        this._drawStartPos = "center"; 
+        this._drawStartPos = "center";
     }
     SVGWidget.prototype = Object.create(Widget.prototype);
+    SVGWidget.prototype.constructor = SVGWidget;
+    SVGWidget.prototype._class += " common_SVGWidget";
 
     //  Properties  ---
     SVGWidget.prototype.move = function (_, transitionDuration) {
@@ -77,7 +79,7 @@
         this._target = _;
 
         //  Target is a DOM Node ID ---
-        if (typeof (this._target) === 'string' || this._target instanceof String) {
+        if (typeof (this._target) === "string" || this._target instanceof String) {
             this._target = document.getElementById(this._target);
         }
 
@@ -87,6 +89,7 @@
             if (!this._parentWidget || this._parentWidget._id === this._id) {
                 this._parentWidget = this.locateParentWidget(this._target.parentNode);
             }
+            this._parentOverlay = this.locateOverlayNode();
         } else if (this._target) {
             //  Target is a DOM Node, so create a SVG Element  ---
             this._parentRelativeDiv = d3.select(this._target).append("div")
@@ -115,15 +118,24 @@
         return this;
     };
 
-    SVGWidget.prototype.enter = function (domeNode, element, d) {
+    SVGWidget.prototype.enter = function (domeNode, element) {
         Widget.prototype.enter.apply(this, arguments);
     };
 
-    SVGWidget.prototype.update = function (domeNode, element, d) {
+    SVGWidget.prototype.update = function (domeNode, element) {
         Widget.prototype.update.apply(this, arguments);
     };
 
-    SVGWidget.prototype.exit = function (domeNode, element, d) {
+    SVGWidget.prototype.postUpdate = function (domeNode, element) {
+        Widget.prototype.postUpdate.apply(this, arguments);
+        if (this._drawStartPos === "origin" && this._target instanceof SVGElement) {
+            this._element.attr("transform", "translate(" + (this._pos.x - this._size.width / 2) + "," + (this._pos.y - this._size.height / 2) + ")scale(" + this._scale + ")");
+        } else {
+            this._element.attr("transform", "translate(" + this._pos.x + "," + this._pos.y + ")scale(" + this._scale + ")");
+        }
+    };
+
+    SVGWidget.prototype.exit = function (domeNode, element) {
         if (this._parentRelativeDiv) {
             this._parentOverlay.remove();
             this._parentElement.remove();
@@ -294,7 +306,7 @@
         return Math.sqrt((pointA.x - pointB.x) * (pointA.x - pointB.x) + (pointA.y - pointB.y) * (pointA.y - pointB.y));
     };
 
-    //  IE Fixers  ---    
+    //  IE Fixers  ---
     SVGWidget.prototype._pushMarkers = function (element, d) {
         if (this.svgMarkerGlitch) {
             element = element || this._element;

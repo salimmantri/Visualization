@@ -12,6 +12,7 @@
         this._tag = "form";
     }
     Form.prototype = Object.create(HTMLWidget.prototype);
+    Form.prototype.constructor = Form;
     Form.prototype._class += " form_Form";
 
     Form.prototype.publish("validate", true, "boolean", "Enable/Disable input validation");
@@ -28,11 +29,6 @@
                     .type("textbox")
                     .validate("^[A-Za-z0-9]+$")
                     .value("SomeString123"),
-                new Input()
-                    .name("button-test")
-                    .label("Button Test")
-                    .type("button")
-                    .value("Button Text"),
                 new Input()
                     .name("number-test")
                     .label("Number Test")
@@ -191,12 +187,16 @@
                         context.clear();
                     }, true)
         ];
-        controls.reverse().forEach(function (w) {
-            var controlNode = context.btntd
-                .append("div")
-                .style("float", "right")
+        var rightJust = context.btntd
+            .append("div")
+            .style("float", "right")
+        ;
+        controls.forEach(function (w) {
+            var leftJust = rightJust
+                .append("span")
+                .style("float", "left")
             ;
-            w.target(controlNode.node()).render();
+            w.target(leftJust.node()).render();
         });
     };
 

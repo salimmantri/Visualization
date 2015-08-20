@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -16,6 +16,10 @@
     </style>
     <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
     <script src="../src/config.js"></script>
+    <!--  Uncomment for github
+    <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
+    <script src="../src/config.js"></script>
+    -->
     <!--  Uncomment to develop
     <script src="../bower_components/requirejs/require.js"></script>
     <script src="../src/config.js"></script>
@@ -68,6 +72,7 @@
                             <option value="src/google/Scatter">Google Scatter</option>
                             <option value="src/google/Timeline">Google Timeline</option>
                             <option value="src/google/TreeMap">Google TreeMap</option>
+                            <option value="src/chart/Summary">Summary</option>
                             <option value="src/chart/Pie">Pie</option>
                             <option value="src/chart/Bubble">Bubble</option>
                             <option value="src/chart/Column">Column</option>
@@ -87,13 +92,18 @@
                             <option value="src/graph/Graph">Graph</option>
                             <option value="src/graph/Vertex">Graph Vertex</option>
                             <option value="src/other/Table">Table</option>
+                            <option value="src/other/WordCloud">Word Cloud</option>
                             <option value="src/form/Slider">Slider</option>
                             <option value="src/marshaller/HTML">HTML Marshaller</option>
                             <option value="src/marshaller/Graph">Graph Marshaller</option>
+                            <option value="src/layout/AbsoluteSurface">AbsoluteSurface Layout</option>
                             <option value="src/layout/Surface">Surface Layout</option>
                             <option value="src/layout/Cell">Cell Layout</option>
                             <option value="src/layout/Grid">Grid Layout</option>
                             <option value="src/layout/Border">Border Layout</option>
+                            <option value="src/layout/Layered">Layered Layout</option>
+                            <option value="src/layout/Tabbed">Tabbed Layout</option>
+                            <option value="src/layout/Popup">Popup Layout</option>
                             <option value="src/amchart/Area">AmChart Area</option>
                             <option value="src/amchart/Bar">AmChart Bar</option>
                             <option value="src/amchart/Bubble">AmChart Bubble</option>
@@ -109,6 +119,16 @@
                         </select>
                     </li>
                     <li>
+                        <prompt style="margin-left:8px;">Theme:</prompt>
+                        <select id="themeSelect" onchange="testTheme(this.value);">
+                            <option value="Default">Default</option>
+                            <option value="LN Red/Grey">LN Red/Grey</option>
+                            <option value="Green/Light-Grey">Green/Light-Grey</option>
+                            <option value="Blue-Bordered">Blue-Bordered</option>
+                            <option value="Red-Bordered">Red-Bordered</option>
+                        </select>
+                    </li>
+                    <li>
                         <label for="showProperties">&nbsp;&nbsp;Properties:</label>
                         <input id="showProperties" type="checkbox" checked onchange="showProperties(this.checked);" />
                     </li>
@@ -120,6 +140,10 @@
                         <label for="showSerialization">&nbsp;&nbsp;S. Text:</label>
                         <input id="showSerializationText" type="checkbox" onchange="showSerializationText(this.checked);" />
                     </li>
+                    <li>
+                        <label for="showThemeText">&nbsp;&nbsp;Theme Text:</label>
+                        <input id="showThemeText" type="checkbox" onchange="showThemeText(this.checked);" />
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -128,14 +152,37 @@
     </div>
     <script>
         var def = window.location.search.split("?")[1];
+        var widgetPath = "";
+        var params = {};
         if (def) {
-            document.getElementById("widgetSelect").value = def;
+            def.split("&").forEach(function (param, idx) {
+                var paramParts = param.split("=");
+                if (paramParts[0] === "hpcc_debug") {
+                    window.__hpcc_debug = paramParts[1];
+                } else if (widgetPath === "" && paramParts.length === 1) {
+                    widgetPath = decodeURIComponent(paramParts[0]);
+                } else {
+                    params[decodeURIComponent(paramParts[0])] = decodeURIComponent(paramParts[1]);
+                }
+            });
+            if (widgetPath) {
+                document.getElementById("widgetSelect").value = widgetPath;
+            }
         }
+        var themeSelectObj = {
+            'Default':{},
+            'LN Red/Grey':{"common_Widget":{"surfaceTitleFontSize":16,"surfaceTitleFontColor":"#FAFAFA","surfaceTitleFontFamily":"PT Sans","surfaceTitleFontBold":false,"surfaceTitleBackgroundColor":"#ED1C24","surfacePadding":"null","surfaceBackgroundColor":"#FAFAFA","surfaceBorderWidth":1,"surfaceBorderColor":"#6D6E71","surfaceBorderRadius":4,"surfaceTitleAlignment":"center","paletteID":"Set1"}},
+            'Blue-Bordered':{"common_Widget":{"surfaceTitlePadding":0,"surfaceTitleFontSize":16,"surfaceTitleFontColor":"#5a6b92","surfaceTitleFontFamily":"'Courier New'","surfaceTitleFontBold":false,"surfaceTitleBackgroundColor":"transparent","surfacePadding":"null","surfaceBackgroundColor":"transparent","surfaceBorderWidth":2,"surfaceBorderColor":"#5a6b92","surfaceBorderRadius":0,"surfaceTitleAlignment":"left","paletteID":"Dark2","axisFontSize":14,"axisFontFamily":"Tahoma","xAxisTitleFontFamily":"'Courier New'","yAxisTitleFontFamily":"'Courier New'","legendFontSize":14,"legendFontFamily":"Tahoma"}},
+            'Red-Bordered':{"common_Widget":{"surfaceTitleFontSize":19,"surfaceTitleFontColor":"rgb(237, 28, 36)","surfaceTitleFontFamily":"'Arial Black'","surfaceTitleBackgroundColor":"rgb(250, 250, 250)","surfacePadding":"null","surfaceBackgroundColor":"rgb(250, 250, 250)","surfaceBorderColor":"rgb(237, 28, 36)","paletteID":"BrBG","axisFontFamily":"'Arial Black'","xAxisTitleFontFamily":"'Arial Black'","xAxisTitleFontSize":19,"yAxisTitleFontFamily":"'Arial Black'","yAxisTitleFontSize":19,"legendFontFamily":"'Arial Black'"}},
+            'Green/Light-Grey':{"common_Widget":{"surfaceTitlePadding":0,"surfaceTitleFontSize":16,"surfaceTitleFontColor":"#4e4e4e","surfaceTitleFontFamily":"Tahoma","surfaceTitleFontBold":false,"surfaceTitleBackgroundColor":"#dbb593","surfacePadding":"null","surfaceBackgroundColor":"#e2e2dc","surfaceBorderWidth":0,"surfaceBorderColor":"#ffffff","surfaceBorderRadius":0,"surfaceTitleAlignment":"left","paletteID":"category10","axisFontSize":14,"axisFontFamily":"Tahoma","xAxisTitleFontFamily":"Tahoma","yAxisTitleFontFamily":"Tahoma","legendFontSize":14,"legendFontFamily":"Tahoma"}},
+        }
+        window.__hpcc_theme = themeSelectObj['Default'];
 
         var body = document.getElementById("body");
         var mainDiv = document.getElementById("main");
         var frame = null;
         var main = null;
+        var testTheme = null;
         var testWidget = null;
         var currWidget = null;
         var showProperties = null;
@@ -149,9 +196,13 @@
                 } else {
                     displaySerialization();
                     displaySerializationText();
+                    displayThemeText();
                 }
             }, 500);
             var serializationSurface = new Surface()
+            ;
+            var themeTextSurface = new Surface()
+                .id("testThemeJSON")
             ;
             var serializationTextSurface = new Surface()
                 .id("testJSON")
@@ -201,9 +252,25 @@
                 }
             }
 
-            testWidget = function (widgetPath) {
+            function displayThemeText(sourceWidget) {
+                if (document.getElementById("showThemeText").checked) {
+                    sourceWidget = sourceWidget || currWidget;
+                    var text = JSON.stringify(Persist.serializeThemeToObject(sourceWidget), null, "  ");
+                    d3.select("#testThemeJSON")
+                        .attr("class", "prettyprint")
+                        .text(text)
+                    ;
+                }
+            }
+
+            testWidget = function (widgetPath, params) {
                 require([widgetPath], function (Widget) {
                     currWidget = new Widget().testData();
+                    if (params) {
+                        for (var key in params) {
+                            currWidget[key](params[key]);
+                        }
+                    }
                     main
                         .setContent(0, 0, currWidget, "", 2, 2)
                     ;
@@ -213,11 +280,23 @@
                             displayProperties(currWidget);
                             displaySerialization(currWidget);
                             displaySerializationText(currWidget);
+                            displayThemeText(currWidget);
                         })
                     ;
                 });
+            };
+            testTheme = function (themeKey) {
+                window.__hpcc_theme = themeSelectObj[themeKey];
+                Persist.removeTheme(currWidget,function(){
+                    Persist.applyTheme(currWidget,themeSelectObj[themeKey],function(){
+                        currWidget.render();
+                        displayProperties(currWidget);
+                        displaySerialization(currWidget);
+                        displaySerializationText(currWidget);
+                        displayThemeText(currWidget);
+                    });
+                })
             }
-            testWidget(document.getElementById("widgetSelect").value);
             showProperties = function (show) {
                 main
                     .setContent(0, 2, show ? propEditor : null, "", 2, 1)
@@ -240,7 +319,7 @@
             }
             showSerializationText = function (show) {
                 main
-                    .setContent(0, 3, show ? serializationTextSurface : null, "", 3, 1)
+                    .setContent(0, 3, show ? serializationTextSurface : null, "", 2, 1)
                     .render(function (widget) {
                         if (show) {
                             displaySerializationText();
@@ -248,6 +327,17 @@
                     })
                 ;
             }
+            showThemeText = function (show) {
+                main
+                    .setContent(2, 3, show ? themeTextSurface : null, "", 1, 1)
+                    .render(function (widget) {
+                        if (show) {
+                            displayThemeText();
+                        }
+                    })
+                ;
+            }
+            var first = true;
             frame.doResize = Surface.prototype.debounce(function () {
                 mainDiv.style.width = window.innerWidth - 16 + "px";
                 mainDiv.style.height = window.innerHeight - 16 - 40 + "px";
@@ -255,6 +345,10 @@
                     .resize()
                     .render()
                 ;
+                if (first) {
+                    first = false;
+                    testWidget(document.getElementById("widgetSelect").value, params);
+                }
             }, 250)
             frame.doResize();
         });

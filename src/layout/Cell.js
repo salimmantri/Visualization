@@ -11,13 +11,14 @@
         this._dragHandles = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
     }
     Cell.prototype = Object.create(Surface.prototype);
+    Cell.prototype.constructor = Cell;
     Cell.prototype._class += " layout_Cell";
 
-    Cell.prototype.publish("gridRow", 0, "number", "Grid Row Position",null,{tags:['Private']});
-    Cell.prototype.publish("gridCol", 0, "number", "Grid Column Position",null,{tags:['Private']});
-    Cell.prototype.publish("gridRowSpan", 1, "number", "Grid Row Span",null,{tags:['Private']});
-    Cell.prototype.publish("gridColSpan", 1, "number", "Grid Column Span",null,{tags:['Private']});
-    Cell.prototype.publish("handleSize", 6, "number", "Grid Row Position",null,{tags:['Private']});
+    Cell.prototype.publish("gridRow", 0, "number", "Grid Row Position",null,{tags:["Private"]});
+    Cell.prototype.publish("gridCol", 0, "number", "Grid Column Position",null,{tags:["Private"]});
+    Cell.prototype.publish("gridRowSpan", 1, "number", "Grid Row Span",null,{tags:["Private"]});
+    Cell.prototype.publish("gridColSpan", 1, "number", "Grid Column Span",null,{tags:["Private"]});
+    Cell.prototype.publish("handleSize", 6, "number", "Grid Row Position",null,{tags:["Private"]});
 
     Cell.prototype.enter = function (domNode, element) {
         Surface.prototype.enter.apply(this, arguments);
@@ -51,13 +52,13 @@
                             return "0px";
                         case "n":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('nw') !== -1){
+                            if(context._dragHandles.indexOf("nw") !== -1){
                                 offsetMultiple++;
                             }
                             return context.handleSize()*offsetMultiple + "px";
                         case "s":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('sw') !== -1){
+                            if(context._dragHandles.indexOf("sw") !== -1){
                                 offsetMultiple++;
                             }
                             return context.handleSize()*offsetMultiple + "px";
@@ -71,13 +72,13 @@
                             return "0px";
                         case "e":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('ne') !== -1){
+                            if(context._dragHandles.indexOf("ne") !== -1){
                                 offsetMultiple++;
                             }
                             return context.handleSize()*offsetMultiple + "px";
                         case "w":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('nw') !== -1){
+                            if(context._dragHandles.indexOf("nw") !== -1){
                                 offsetMultiple++;
                             }
                             return context.handleSize()*offsetMultiple + "px";
@@ -91,19 +92,19 @@
                     switch (d) {
                         case "n":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('ne') !== -1){
+                            if(context._dragHandles.indexOf("ne") !== -1){
                                 offsetMultiple++;
                             }
-                            if(context._dragHandles.indexOf('nw') !== -1){
+                            if(context._dragHandles.indexOf("nw") !== -1){
                                 offsetMultiple++;
                             }
                             return context._size.width - (context.handleSize()*offsetMultiple) + "px";
                         case "s":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('se') !== -1){
+                            if(context._dragHandles.indexOf("se") !== -1){
                                 offsetMultiple++;
                             }
-                            if(context._dragHandles.indexOf('sw') !== -1){
+                            if(context._dragHandles.indexOf("sw") !== -1){
                                 offsetMultiple++;
                             }
                             return context._size.width - (context.handleSize()*offsetMultiple) + "px";
@@ -115,19 +116,19 @@
                     switch (d) {
                         case "w":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('nw') !== -1){
+                            if(context._dragHandles.indexOf("nw") !== -1){
                                 offsetMultiple++;
                             }
-                            if(context._dragHandles.indexOf('sw') !== -1){
+                            if(context._dragHandles.indexOf("sw") !== -1){
                                 offsetMultiple++;
                             }
                             return context._size.height - (context.handleSize()*offsetMultiple) + "px";
                         case "e":
                             offsetMultiple = 0;
-                            if(context._dragHandles.indexOf('ne') !== -1){
+                            if(context._dragHandles.indexOf("ne") !== -1){
                                 offsetMultiple++;
                             }
-                            if(context._dragHandles.indexOf('se') !== -1){
+                            if(context._dragHandles.indexOf("se") !== -1){
                                 offsetMultiple++;
                             }
                             return context._size.height - (context.handleSize()*offsetMultiple) + "px";

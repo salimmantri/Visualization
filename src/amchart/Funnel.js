@@ -10,22 +10,17 @@
         CommonFunnel.call(this);
     }
     Funnel.prototype = Object.create(CommonFunnel.prototype);
-    Funnel.prototype.implements(I2DChart.prototype);
+    Funnel.prototype.constructor = Funnel;
     Funnel.prototype._class += " amchart_Funnel";
+    Funnel.prototype.implements(I2DChart.prototype);
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    Funnel.prototype.publish("paletteID", "default", "set", "Palette ID", Funnel.prototype._palette.switch(), {tags:['Basic','Shared']});
+    Funnel.prototype.publish("paletteID", "default", "set", "Palette ID", Funnel.prototype._palette.switch(), {tags:["Basic","Shared"]});
 
-    /**
-     * Publish Params Unique To This Widget
-     */
-    Funnel.prototype.publish("neckHeightPercent", 30, "number", "Neck Height %",null,{tags:['Basic']});
-    Funnel.prototype.publish("neckWidthPercent", 40, "number", "Neck Width %",null,{tags:['Basic']});
+    Funnel.prototype.publish("neckHeightPercent", 30, "number", "Neck Height %",null,{tags:["Basic"]});
+    Funnel.prototype.publish("neckWidthPercent", 40, "number", "Neck Width %",null,{tags:["Basic"]});
 
     //TODO
-    Funnel.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:['Basic']});
+    Funnel.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Basic"]});
 
     Funnel.prototype.enter = function(domNode, element) {
         CommonFunnel.prototype.enter.apply(this, arguments);

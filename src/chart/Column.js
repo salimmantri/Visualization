@@ -1,28 +1,35 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "./XYAxis", "../api/INDChart", "css!./Column"], factory);
+        define(["d3", "./XYAxis", "../api/INDChart", "../api/ITooltip", "css!./Column"], factory);
     } else {
-        root.chart_Column = factory(root.d3, root.chart_XYAxis, root.api_INDChart);
+        root.chart_Column = factory(root.d3, root.chart_XYAxis, root.api_INDChart, root.api_ITooltip);
     }
-}(this, function (d3, XYAxis, INDChart) {
+}(this, function (d3, XYAxis, INDChart, ITooltip) {
     function Column(target) {
         XYAxis.call(this);
         INDChart.call(this);
+        ITooltip.call(this);
 
         this._linearGap = 25;
     }
     Column.prototype = Object.create(XYAxis.prototype);
+    Column.prototype.constructor = Column;
     Column.prototype._class += " chart_Column";
     Column.prototype.implements(INDChart.prototype);
+    Column.prototype.implements(ITooltip.prototype);
 
-    Column.prototype.publish("paletteID", "default", "set", "Palette ID", Column.prototype._palette.switch(),{tags:['Basic','Shared']});
+    Column.prototype.publish("paletteID", "default", "set", "Palette ID", Column.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Column.prototype.publish("stacked", false, "boolean", "Stacked Bars");
+    Column.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Column.prototype.updateChart = function (domNode, element, margin, width, height) {
         var context = this;
 
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
 
         var dataLen = 10;
         var offset = 0;
@@ -55,39 +62,55 @@
             .each(function (dataRow, i) {
                 var element = d3.select(this);
 
-                var columnRect = element.selectAll("rect").data(dataRow.filter(function (d, i) {return i > 0;}));
+                var columnRect = element.selectAll("rect").data(dataRow.map(function (d, i) {
+                    return {
+                        column: context._columns[i],
+                        row: dataRow,
+                        value: d,
+                        idx: i
+                    };
+                }).filter(function (d, i) { return d.value !== null && d.idx > 0; }));
 
                 columnRect
                   .enter().append("rect")
                     .attr("class", "columnRect")
-                    .on("click", function (d, idx) {
-                        context.click(context.rowToObj(dataRow), context._columns[idx + 1]);
+                    .call(context._selection.enter.bind(context._selection))
+                    .on("mouseover.tooltip", function (d) {
+                        context.tooltipShow(dataRow, context._columns, d.idx);
                     })
-                    .append("title")
+                    .on("mouseout.tooltip", function (d) {
+                        context.tooltipShow();
+                    })
+                    .on("mousemove.tooltip", function (d) {
+                        context.tooltipShow(dataRow, context._columns, d.idx);
+                    })
+                    .on("click", function (d, idx) {
+                        context.click(context.rowToObj(dataRow), context.column, context._selection.selected(this));
+                    })
                 ;
 
                 if (context.orientation() === "horizontal") {
                     columnRect.transition()
                         .attr("class", "columnRect")
-                        .attr("x", function (d, idx) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(context._columns[idx + 1])) + offset;})
+                        .attr("x", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("width", context.stacked() ? dataLen : columnScale.rangeBand())
-                        .attr("y", function (d) { return d instanceof Array ? context.valueScale(d[1]) : context.valueScale(d) ; })
-                        .attr("height", function (d) {  return  d instanceof Array ? context.valueScale(d[0]) - context.valueScale(d[1]) : height - context.valueScale(d) ; })
-                        .style("fill", function (d, idx) { return context._palette(context._columns[idx + 1]); })
+                        .attr("y", function (d) { return d.value instanceof Array ? context.valueScale(d.value[1]) : context.valueScale(d.value); })
+                        .attr("height", function (d) { return d.value instanceof Array ? context.valueScale(d.value[0]) - context.valueScale(d.value[1]) : height - context.valueScale(d.value); })
+                        .style("fill", function (d) { return context._palette(d.column); })
                     ;
                 } else {
                     columnRect.transition()
                         .attr("class", "columnRect")
-                        .attr("y", function (d, idx) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(context._columns[idx + 1])) + offset;})
+                        .attr("y", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("height", context.stacked() ? dataLen : columnScale.rangeBand())
-                        .attr("x", function (d) { return d instanceof Array ? context.valueScale(d[0]) : 0 ; })
-                        .attr("width", function (d) {  return  d instanceof Array ? context.valueScale(d[1]) - context.valueScale(d[0]) : context.valueScale(d) ; })
-                        .style("fill", function (d, idx) { return context._palette(context._columns[idx + 1]); })
+                        .attr("x", function (d) { return d.value instanceof Array ? context.valueScale(d.value[0]) : 0; })
+                        .attr("width", function (d) { return d.value instanceof Array ? context.valueScale(d.value[1]) - context.valueScale(d.value[0]) : context.valueScale(d.value); })
+                        .style("fill", function (d) { return context._palette(d.column); })
                     ;
                 }
 
-                columnRect.select("title")
-                    .text(function (d, idx) { return dataRow[0] + " (" + d + "," + " " + context._columns[idx + 1] + ")"; })
+                columnRect
+
                 ;
 
                 if (context.stacked()) {

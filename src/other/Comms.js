@@ -6,6 +6,24 @@
         root.other_Comms = factory();
     }
 }(this, function () {
+    function espValFix(val) {
+        if (!val.trim) {
+            return val;
+        }
+        var retVal = val.trim();
+        if (retVal !== "" && !isNaN(retVal)) {
+            return Number(retVal);
+        }
+        return retVal;
+    }
+
+    function espRowFix(row) {
+        for (var key in row) {
+            row[key] = espValFix(row[key]);
+        }
+        return row;
+    }
+
     function ESPUrl() {
         this._protocol = "http:";
         this._hostname = "localhost";
@@ -14,7 +32,7 @@
     ESPUrl.prototype.url = function (_) {
         if (!arguments.length) return this._url;
         this._url = _;
-        var parser = document.createElement('a');
+        var parser = document.createElement("a");
         parser.href = this._url;
 
         var params = {};
@@ -189,13 +207,13 @@
 
         var respondedTimeout = 60000;
         var respondedTick = 5000;
-        var callbackName = 'jsonp_callback_' + Math.round(Math.random() * 999999);
+        var callbackName = "jsonp_callback_" + Math.round(Math.random() * 999999);
         window[callbackName] = function (response) {
             respondedTimeout = 0;
             doCallback(response);
         };
-        var script = document.createElement('script');
-        script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'jsonp=' + callbackName + "&" + serialize(request);
+        var script = document.createElement("script");
+        script.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "jsonp=" + callbackName + "&" + serialize(request);
         document.body.appendChild(script);
         var progress = setInterval(function () {
             if (respondedTimeout <= 0) {
@@ -243,7 +261,7 @@
     };
 
     Basic.prototype.call = function (request, callback) {
-        var url = this._url + (this._url.indexOf('?') >= 0 ? '&' : '?') + serialize(request);
+        var url = this._url + (this._url.indexOf("?") >= 0 ? "&" : "?") + serialize(request);
         function doCall(request, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
@@ -359,7 +377,8 @@
             }
             // Remove "response.result.Row"
             for (key in response) {
-                response[key] = response[key].Row;
+                response[key] = response[key].Row.map(espRowFix);
+
             }
             context._mappings.mapResponse(response);
             callback(response);
@@ -481,7 +500,7 @@
                 context._total = response[key].Total;
                 response = response[key].Result;
                 for (var responseKey in response) {
-                    response = response[responseKey].Row;
+                    response = response[responseKey].Row.map(espRowFix);
                     break;
                 }
                 break;
@@ -674,7 +693,7 @@
             }
             // Remove "response.result.Row"
             for (key in response) {
-                context._resultNameCache[key] = response[key].Row;
+                context._resultNameCache[key] = response[key].Row.map(espRowFix);
                 ++context._resultNameCacheCount;
             }
             callback(context._resultNameCache);
@@ -740,7 +759,7 @@
         } else {
             var changedFilter = {};
             for (var key in request) {
-                if (request[key] && request[key + "_changed"]) {
+                if (request[key] && request[key + "_changed"] !== undefined) {
                     changedFilter[key] = request[key];
                 }
             }
@@ -777,7 +796,7 @@
 
     HIPIEDatabomb.prototype.databomb = function (_) {
         if (!arguments.length) return this._databomb;
-        this._databomb = _;
+        this._databomb = _.map(espRowFix);
         return this;
     };
 

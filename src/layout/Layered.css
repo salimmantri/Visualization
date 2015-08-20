@@ -1,0 +1,8 @@
+.layout_Layered .container {
+    position: relative;
+    pointer-events: none;
+}
+
+.layout_Layered .content {
+    position: absolute;
+}

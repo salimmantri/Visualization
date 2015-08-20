@@ -1,25 +1,29 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "./XYAxis", "../api/INDChart", "css!./Scatter"], factory);
+        define(["d3", "../common/SVGWidget", "./XYAxis", "../api/INDChart", "../api/ITooltip", "css!./Scatter"], factory);
     } else {
-        root.chart_Column = factory(root.d3, root.common_SVGWidget, root.chart_XYAxis, root.api_INDChart);
+        root.chart_Scatter = factory(root.d3, root.common_SVGWidget, root.chart_XYAxis, root.api_INDChart, root.api_ITooltip);
     }
-}(this, function (d3, SVGWidget, XYAxis, INDChart) {
+}(this, function (d3, SVGWidget, XYAxis, INDChart, ITooltip) {
     function Scatter(target) {
         XYAxis.call(this);
         INDChart.call(this);
+        ITooltip.call(this);
     }
     Scatter.prototype = Object.create(XYAxis.prototype);
+    Scatter.prototype.constructor = Scatter;
     Scatter.prototype._class += " chart_Scatter";
     Scatter.prototype.implements(INDChart.prototype);
+    Scatter.prototype.implements(ITooltip.prototype);
 
-    Scatter.prototype.publish("paletteID", "default", "set", "Palette ID", Scatter.prototype._palette.switch(),{tags:['Basic','Shared']});
+    Scatter.prototype.publish("paletteID", "default", "set", "Palette ID", Scatter.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Scatter.prototype.publish("pointShape", "cross", "set", "Shape of the data points", ["circle", "rectangle", "cross"]);
     Scatter.prototype.publish("pointSize", 6, "number", "Point Size");
     Scatter.prototype.publish("interpolate", "", "set", "Interpolate Data", ["", "linear", "step", "step-before", "step-after", "basis", "bundle", "cardinal", "monotone"]);
     Scatter.prototype.publish("interpolateFill", false, "boolean", "Fill Interpolation");
     Scatter.prototype.publish("interpolateFillOpacity", 0.66, "number", "Fill Interpolation Opacity");
+    Scatter.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Scatter.prototype.xPos = function (d) {
         return this.orientation() === "horizontal" ? this.dataPos(d.label) : this.valuePos(d.value);
@@ -33,6 +37,9 @@
         var context = this;
 
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
 
         if (this._prevPointShape !== this.pointShape()) {
             this.svgData.selectAll(".data").remove();
@@ -58,20 +65,41 @@
         var points = this.svgData.selectAll(".point").data(data, function (d, idx) { return d.shape + "_" + idx; });
         points.enter().append("g")
             .attr("class", "point")
-            .on("click", function (d, idx) {
-                context.click(context.rowToObj(context.data()[d.rowIdx]), context._columns[d.colIdx]);
-            })
             .each(function (d) {
                 var element = d3.select(this);
                 element
+                    .append("circle")
+                    .attr("class", "pointSelection")
+                    .on("mouseover.tooltip", function (d) {
+                        context.tooltipShow(context.data()[d.rowIdx], context._columns, d.colIdx);
+                    })
+                    .on("mouseout.tooltip", function (d) {
+                        context.tooltipShow();
+                    })
+                    .on("mousemove.tooltip", function (d) {
+                        context.tooltipShow(context.data()[d.rowIdx], context._columns, d.colIdx);
+                    })
+                    .call(context._selection.enter.bind(context._selection))
+                    .on("click", function (d, idx) {
+                        context.click(context.rowToObj(context.data()[d.rowIdx]), context._columns[d.colIdx], context._selection.selected(this));
+                    })
+                ;
+                element
                     .append(d.shape)
-                    .append("title")
+                    .attr("class", "pointShape")
                 ;
             })
         ;
         points
             .each(function (d) {
-                var element = d3.select(this).select(d.shape);
+                var elementSelection = d3.select(this).select(".pointSelection");
+                elementSelection
+                    .attr("cx", function (d) { return context.xPos(d); })
+                    .attr("cy", function (d) { return context.yPos(d); })
+                    .attr("r", context.pointSize())
+                ;
+
+                var element = d3.select(this).select(".pointShape");
                 switch (d.shape) {
                     case "rect":
                         element
@@ -102,13 +130,11 @@
                         ;
                         break;
                 }
-                element.select("title")
-                    .text(function (d, idx) { return context.data()[d.rowIdx][0] + " (" + context.columns()[d.colIdx] + ")" + ": " + d.value; })
-                ;
-
             })
         ;
-        points.exit().remove();
+        points.exit()
+            .remove()
+        ;
 
         var areas = this.svgData.selectAll(".area").data(this.columns().filter(function (d, idx) { return context.interpolate() && context.interpolateFill() && idx > 0; }));
         areas.enter().append("path")

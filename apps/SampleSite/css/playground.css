@@ -99,7 +99,6 @@ table.table {
 }
 .doc-item {
     margin-bottom: 8px;
-/*    display:none;*/
 }
 .doc-item > .panel-body {
     padding: 8px;
@@ -118,18 +117,13 @@ table.table {
 }
 .doc-item .panel-heading:first-of-type {
     border-top:0;
-/*    border-top-left-radius:5px;
-    border-top-right-radius:5px;*/
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
 }
-/*.doc-extend { ????
+.doc-extend {
     float:right;
-}*/
-.doc-basic {
-    display:block;
 }
-.doc-ext {
-    display:none;
-}
+
 /* */
 .panel {
     margin-bottom:0;
@@ -305,8 +299,3 @@ table.table {
 .navbar-nav li a {
     padding-top: 0;
 }*/
-
-/* Code Editor */
-#css-editor {
-    position: absolute;
-}

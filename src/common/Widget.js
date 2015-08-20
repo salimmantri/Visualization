@@ -4,15 +4,12 @@
         define(["d3"], factory);
     } else {
         root.require = root.require || function (paths, cb) {
-            if (typeof paths === 'function') {
+            if (typeof paths === "function") {
                 cb = paths;
                 paths = [];
             }
 
             var objs = paths.map(function (path) {
-                if (path === "d3-cloud/d3.layout.cloud") {
-                    return root.d3.layout.cloud;
-                }
                 var prop = path.substring("src/".length).split("/").join("_");
                 return root[prop];
             });
@@ -43,6 +40,27 @@
         this._watchArr = [];
 
         this._renderCount = 0;
+
+        if (window.__hpcc_debug) {
+            if (window.g_all === undefined) {
+                window.g_all = {};
+            }
+            window.g_all[this._id] = this;
+        }
+        if(window.__hpcc_theme){
+            var clsArr = this._class.trim().split(" ").reverse();
+            for(var i in clsArr){
+                if(typeof (window.__hpcc_theme[clsArr[i]]) !== "undefined"){
+                    for(var paramName in window.__hpcc_theme[clsArr[i]]){
+                        if(typeof (this[paramName]) === "function"){
+                            var proto = Object.getPrototypeOf(this);
+                            proto["__meta_"+paramName].trueDefaultValue = this[paramName]();
+                            proto["__meta_"+paramName].defaultValue = window.__hpcc_theme[clsArr[i]][paramName];
+                        }
+                    }
+                }
+            }
+        }
     }
     Widget.prototype._class = " common_Widget";
 
@@ -92,20 +110,20 @@
             if (config.attributes) {
                 listener = new MutationListener(this.callback, domNode, "attributes");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMAttrModified', listener, true);
+                domNode.addEventListener("DOMAttrModified", listener, true);
             }
 
             if (config.characterData) {
                 listener = new MutationListener(this.callback, domNode, "characterData");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMCharacterDataModified', listener, true);
+                domNode.addEventListener("DOMCharacterDataModified", listener, true);
             }
 
             if (config.childList) {
                 listener = new MutationListener(this.callback, domNode, "childList");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMNodeInserted', listener, true);
-                domNode.addEventListener('DOMNodeRemoved', listener, true);
+                domNode.addEventListener("DOMNodeInserted", listener, true);
+                domNode.addEventListener("DOMNodeRemoved", listener, true);
             }
         };
 
@@ -113,14 +131,14 @@
             this.listeners.forEach(function (item) {
                 switch (item.type) {
                     case "attributes":
-                        item.domNode.removeEventListener('DOMAttrModified', item, true);
+                        item.domNode.removeEventListener("DOMAttrModified", item, true);
                         break;
                     case "characterData":
-                        item.domNode.removeEventListener('DOMCharacterDataModified', item, true);
+                        item.domNode.removeEventListener("DOMCharacterDataModified", item, true);
                         break;
                     case "childList":
-                        item.domNode.removeEventListener('DOMNodeRemoved', item, true);
-                        item.domNode.removeEventListener('DOMNodeInserted', item, true);
+                        item.domNode.removeEventListener("DOMNodeRemoved", item, true);
+                        item.domNode.removeEventListener("DOMNodeInserted", item, true);
                         break;
                 }
             });
@@ -157,42 +175,50 @@
             if (!arguments.length) {
                 return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
             }
-            switch (type) {
-                case "set":
-                    if (!set || set.indexOf(_) < 0) {
-                        console.log("Invalid value for '" + id + "':  " + _);
-                    }
-                    break;
-                case "html-color":
-                    var litmus = 'red';
-                    var d = document.createElement('div');
-                    d.style.color=litmus;
-                    d.style.color=_;
-                    //Element's style.color will be reverted to litmus or set to '' if an invalid color is given
-                    if( _ !== litmus && (d.style.color === litmus || d.style.color === '')){
-                        console.log("Invalid value for '" + id + "':  " + _);
-                    }
-                    break;
-                case "boolean":
-                    _ = Boolean(_);
-                    break;
-                case "number":
-                    _ = Number(_);
-                    break;
-                case "string":
-                    _ = String(_);
-                    break;
-                case "array":
-                    if (!(_ instanceof Array)) {
-                        console.log("Invalid value for '" + id);
-                    }
-                    break;
+            if (_ !== null) {
+                switch (type) {
+                    case "set":
+                        if (!set || set.indexOf(_) < 0) {
+                            console.log("Invalid value for '" + id + "':  " + _);
+                        }
+                        break;
+                    case "html-color":
+                        if (window.__hpcc_debug && _ && _ !== "red") {
+                            var litmus = "red";
+                            var d = document.createElement("div");
+                            d.style.color = litmus;
+                            d.style.color = _;
+                            //Element's style.color will be reverted to litmus or set to "" if an invalid color is given
+                            if (d.style.color === litmus || d.style.color === "") {
+                                console.log("Invalid value for '" + id + "':  " + _);
+                            }
+                        }
+                        break;
+                    case "boolean":
+                        _ = typeof (_) === "string" && ["false", "off", "0"].indexOf(_.toLowerCase()) >= 0 ? false : Boolean(_);
+                        break;
+                    case "number":
+                        _ = Number(_);
+                        break;
+                    case "string":
+                        _ = String(_);
+                        break;
+                    case "array":
+                        if (!(_ instanceof Array)) {
+                            console.log("Invalid value for '" + id);
+                        }
+                        break;
+                }
             }
             if (isPrototype) {
                 this["__meta_" + id].defaultValue = _;
             } else {
                 this.broadcast(id, _, this["__prop_" + id]);
-                this["__prop_" + id] = _;
+                if (_ === null) {
+                    delete this["__prop_" + id];
+                } else {
+                    this["__prop_" + id] = _;
+                }
             }
             return this;
         };
@@ -204,6 +230,20 @@
             return this["__prop_" + id] !== undefined;
         };
         this[id + "_reset"] = function () {
+            switch (type) {
+                case "widget":
+                    if (this["__prop_" + id]) {
+                        this["__prop_" + id].target(null);
+                    }
+                    break;
+                case "widgetArray":
+                    if (this["__prop_" + id]) {
+                        this["__prop_" + id].forEach(function (widget) {
+                            widget.target(null);
+                        });
+                    }
+                    break;
+            }
             this["__prop_" + id] = undefined;
         };
         this["__prop_" + id] = undefined;
@@ -309,6 +349,10 @@
         if (!arguments.length) return this._class;
         this._class = _;
         return this;
+    };
+
+    Widget.prototype.classID = function () {
+        return this._class.split(" ").pop();
     };
 
     Widget.prototype.columns = function (_) {
@@ -505,7 +549,7 @@
         var element = d3.select(domNode);
         if (element) {
             var widget = element.datum();
-            if (widget) {
+            if (widget && widget instanceof Widget) {
                 return widget;
             }
         }
@@ -626,12 +670,9 @@
         ;
         elements
             .each(function (context) {
+                context.preUpdate(this, context._element);
                 context.update(this, context._element);
-                if (context._drawStartPos === "origin" && context._target instanceof SVGElement) {
-                    context._element.attr("transform", function (d) { return "translate(" + (context._pos.x - context._size.width / 2) + "," + (context._pos.y - context._size.height / 2) + ")scale(" + context._scale + ")"; });
-                } else {
-                    context._element.attr("transform", function (d) { return "translate(" + context._pos.x + "," + context._pos.y + ")scale(" + context._scale + ")"; });
-                }
+                context.postUpdate(this, context._element);
             })
         ;
         elements.exit()
@@ -649,9 +690,11 @@
         return this;
     };
 
-    Widget.prototype.enter = function (domeNode, element, d) { };
-    Widget.prototype.update = function (domeNode, element, d) { };
-    Widget.prototype.exit = function (domeNode, element, d) { };
+    Widget.prototype.enter = function (domeNode, element) { };
+    Widget.prototype.preUpdate = function (domeNode, element) { };
+    Widget.prototype.update = function (domeNode, element) { };
+    Widget.prototype.postUpdate = function (domeNode, element) { };
+    Widget.prototype.exit = function (domeNode, element) { };
 
     //  Util  ---
     Widget.prototype.debounce = function (func, threshold, execAsap) {
