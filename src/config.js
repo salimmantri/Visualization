@@ -110,7 +110,7 @@ case "cdn.rawgit.com":
             "amcharts.plugins.responsive": "//" + window.location.hostname + "/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/plugins/responsive/responsive",
             "amcharts.plugins.dataloader": "//" + window.location.hostname + "/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/plugins/dataloader",
             "amchartsImg": "//" + window.location.hostname + "/arturgspb/bower-amcharts/v3.13.3/dist/amcharts/images/",
-            "simpleheat": "https://raw.githubusercontent.com/mourner/simpleheat/gh-pages/simpleheat",
+            "simpleheat": "//" + window.location.hostname + "/mourner/simpleheat/gh-pages/simpleheat",
 
             "src": "../src"
         }
