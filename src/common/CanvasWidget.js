@@ -20,9 +20,8 @@
             .style("width", this._size.width + "px")
             .style("height", this._size.height + "px")
         ;
-        this._canvas = d3.select(this._target).selectAll("canvas");
-        this._canvas.attr("width", this._size.width);
-        this._canvas.attr("height", this._size.height);
+        this._element.attr("width", this._size.width);
+        this._element.attr("height", this._size.height);
         return retVal;
     };
 
