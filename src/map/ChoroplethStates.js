@@ -79,12 +79,13 @@
         var context = this;
         //  Update  ---
         this.choroPaths
+            .attr("vector-effect", "non-scaling-stroke")
             .attr("d", this.d3Path)
             .each(function (d) {
                 var code = usStates.stateNames[d.id].code;
                 var weight = context._dataMap[code] ? context._dataMap[code][1] : undefined;
                 d3.select(this)
-                    .style("fill", weight === undefined ? "url(#hash)" : context._palette(weight, context._dataMinWeight, context._dataMaxWeight))
+                    .style("fill", weight === undefined ? "none" : context._palette(weight, context._dataMinWeight, context._dataMaxWeight))
                 ;
             })
         ;
