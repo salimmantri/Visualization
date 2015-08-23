@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "./ChoroplethStates", "async!http://maps.google.com/maps/api/js?sensor=false", "css!./GMap"], factory);
+        define(["d3", "../common/HTMLWidget", "../layout/AbsoluteSurface", "async!http://maps.google.com/maps/api/js?sensor=false", "css!./GMap"], factory);
     } else {
         root.map_GMap2 = factory(root.d3, root.common_HTMLWidget);
     }
-}(this, function (d3, HTMLWidget, ChoroplethStates) {
+}(this, function (d3, HTMLWidget, AbsoluteSurface) {
     function Overlay(gmap, map) {
         this._div = null;
 
@@ -24,25 +24,43 @@
     Overlay.prototype = new google.maps.OverlayView();
 
     Overlay.prototype.onAdd = function () {
-        var div = document.createElement('div');
-        d3.select(div)
+        this.div = document.createElement('div');
+        d3.select(this.div)
             .style({
-                width: this._gmap.width(),
-                height: this._gmap.height()
+                width: this._gmap.width() + "px",
+                height: this._gmap.height() + "px"
             })
         ;
 
-        this.choro = new ChoroplethStates()
-            .target(div)
-            .projection("mercator")
-            //.testData()
+        this.surface = new AbsoluteSurface()
+            .target(this.div)
+            .units("pixels")
+            .testData()
         ;
 
         var panes = this.getPanes();
-        panes.overlayLayer.appendChild(div);
+        panes.overlayLayer.appendChild(this.div);
     };
 
     Overlay.prototype.draw = function () {
+        var projection = this.getProjection();
+
+        var point1 = projection.fromLatLngToDivPixel(new google.maps.LatLng(37.665074, -122.384375));
+        var point2 = projection.fromLatLngToDivPixel(new google.maps.LatLng(45.777062, -108.549835));
+
+        var x = Math.min(point1.x, point2.x);
+        var y = Math.min(point1.y, point2.y);
+        var width = Math.max(point1.x, point2.x) - x;
+        var height = Math.max(point1.y, point2.y) - y;
+
+        this.surface
+            .widgetX(x)
+            .widgetY(y)
+            .widgetWidth(width)
+            .widgetHeight(height)
+            .resize()
+            .render()
+        ;
         /*
         var bounds = this._map.getBounds(),
                 ne = bounds.getNorthEast(),
@@ -73,6 +91,7 @@
     };
 
     Overlay.prototype.onRemove = function () {
+        this.surface.target(null);
         this._div.parentNode.removeChild(this._div);
         this._div = null;
     };
