@@ -57,16 +57,10 @@
             var publishedProps = discover(widget);
             for (var i = 0; i < publishedProps.length; ++i) {
                 var publishItem = publishedProps[i];
-                switch (publishItem.type) {
-                    case "widget":
-                    case "widgetArray":
-                        break;
-                    default:
-                        if (!(filter instanceof Array) || filter.length === 0 || filter.indexOf(publishItem.id) >= 0) {
-                            if (visitor(widget, publishItem)) {
-                                continue;
-                            }
-                        }
+                if (!(filter instanceof Array) || filter.length === 0 || filter.indexOf(publishItem.id) >= 0) {
+                    if (visitor(widget, publishItem)) {
+                        continue;
+                    }
                 }
             }
         });
