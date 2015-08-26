@@ -104,6 +104,12 @@
         return this;
     };
 
+    MultiChart.prototype.chartTypeProperties = function (_) {
+        if (!arguments.length) return this._chartTypeProperties;
+        this._chartTypeProperties = _;
+        return this;
+    };
+
     MultiChart.prototype.requireContent = function (chartType, callback) {
         var path = "src/" + this._allCharts[chartType].widgetClass.split("_").join("/");
         require([path], function (WidgetClass) {
@@ -122,6 +128,20 @@
                     .data(context._data)
                     .size(size)
                 ;
+                if (context._chartTypeProperties) {
+                    for (var key in context._chartTypeProperties) {
+                        if (newContent[key]) {
+                            try {
+                                newContent[key](context._chartTypeProperties[key]);
+                            } catch (e) {
+                                console.log("Exception Setting Property:  " + key);
+                            }
+                        } else {
+                            console.log("Unknown Property:  " + key);
+                        }
+                    }
+                    delete context._chartTypeProperties;
+                }
                 context.chart(newContent);
                 newContent.click = function (row, column, selected) {
                     context.click(row, column, selected);

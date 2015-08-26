@@ -99,7 +99,9 @@
             .attr("class", "surfaceTitle")
         ;
         titles
-            .text(function (d) { return d; })
+            .text(function (d) { 
+                return d; 
+            })
             .style("text-align",this.surfaceTitleAlignment())
             .style("color",this.surfaceTitleFontColor())
             .style("font-size",this.surfaceTitleFontSize()+"px")

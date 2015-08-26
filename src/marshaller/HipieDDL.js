@@ -516,7 +516,7 @@
                 this.loadWidget("src/chart/MultiChart", function (widget) {
                     widget
                         .id(visualization.id)
-                        .chartType(context.properties.charttype || context.type)
+                        .chartType(context.properties.chartType || context.properties.charttype || context.type)
                     ;
                 });
                 break;
@@ -524,7 +524,7 @@
                 this.loadWidget("src/chart/MultiChart", function (widget) {
                     widget
                         .id(visualization.id)
-                        .chartType(context.properties.charttype || context.type)
+                        .chartType(context.properties.chartType || context.properties.charttype || context.type)
                     ;
                 });
                 break;
@@ -634,12 +634,16 @@
         this.widget = widget;
         this.events.setWidget(widget);
         if (!skipProperties) {
-            for (var key in this.properties) {
-                if (this.widget[key]) {
-                    try {
-                        this.widget[key](this.properties[key]);
-                    } catch (e) {
-                        console.log("Invalid Property:" + this.id + ".properties." + key);
+            if (widget.classID() === "chart_MultiChart") {
+                widget.chartTypeProperties(this.properties);
+            } else {
+                for (var key in this.properties) {
+                    if (this.widget[key]) {
+                        try {
+                            this.widget[key](this.properties[key]);
+                        } catch (e) {
+                            console.log("Invalid Property:" + this.id + ".properties." + key);
+                        }
                     }
                 }
             }

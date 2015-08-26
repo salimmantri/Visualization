@@ -796,7 +796,9 @@
 
     HIPIEDatabomb.prototype.databomb = function (_) {
         if (!arguments.length) return this._databomb;
+        console.profile("String Fixup");
         this._databomb = _.map(espRowFix);
+        console.profileEnd();
         return this;
     };
 

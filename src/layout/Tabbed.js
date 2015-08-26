@@ -104,7 +104,6 @@
                     .surfaceBorderWidth(context.showTabs() ? null : 0)
                     .surfacePadding(context.showTabs() ? null : 0)
                     .resize(wSize)
-                    .render()
                 ;
             })
         ;
@@ -115,6 +114,31 @@
                 ;
             })
             .remove();
+    };
+
+    Tabbed.prototype.render = function (callback) {
+        var context = this;
+        HTMLWidget.prototype.render.call(this, function (widget) {
+            if (context.widgets().length) {
+                var renderCount = context.widgets().length;
+                context.widgets().forEach(function (contentWidget, idx) {
+                    setTimeout(function () {
+                        contentWidget.render(function () {
+                            if (--renderCount === 0) {
+                                if (callback) {
+                                    callback(widget);
+                                }
+                            }
+                        });
+                    }, 0);
+                });
+            } else {
+                if (callback) {
+                    callback(widget);
+                }
+            }
+        });
+        return this;
     };
 
     return Tabbed;

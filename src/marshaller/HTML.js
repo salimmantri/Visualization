@@ -107,13 +107,13 @@
                     }
                     cellCol++;
                 });
-                for (var key2 in dashboards[key].dashboard.datasources) {
-                    dashboards[key].dashboard.datasources[key2].fetchData({}, true);
-                }
             }
             Tabbed.prototype.render.call(context, function (widget) {
                 if (callback) {
                     callback(widget);
+                }
+                for (var key2 in dashboards[key].dashboard.datasources) {
+                    dashboards[key].dashboard.datasources[key2].fetchData({}, true);
                 }
             });
         }
