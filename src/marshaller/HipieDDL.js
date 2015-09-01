@@ -545,6 +545,7 @@
                 this.loadWidget(this.source.mappings.contains("county") ? "src/map/ChoroplethCounties" : "src/map/ChoroplethStates", function (widget) {
                     widget
                         .id(visualization.id)
+                        .paletteID(visualization.color)
                     ;
                 });
                 break;
