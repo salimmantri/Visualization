@@ -80,6 +80,46 @@
 
     SourceMappings.prototype.doMapAll = function (data) {
         var context = this;
+        var sumBy = [];
+        var sumField = "";
+        for (var key in this.mappings) {
+            var sumIdx = key.indexOf("_SUM")
+            if (sumIdx >= 0 && sumIdx === key.length - 4) {
+                sumField = key.substring(0, key.length - 4);
+            } else {
+                sumBy.push(key);
+            }
+        }
+        if (sumField) {
+            var nest = d3.nest();
+            sumBy.forEach(function (sumByItem) {
+                nest.key(function(d) { return d[sumByItem];});
+            });
+            nest.rollup(function (leaves) { return d3.sum(leaves, function (d) { return d[sumField]; }) })
+            var context = this;
+            var retVal = [];
+
+            function nodeToRow(node, idx, _row) {
+                var row = _row.map(function (d) { return d; });
+                row[context.columnsIdx[sumBy[idx]]] = node.key;
+                if (node.values instanceof Array) {
+                    node.values.forEach(function (d) {
+                        nodeToRow(d, idx + 1, row);
+                    });
+                } else {
+                    row[context.columnsIdx[sumField + "_SUM"]] = node.values;
+                    retVal.push(row);
+                }
+            }
+            var nested = nest.entries(data);
+            nested.forEach(function (d) {
+                var idx = 0;
+                var row = [];
+                nodeToRow(d, 0, row);
+            });
+
+            return retVal;
+        }
         return data.map(function (item) {
             return context.doMap(item);
         });
