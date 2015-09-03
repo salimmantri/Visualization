@@ -26,28 +26,41 @@
         ;
     };
     
-    Legend.prototype.targetWidget = function (widget) {
-        var context = this;
+    Legend.prototype.targetWidget = function (_) {
+        if (!arguments.length) return this._targetWidget;
+        this._targetWidget = _;
+        return this;
+    };
+
+    Legend.prototype.enter = function (domNode, element) {
+        Table.prototype.enter.apply(this, arguments);
+        this.renderHtmlDataCells(true);
+        this.fixedHeader(false);
+        element.classed("other_Legend", true);
+    };
+
+    Legend.prototype.update = function (domNode, element) {
+        if (this._targetWidget) {// && this._prevTargetWidgetID !== this._targetWidget.id()) {
             var colArr = ["Key", "Label"];
             var dataArr = [];
-            var widgetColumns = widget.columns();
+            var widgetColumns = this._targetWidget.columns();
 
-            var paletteType = widget._palette.toString().split("function ")[1].split("(")[0];
+            var paletteType = this._targetWidget._palette.toString().split("function ")[1].split("(")[0];
             if(paletteType === "ordinal"){
                 for(var i in widgetColumns){
                     if(i > 0){
                         dataArr.push([
-                            _htmlColorBlock(widget._palette(widgetColumns[i])),
+                            _htmlColorBlock(this._targetWidget._palette(widgetColumns[i])),
                             widgetColumns[i]
                         ]);
                     }
                 }
             } 
             else if (paletteType === "rainbow"){
-                var colorArr = widget._palette.colors().reverse();
+                var colorArr = this._targetWidget._palette.colors().reverse();
                 var steps = colorArr.length;
-                var weightMin = widget._dataMinWeight;
-                var weightMax = widget._dataMaxWeight;
+                var weightMin = this._targetWidget._dataMinWeight;
+                var weightMax = this._targetWidget._dataMaxWeight;
                 for(var x = 0;x<steps;x++){
                     var stepWeightDiff = parseInt((weightMax - weightMin) / steps);
                     var lower,higher;
@@ -65,34 +78,22 @@
                 }
             }
 
-            context.columns(colArr);
-            context.data(dataArr);
-
-            context._targetWidget = widget;
+            this.columns(colArr);
+            this.data(dataArr);
         
-        return this;
-        
-        function _htmlColorBlock(hexColor){
-            return "<div class=\"colorBlock\" style=\"background-color:"+hexColor+";\"></div>";
-        }
-        function commaSeparateNumber(val){
-            var int = val.toString().split(".")[0];
-            var dec = val.toString().split(".")[1];
-            while (/(\d+)(\d{3})/.test(int.toString())){
-                int = int.toString().replace(/(\d+)(\d{3})/, "$1"+","+"$2");
+            function _htmlColorBlock(hexColor){
+                return "<div class=\"colorBlock\" style=\"background-color:"+hexColor+";\"></div>";
             }
-            return typeof(dec) !== "undefined" ? int+"."+dec : int;
+            function commaSeparateNumber(val){
+                var int = val.toString().split(".")[0];
+                var dec = val.toString().split(".")[1];
+                while (/(\d+)(\d{3})/.test(int.toString())){
+                    int = int.toString().replace(/(\d+)(\d{3})/, "$1"+","+"$2");
+                }
+                return typeof(dec) !== "undefined" ? int+"."+dec : int;
+            }
         }
-    };
 
-    Legend.prototype.enter = function (domNode, element) {
-        Table.prototype.enter.apply(this, arguments);
-        this.renderHtmlDataCells(true);
-        this.fixedHeader(false);
-        element.classed("other_Legend", true);
-    };
-
-    Legend.prototype.update = function (domNode, element) {
         Table.prototype.update.apply(this, arguments);
         
         var context = this;

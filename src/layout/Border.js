@@ -31,15 +31,15 @@
 
     Border.prototype.publish("layoutType", "Default", "set", "This determines the placement/size of the Cells relative to the Border._target element", ["Default"], { tags: ["Private"] });
 
-    Border.prototype.publish("topCellSize", 0, "number", "Height of the 'Top' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("leftCellSize", 0, "number", "Width of the 'Left' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("rightCellSize", 0, "number", "Width of the 'Right' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("bottomCellSize", 0, "number", "Height of the 'Bottom' Cell (px)",null,{tags:["Private"]});
+    Border.prototype.publish("topCellSize", 0, "number", "Height of the 'Top' Cell (px)", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("leftCellSize", 0, "number", "Width of the 'Left' Cell (px)", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("rightCellSize", 0, "number", "Width of the 'Right' Cell (px)", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("bottomCellSize", 0, "number", "Height of the 'Bottom' Cell (px)", null, { tags: ["Private"], optional: true });
 
-    Border.prototype.publish("topCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Top' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("leftCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Left' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("rightCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Right' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("bottomCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Bottom' Cell",null,{tags:["Private"]});
+    Border.prototype.publish("topCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Top' Cell", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("leftCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Left' Cell", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("rightCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Right' Cell", null, { tags: ["Private"], optional: true });
+    Border.prototype.publish("bottomCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Bottom' Cell", null, { tags: ["Private"], optional: true });
 
     Border.prototype.publish("cellPadding", 0, "number", "Cell Padding (px)", null, { tags: ["Intermediate"] });
 

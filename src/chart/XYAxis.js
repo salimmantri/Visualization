@@ -546,7 +546,7 @@
             .attr("transform", "translate(0," + height + ")")
             .call(this.currAxis)
         ;
-        this.svgXAxisText
+        this.svgXAxisText.transition()
             .attr("x", width - 2)
             .text(isHorizontal ? this.columns()[0] : this.yAxisTitle())
         ;
