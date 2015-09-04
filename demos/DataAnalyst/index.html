@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Data Analyst</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/graph.css">
+    <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
+    <script src="../../src/config.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: ".."
+        });
+        var testData = "State	Covered Entity Type	Individuals Affected	Breach Submission Date	Type of Breach	Location of Breached Information	count	Breach Submission Date_year	Breach Submission Date_mth_num	Breach Submission Date_mth_name	Breach Submission Date_qtr	Breach Submission Date_yr_qtr	Breach Submission Date_week_day	Breach Submission Date_day	state_code\n" +
+"CT	Health Plan	6372	2010-07-27T04:00:00.000Z	Other	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	3-Tue	27	US-CT\n" +
+"SC	Health Plan	2850	2010-04-22T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	5-Thu	22	US-SC\n" +
+"TX	Healthcare Provider	4083	2010-05-25T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	3-Tue	25	US-TX\n" +
+"OH	Business Associate	1200	2010-07-23T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	23	US-OH\n" +
+"MO	Healthcare Provider	1907	2010-08-09T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	2-Mon	9	US-MO\n" +
+"IL	Healthcare Provider	967	2010-09-24T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	6-Fri	24	US-IL\n" +
+"MA	Business Associate	11000	2010-10-01T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	6-Fri	1	US-MA\n" +
+"TN	Healthcare Provider	8200	2010-11-30T05:00:00.000Z	Improper Disposal	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	30	US-TN\n" +
+"OH	Healthcare Provider	1000	2010-12-21T05:00:00.000Z	Improper Disposal	Paper/Films	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	3-Tue	21	US-OH\n" +
+"SC	Healthcare Provider	2717	2011-04-12T04:00:00.000Z	Improper Disposal	Paper/Films	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	3-Tue	12	US-SC\n" +
+"VA	Healthcare Provider	700	2011-07-22T04:00:00.000Z	Improper Disposal	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	22	US-VA\n" +
+"IL	Business Associate	2000	2011-12-09T05:00:00.000Z	Improper Disposal	Paper/Films	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	6-Fri	9	US-IL\n" +
+"IN	Healthcare Provider	1000	2012-04-12T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	5-Thu	12	US-IN\n" +
+"TX	Healthcare Provider	1000	2012-04-16T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	2-Mon	16	US-TX\n" +
+"AL	Healthcare Provider	1655	2012-05-04T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	4	US-AL\n" +
+"IA	Health Plan	3000	2012-05-11T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	11	US-IA\n" +
+"GA	Business Associate	13074	2012-10-08T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	2-Mon	8	US-GA\n" +
+"OH	Healthcare Provider	500	2012-10-29T04:00:00.000Z	Improper Disposal	Paper/Films	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	2-Mon	29	US-OH\n" +
+"NC	Healthcare Provider	1100	2012-11-29T05:00:00.000Z	Improper Disposal	Paper/Films	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-NC\n" +
+"NV	Healthcare Provider	1483	2013-01-08T05:00:00.000Z	Improper Disposal	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	3-Tue	8	US-NV\n" +
+"LA	Business Associate	16988	2013-01-31T05:00:00.000Z	Improper Disposal	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	31	US-LA\n" +
+"TX	Business Associate	189489	2013-05-07T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	7	US-TX\n" +
+"WA	Healthcare Provider	750	2013-05-07T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	7	US-WA\n" +
+"NY	Healthcare Provider	1586	2013-10-04T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	4	US-NY\n" +
+"CO	Healthcare Provider	606	2013-10-14T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	14	US-CO\n" +
+"FL	Business Associate	603	2013-10-29T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	3-Tue	29	US-FL\n" +
+"CA	Healthcare Provider	3534	2014-03-04T05:00:00.000Z	Improper Disposal	Paper/Films	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	3-Tue	4	US-CA\n" +
+"MO	Healthcare Provider	1376	2014-08-26T04:00:00.000Z	Improper Disposal	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	26	US-MO\n" +
+"MN	Healthcare Provider	1778	2014-11-25T05:00:00.000Z	Improper Disposal	Paper/Films	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	3-Tue	25	US-MN\n" +
+"MS	Healthcare Provider	19000	2015-02-04T05:00:00.000Z	Improper Disposal	Paper/Films	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	4-Wed	4	US-MS\n" +
+"OH	Healthcare Provider	5000	2015-02-05T05:00:00.000Z	Improper Disposal	Paper/Films	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	5-Thu	5	US-OH\n" +
+"TX	Healthcare Provider	1430	2010-04-28T04:00:00.000Z	Improper Disposal	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	4-Wed	28	US-TX\n" +
+"AZ	Healthcare Provider	2000	2011-06-09T04:00:00.000Z	Improper Disposal	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	9	US-AZ\n" +
+"OK	Healthcare Provider	1950	2010-11-29T05:00:00.000Z	Improper Disposal	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	2-Mon	29	US-OK\n" +
+"CA	Business Associate	49714	2014-08-15T04:00:00.000Z	Improper Disposal	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	15	US-CA\n" +
+"NC	Healthcare Provider	17300	2013-04-30T04:00:00.000Z	Improper Disposal	Paper/Films	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	3-Tue	30	US-NC\n" +
+"KY	Healthcare Provider	727	2014-10-22T04:00:00.000Z	Improper Disposal	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	22	US-KY\n" +
+"IL	Healthcare Provider	6800	2010-04-05T04:00:00.000Z	Loss	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	2-Mon	5	US-IL\n" +
+"	Business Associate	716	2010-11-02T04:00:00.000Z	Loss	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	2	US-null\n" +
+"MN	Healthcare Provider	1215	2011-04-14T04:00:00.000Z	Loss	Paper/Films	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	5-Thu	14	US-MN\n" +
+"CA	Business Associate	1192	2011-06-10T04:00:00.000Z	Loss	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	6-Fri	10	US-CA\n" +
+"IL	Healthcare Provider	518	2011-09-23T04:00:00.000Z	Loss	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	6-Fri	23	US-IL\n" +
+"MA	Healthcare Provider	6831	2012-04-06T04:00:00.000Z	Loss	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	6	US-MA\n" +
+"TN	Health Plan	1102	2012-05-31T04:00:00.000Z	Loss	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	5-Thu	31	US-TN\n" +
+"CO	Healthcare Provider	6262	2012-11-07T05:00:00.000Z	Loss	Paper/Films	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	4-Wed	7	US-CO\n" +
+"CA	Business Associate	14829	2013-04-29T04:00:00.000Z	Loss	Paper/Films	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	2-Mon	29	US-CA\n" +
+"CA	Business Associate	4718	2013-07-10T04:00:00.000Z	Loss	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	4-Wed	10	US-CA\n" +
+"CA	Business Associate	1674	2013-12-20T05:00:00.000Z	Loss	Paper/Films	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	20	US-CA\n" +
+"FL	Healthcare Provider	13074	2014-02-12T05:00:00.000Z	Loss	Paper/Films	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	12	US-FL\n" +
+"KS	Healthcare Provider	979	2014-04-09T04:00:00.000Z	Loss	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	9	US-KS\n" +
+"CT	Business Associate	527	2014-04-09T04:00:00.000Z	Loss	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	9	US-CT\n" +
+"OH	Healthcare Provider	617	2014-04-18T04:00:00.000Z	Loss	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	18	US-OH\n" +
+"PA	Healthcare Provider	1845	2014-04-29T04:00:00.000Z	Loss	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	29	US-PA\n" +
+"OH	Healthcare Provider	605	2014-08-06T04:00:00.000Z	Loss	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	4-Wed	6	US-OH\n" +
+"WY	Healthcare Provider	1607	2014-12-01T05:00:00.000Z	Loss	Paper/Films	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	2-Mon	1	US-WY\n" +
+"IL	Business Associate	680	2015-02-09T05:00:00.000Z	Loss	Paper/Films	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	2-Mon	9	US-IL\n" +
+"NC	Healthcare Provider	955	2015-02-09T05:00:00.000Z	Loss	Paper/Films	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	2-Mon	9	US-NC\n" +
+"KS	Healthcare Provider	4668	2015-03-03T05:00:00.000Z	Loss	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	3	US-KS\n" +
+"IN	Healthcare Provider	650	2015-03-20T04:00:00.000Z	Loss	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	20	US-IN\n" +
+"MA	Healthcare Provider	2473	2015-03-20T04:00:00.000Z	Loss	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	20	US-MA\n" +
+"FL	Healthcare Provider	627	2015-03-24T04:00:00.000Z	Loss	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	24	US-FL\n" +
+"OH	Healthcare Provider	2584	2015-04-23T04:00:00.000Z	Loss	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	23	US-OH\n" +
+"KS	Healthcare Provider	864	2015-04-28T04:00:00.000Z	Loss	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	28	US-KS\n" +
+"IL	Healthcare Provider	1138	2015-05-01T04:00:00.000Z	Loss	Paper/Films	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	1	US-IL\n" +
+"CA	Healthcare Provider	1339	2015-05-06T04:00:00.000Z	Loss	Paper/Films	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	4-Wed	6	US-CA\n" +
+"UT	Healthcare Provider	2600	2013-03-22T04:00:00.000Z	Loss	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	22	US-UT\n" +
+"PA	Healthcare Provider	8000	2010-04-02T04:00:00.000Z	Loss	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	6-Fri	2	US-PA\n" +
+"IL	Healthcare Provider	657	2010-08-05T04:00:00.000Z	Loss	Paper/Films	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	5	US-IL\n" +
+"MA	Business Associate	10000	2014-08-15T04:00:00.000Z	Loss	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	15	US-MA\n" +
+"VA	Business Associate	83000	2009-12-08T05:00:00.000Z	Other	Paper/Films	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	3-Tue	8	US-VA\n" +
+"RI	Business Associate	528	2010-02-16T05:00:00.000Z	Other	Paper/Films	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	3-Tue	16	US-RI\n" +
+"FL	Healthcare Provider	3800	2010-03-17T04:00:00.000Z	Other	Paper/Films	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	4-Wed	17	US-FL\n" +
+"GA	Business Associate	660	2010-04-09T04:00:00.000Z	Other	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	6-Fri	9	US-GA\n" +
+"NY	Healthcare Provider	2628	2010-05-20T04:00:00.000Z	Other	Paper/Films	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	5-Thu	20	US-NY\n" +
+"MN	Health Plan	16291	2010-06-04T04:00:00.000Z	Other	Paper/Films	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	6-Fri	4	US-MN\n" +
+"CA	Healthcare Provider	1000	2010-06-29T04:00:00.000Z	Other	Paper/Films	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	29	US-CA\n" +
+"FL	Healthcare Provider	2047	2010-07-08T04:00:00.000Z	Other	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	5-Thu	8	US-FL\n" +
+"MN	Business Associate	1097	2010-07-17T04:00:00.000Z	Other	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	7-Sat	17	US-MN\n" +
+"SC	Business Associate	1270	2010-09-20T04:00:00.000Z	Other	Paper/Films	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	2-Mon	20	US-SC\n" +
+"PA	Healthcare Provider	2900	2011-12-07T05:00:00.000Z	Other	Paper/Films	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	4-Wed	7	US-PA\n" +
+"CA	Health Plan	11081	2011-12-17T05:00:00.000Z	Other	Paper/Films	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	7-Sat	17	US-CA\n" +
+"CA	Business Associate	1700	2012-01-13T05:00:00.000Z	Other	Paper/Films	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	6-Fri	13	US-CA\n" +
+"CA	Health Plan	11646	2012-01-19T05:00:00.000Z	Other	Paper/Films	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	5-Thu	19	US-CA\n" +
+"MN	Health Plan	6678	2012-02-01T05:00:00.000Z	Other	Paper/Films	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	1	US-MN\n" +
+"CA	Healthcare Provider	1366	2012-02-08T05:00:00.000Z	Other	Paper/Films	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	8	US-CA\n" +
+"KY	Healthcare Provider	1182	2012-03-06T05:00:00.000Z	Other	Paper/Films	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	3-Tue	6	US-KY\n" +
+"IL	Business Associate	3482	2012-03-23T04:00:00.000Z	Other	Paper/Films	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	23	US-IL\n" +
+"AR	Health Plan	2863	2012-12-20T05:00:00.000Z	Other	Paper/Films	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	5-Thu	20	US-AR\n" +
+"FL	Healthcare Provider	566	2013-02-13T05:00:00.000Z	Other	Paper/Films	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	4-Wed	13	US-FL\n" +
+"IN	Business Associate	187533	2013-07-01T04:00:00.000Z	Other	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	2-Mon	1	US-IN\n" +
+"CA	Health Plan	8331	2013-07-02T04:00:00.000Z	Other	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	3-Tue	2	US-CA\n" +
+"IL	Business Associate	3133	2013-07-08T04:00:00.000Z	Other	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	2-Mon	8	US-IL\n" +
+"CA	Healthcare Provider	1033	2013-08-16T04:00:00.000Z	Other	Paper/Films	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	16	US-CA\n" +
+"FL	Healthcare Provider	1471	2013-08-22T04:00:00.000Z	Other	Paper/Films	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	5-Thu	22	US-FL\n" +
+"WA	Healthcare Provider	1015	2013-10-03T04:00:00.000Z	Other	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	5-Thu	3	US-WA\n" +
+"TX	Health Plan	6284	2013-11-01T04:00:00.000Z	Other	Paper/Films	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	1	US-TX\n" +
+"IL	Healthcare Provider	17350	2013-12-06T05:00:00.000Z	Other	Paper/Films	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-IL\n" +
+"TX	Health Plan	2826	2013-12-21T05:00:00.000Z	Other	Paper/Films	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	7-Sat	21	US-TX\n" +
+"NC	Healthcare Provider	1683	2013-12-23T05:00:00.000Z	Other	Paper/Films	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	23	US-NC\n" +
+"MI	Business Associate	3000	2014-01-06T05:00:00.000Z	Other	Paper/Films	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	2-Mon	6	US-MI\n" +
+"IL	Healthcare Provider	836	2014-04-04T04:00:00.000Z	Other	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	4	US-IL\n" +
+"NV	Business Associate	4744	2014-05-10T04:00:00.000Z	Other	Paper/Films	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	7-Sat	10	US-NV\n" +
+"IL	Healthcare Provider	160000	2014-12-15T05:00:00.000Z	Other	Paper/Films	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	2-Mon	15	US-IL\n" +
+"CA	Business Associate	1368	2013-02-12T05:00:00.000Z	Theft	Paper/Films	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	3-Tue	12	US-CA\n" +
+"ND	Healthcare Provider	2000	2013-11-12T05:00:00.000Z	Theft	Paper/Films	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	12	US-ND\n" +
+"VA	Business Associate	1444	2012-01-23T05:00:00.000Z	Theft	Paper/Films	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	2-Mon	23	US-VA\n" +
+"IL	Health Plan	754	2012-08-21T04:00:00.000Z	Theft	Paper/Films	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	3-Tue	21	US-IL\n" +
+"FL	Healthcare Provider	64846	2012-09-07T04:00:00.000Z	Theft	Paper/Films	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	6-Fri	7	US-FL\n" +
+"WA	Health Plan	3104	2014-02-11T05:00:00.000Z	Theft	Paper/Films	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	3-Tue	11	US-WA\n" +
+"RI	Healthcare Provider	2082	2013-03-29T04:00:00.000Z	Theft	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	29	US-RI\n" +
+"TX	Healthcare Provider	1000	2009-10-21T04:00:00.000Z	Theft	Paper/Films	1	2009	10	[10] Oct	 Qtr_4	2009 Qtr_4	4-Wed	21	US-TX\n" +
+"DC	Business Associate	3400	2010-01-08T05:00:00.000Z	Theft	Paper/Films	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	6-Fri	8	US-DC\n" +
+"MD	Business Associate	15000	2010-01-11T05:00:00.000Z	Theft	Paper/Films	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	2-Mon	11	US-MD\n" +
+"PR	Business Associate	1907	2010-02-17T05:00:00.000Z	Theft	Paper/Films	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	4-Wed	17	US-PR\n" +
+"PR	Business Associate	605	2010-02-17T05:00:00.000Z	Theft	Paper/Films	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	4-Wed	17	US-PR\n" +
+"TN	Health Plan	3900	2010-02-19T05:00:00.000Z	Theft	Paper/Films	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	6-Fri	19	US-TN\n" +
+"NY	Healthcare Provider	500	2010-02-25T05:00:00.000Z	Theft	Paper/Films	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	5-Thu	25	US-NY\n" +
+"NC	Healthcare Provider	554	2010-03-03T05:00:00.000Z	Theft	Paper/Films	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	4-Wed	3	US-NC\n" +
+"RI	Health Plan	12000	2010-04-21T04:00:00.000Z	Theft	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	4-Wed	21	US-RI\n" +
+"CO	Healthcare Provider	649	2010-05-05T04:00:00.000Z	Theft	Paper/Films	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	4-Wed	5	US-CO\n" +
+"FL	Healthcare Provider	568	2010-05-05T04:00:00.000Z	Theft	Paper/Films	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	4-Wed	5	US-FL\n" +
+"NY	Business Associate	2631	2010-07-30T04:00:00.000Z	Theft	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-NY\n" +
+"NC	Healthcare Provider	1590	2010-07-30T04:00:00.000Z	Theft	Paper/Films	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-NC\n" +
+"MA	Business Associate	24750	2010-08-25T04:00:00.000Z	Theft	Paper/Films	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	4-Wed	25	US-MA\n" +
+"NV	Healthcare Provider	507	2010-09-10T04:00:00.000Z	Theft	Paper/Films	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	6-Fri	10	US-NV\n" +
+"RI	Healthcare Provider	1361	2010-09-10T04:00:00.000Z	Theft	Paper/Films	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	6-Fri	10	US-RI\n" +
+"CA	Healthcare Provider	33000	2010-09-17T04:00:00.000Z	Theft	Paper/Films	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	6-Fri	17	US-CA\n" +
+"KY	Healthcare Provider	2200	2010-10-05T04:00:00.000Z	Theft	Paper/Films	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	3-Tue	5	US-KY\n" +
+"FL	Healthcare Provider	1500	2010-11-16T05:00:00.000Z	Theft	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	16	US-FL\n" +
+"MD	Business Associate	800	2010-12-29T05:00:00.000Z	Theft	Paper/Films	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	4-Wed	29	US-MD\n" +
+"CO	Healthcare Provider	546	2011-02-07T05:00:00.000Z	Theft	Paper/Films	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	2-Mon	7	US-CO\n" +
+"WA	Healthcare Provider	3100	2011-02-09T05:00:00.000Z	Theft	Paper/Films	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	4-Wed	9	US-WA\n" +
+"AZ	Healthcare Provider	566	2011-04-14T04:00:00.000Z	Theft	Paper/Films	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	5-Thu	14	US-AZ\n" +
+"PA	Healthcare Provider	1388	2011-05-09T04:00:00.000Z	Theft	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	2-Mon	9	US-PA\n" +
+"NY	Business Associate	550	2011-05-19T04:00:00.000Z	Theft	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	5-Thu	19	US-NY\n" +
+"PR	Healthcare Provider	6006	2011-05-26T04:00:00.000Z	Theft	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	5-Thu	26	US-PR\n" +
+"GA	Healthcare Provider	7500	2011-07-15T04:00:00.000Z	Theft	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	15	US-GA\n" +
+"IL	Health Plan	501	2011-07-28T04:00:00.000Z	Theft	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	5-Thu	28	US-IL\n" +
+"CA	Healthcare Provider	1800	2011-09-07T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	7	US-CA\n" +
+"PR	Healthcare Provider	2000	2011-09-13T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	3-Tue	13	US-PR\n" +
+"TX	Healthcare Provider	2541	2011-09-14T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	14	US-TX\n" +
+"MS	Healthcare Provider	1797	2011-09-20T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	3-Tue	20	US-MS\n" +
+"NY	Healthcare Provider	2600	2011-09-26T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	2-Mon	26	US-NY\n" +
+"TN	Healthcare Provider	731	2011-09-28T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	28	US-TN\n" +
+"FL	Healthcare Provider	2200	2011-10-25T04:00:00.000Z	Theft	Paper/Films	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	25	US-FL\n" +
+"MI	Business Associate	1100	2011-10-28T04:00:00.000Z	Theft	Paper/Films	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	28	US-MI\n" +
+"NM	Health Plan	1537	2011-11-13T05:00:00.000Z	Theft	Paper/Films	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	1-Sun	13	US-NM\n" +
+"NE	Healthcare Provider	611	2011-12-09T05:00:00.000Z	Theft	Paper/Films	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	6-Fri	9	US-NE\n" +
+"NH	Healthcare Provider	771	2012-01-16T05:00:00.000Z	Theft	Paper/Films	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	2-Mon	16	US-NH\n" +
+"NJ	Healthcare Provider	1287	2012-02-13T05:00:00.000Z	Theft	Paper/Films	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	2-Mon	13	US-NJ\n" +
+"CA	Healthcare Provider	1431	2012-03-12T04:00:00.000Z	Theft	Paper/Films	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	2-Mon	12	US-CA\n" +
+"CA	Health Plan	875	2012-03-14T04:00:00.000Z	Theft	Paper/Films	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	4-Wed	14	US-CA\n" +
+"CA	Healthcare Provider	712	2012-03-29T04:00:00.000Z	Theft	Paper/Films	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	5-Thu	29	US-CA\n" +
+"TX	Healthcare Provider	502	2012-04-04T04:00:00.000Z	Theft	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	4-Wed	4	US-TX\n" +
+"FL	Healthcare Provider	750	2012-04-23T04:00:00.000Z	Theft	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	2-Mon	23	US-FL\n" +
+"OR	Healthcare Provider	550	2012-04-26T04:00:00.000Z	Theft	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	5-Thu	26	US-OR\n" +
+"TX	Healthcare Provider	750	2012-05-03T04:00:00.000Z	Theft	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	5-Thu	3	US-TX\n" +
+"WV	Healthcare Provider	2905	2012-05-10T04:00:00.000Z	Theft	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	5-Thu	10	US-WV\n" +
+"CA	Healthcare Provider	745	2012-05-23T04:00:00.000Z	Theft	Paper/Films	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	4-Wed	23	US-CA\n" +
+"FL	Healthcare Provider	1409	2012-06-14T04:00:00.000Z	Theft	Paper/Films	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	5-Thu	14	US-FL\n" +
+"IL	Healthcare Provider	1500	2012-07-12T04:00:00.000Z	Theft	Paper/Films	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	5-Thu	12	US-IL\n" +
+"IA	Healthcare Provider	1298	2012-07-16T04:00:00.000Z	Theft	Paper/Films	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	2-Mon	16	US-IA\n" +
+"IL	Healthcare Provider	1240	2012-07-30T04:00:00.000Z	Theft	Paper/Films	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	2-Mon	30	US-IL\n" +
+"NJ	Healthcare Provider	638	2012-10-23T04:00:00.000Z	Theft	Paper/Films	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	3-Tue	23	US-NJ\n" +
+"RI	Healthcare Provider	955	2012-10-26T04:00:00.000Z	Theft	Paper/Films	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	6-Fri	26	US-RI\n" +
+"IL	Business Associate	508	2012-11-02T04:00:00.000Z	Theft	Paper/Films	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	6-Fri	2	US-IL\n" +
+"GA	Healthcare Provider	1306	2012-11-27T05:00:00.000Z	Theft	Paper/Films	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	3-Tue	27	US-GA\n" +
+"FL	Healthcare Provider	4907	2012-12-07T05:00:00.000Z	Theft	Paper/Films	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	7	US-FL\n" +
+"AZ	Healthcare Provider	35488	2012-12-21T05:00:00.000Z	Theft	Paper/Films	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	21	US-AZ\n" +
+"NY	Health Plan	1771	2013-01-02T05:00:00.000Z	Theft	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	4-Wed	2	US-NY\n" +
+"NY	Business Associate	725	2013-01-22T05:00:00.000Z	Theft	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	3-Tue	22	US-NY\n" +
+"WI	Healthcare Provider	2400	2013-01-25T05:00:00.000Z	Theft	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	6-Fri	25	US-WI\n" +
+"CA	Health Plan	686	2013-02-25T05:00:00.000Z	Theft	Paper/Films	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	2-Mon	25	US-CA\n" +
+"OH	Business Associate	2261	2013-03-01T05:00:00.000Z	Theft	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	1	US-OH\n" +
+"PA	Healthcare Provider	527	2013-03-04T05:00:00.000Z	Theft	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	2-Mon	4	US-PA\n" +
+"TX	Healthcare Provider	554	2013-04-05T04:00:00.000Z	Theft	Paper/Films	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	6-Fri	5	US-TX\n" +
+"MO	Healthcare Provider	589	2013-04-11T04:00:00.000Z	Theft	Paper/Films	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	5-Thu	11	US-MO\n" +
+"NC	Healthcare Provider	1093	2013-06-14T04:00:00.000Z	Theft	Paper/Films	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	6-Fri	14	US-NC\n" +
+"FL	Healthcare Provider	5200	2013-06-24T04:00:00.000Z	Theft	Paper/Films	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	2-Mon	24	US-FL\n" +
+"AZ	Business Associate	4305	2013-07-02T04:00:00.000Z	Theft	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	3-Tue	2	US-AZ\n" +
+"OH	Healthcare Provider	2203	2013-07-03T04:00:00.000Z	Theft	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	4-Wed	3	US-OH\n" +
+"MN	Healthcare Provider	2764	2013-07-10T04:00:00.000Z	Theft	Paper/Films	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	4-Wed	10	US-MN\n" +
+"PA	Healthcare Provider	2350	2013-10-03T04:00:00.000Z	Theft	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	5-Thu	3	US-PA\n" +
+"VA	Business Associate	25513	2014-01-10T05:00:00.000Z	Theft	Paper/Films	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	10	US-VA\n" +
+"CT	Healthcare Provider	858	2014-01-16T05:00:00.000Z	Theft	Paper/Films	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	5-Thu	16	US-CT\n" +
+"MT	Healthcare Provider	543	2014-03-24T04:00:00.000Z	Theft	Paper/Films	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	24	US-MT\n" +
+"VA	Business Associate	75026	2014-04-10T04:00:00.000Z	Theft	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	10	US-VA\n" +
+"AL	Healthcare Provider	629	2014-04-25T04:00:00.000Z	Theft	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-AL\n" +
+"IL	Business Associate	5696	2014-04-30T04:00:00.000Z	Theft	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	30	US-IL\n" +
+"PA	Business Associate	2589	2014-07-08T04:00:00.000Z	Theft	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	3-Tue	8	US-PA\n" +
+"PA	Healthcare Provider	661	2014-07-16T04:00:00.000Z	Theft	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	16	US-PA\n" +
+"WA	Healthcare Provider	522	2014-07-30T04:00:00.000Z	Theft	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	30	US-WA\n" +
+"CA	Healthcare Provider	500	2014-08-18T04:00:00.000Z	Theft	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	2-Mon	18	US-CA\n" +
+"GA	Healthcare Provider	2350	2014-08-25T04:00:00.000Z	Theft	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	2-Mon	25	US-GA\n" +
+"TN	Business Associate	566	2014-09-04T04:00:00.000Z	Theft	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	5-Thu	4	US-TN\n" +
+"TN	Business Associate	800	2014-09-12T04:00:00.000Z	Theft	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	12	US-TN\n" +
+"NY	Healthcare Provider	20000	2014-10-22T04:00:00.000Z	Theft	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	22	US-NY\n" +
+"OR	Healthcare Provider	1740	2014-10-29T04:00:00.000Z	Theft	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	29	US-OR\n" +
+"CA	Business Associate	2691	2014-11-14T05:00:00.000Z	Theft	Paper/Films	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	14	US-CA\n" +
+"PA	Healthcare Provider	860	2014-11-19T05:00:00.000Z	Theft	Paper/Films	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	4-Wed	19	US-PA\n" +
+"TX	Healthcare Provider	4920	2015-01-16T05:00:00.000Z	Theft	Paper/Films	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	6-Fri	16	US-TX\n" +
+"CA	Healthcare Provider	1342	2015-03-05T05:00:00.000Z	Theft	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	5	US-CA\n" +
+"MI	Health Plan	3903	2015-03-17T04:00:00.000Z	Theft	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	17	US-MI\n" +
+"CA	Healthcare Provider	826	2015-04-02T04:00:00.000Z	Theft	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-CA\n" +
+"CA	Healthcare Provider	880	2015-04-29T04:00:00.000Z	Theft	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	4-Wed	29	US-CA\n" +
+"AZ	Healthcare Provider	654	2011-05-11T04:00:00.000Z	Theft	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	4-Wed	11	US-AZ\n" +
+"PA	Business Associate	579	2011-09-28T04:00:00.000Z	Theft	Paper/Films	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	28	US-PA\n" +
+"CA	Business Associate	700	2011-10-07T04:00:00.000Z	Theft	Paper/Films	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	7	US-CA\n" +
+"IN	Healthcare Provider	1423	2012-01-26T05:00:00.000Z	Theft	Paper/Films	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	5-Thu	26	US-IN\n" +
+"MI	Healthcare Provider	1087	2014-03-13T04:00:00.000Z	Theft	Paper/Films	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	5-Thu	13	US-MI\n" +
+"GA	Business Associate	2523	2014-04-17T04:00:00.000Z	Theft	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	17	US-GA\n" +
+"NJ	Healthcare Provider	2828	2014-05-09T04:00:00.000Z	Theft	Paper/Films	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	6-Fri	9	US-NJ\n" +
+"VA	Healthcare Provider	568	2014-10-10T04:00:00.000Z	Theft	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	10	US-VA\n" +
+"IN	Healthcare Provider	845	2010-11-12T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	6-Fri	12	US-IN\n" +
+"CA	Healthcare Provider	771	2010-11-25T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	5-Thu	25	US-CA\n" +
+"MI	Business Associate	9475	2010-12-03T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	6-Fri	3	US-MI\n" +
+"AZ	Business Associate	4500	2011-03-01T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	3-Tue	1	US-AZ\n" +
+"MD	Business Associate	765	2011-03-18T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	6-Fri	18	US-MD\n" +
+"WV	Healthcare Provider	1470	2011-03-30T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	4-Wed	30	US-WV\n" +
+"AL	Business Associate	13412	2011-05-25T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	4-Wed	25	US-AL\n" +
+"WV	Healthcare Provider	950	2011-06-16T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	16	US-WV\n" +
+"CA	Health Plan	694	2011-06-29T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	29	US-CA\n" +
+"AL	Healthcare Provider	880	2011-07-08T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	8	US-AL\n" +
+"TX	Business Associate	4573	2011-07-22T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	22	US-TX\n" +
+"UT	Business Associate	1378	2011-07-22T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	22	US-UT\n" +
+"CA	Healthcare Provider	1500	2011-07-29T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	29	US-CA\n" +
+"WA	Health Plan	3950	2011-08-09T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	3-Tue	9	US-WA\n" +
+"TN	Health Plan	1770	2011-11-28T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	2-Mon	28	US-TN\n" +
+"DC	Healthcare Provider	1549	2012-02-15T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	15	US-DC\n" +
+"MI	Business Associate	555	2012-04-10T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	3-Tue	10	US-MI\n" +
+"CA	Healthcare Provider	1370	2012-11-29T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-CA\n" +
+"OH	Business Associate	635	2013-01-08T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	3-Tue	8	US-OH\n" +
+"AZ	Health Plan	852	2013-01-08T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	3-Tue	8	US-AZ\n" +
+"MA	Business Associate	3667	2013-02-19T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	3-Tue	19	US-MA\n" +
+"TX	Healthcare Provider	697	2013-03-22T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	22	US-TX\n" +
+"CA	Business Associate	2400	2013-03-29T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	29	US-CA\n" +
+"PA	Business Associate	3794	2013-04-05T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	6-Fri	5	US-PA\n" +
+"OR	Healthcare Provider	959	2013-06-14T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	6-Fri	14	US-OR\n" +
+"MO	Business Associate	1357	2013-08-13T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	3-Tue	13	US-MO\n" +
+"MO	Business Associate	25461	2013-09-20T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	20	US-MO\n" +
+"TN	Business Associate	4330	2013-10-04T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	4	US-TN\n" +
+"NC	Health Plan	687	2013-11-07T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	5-Thu	7	US-NC\n" +
+"PR	Business Associate	13336	2013-11-08T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	8	US-PR\n" +
+"OH	Business Associate	1420	2014-01-27T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	2-Mon	27	US-OH\n" +
+"FL	Business Associate	580	2014-03-31T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	31	US-FL\n" +
+"TN	Healthcare Provider	1144	2014-04-14T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	2-Mon	14	US-TN\n" +
+"DC	Business Associate	2200	2014-04-24T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	24	US-DC\n" +
+"IA	Health Plan	862	2014-04-25T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-IA\n" +
+"PR	Health Plan	11531	2014-05-18T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	1-Sun	18	US-PR\n" +
+"PR	Health Plan	56853	2014-05-29T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	5-Thu	29	US-PR\n" +
+"CA	Healthcare Provider	592	2014-07-04T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	6-Fri	4	US-CA\n" +
+"IN	Business Associate	63325	2014-07-09T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	9	US-IN\n" +
+"MN	Health Plan	500	2014-07-17T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	5-Thu	17	US-MN\n" +
+"NY	Health Plan	802	2014-08-27T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	4-Wed	27	US-NY\n" +
+"GA	Healthcare Provider	10000	2014-09-04T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	5-Thu	4	US-GA\n" +
+"IN	Health Plan	1464	2014-09-08T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	2-Mon	8	US-IN\n" +
+"SC	Healthcare Provider	3637	2014-09-10T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	4-Wed	10	US-SC\n" +
+"IL	Healthcare Provider	1866	2014-09-10T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	4-Wed	10	US-IL\n" +
+"NM	Healthcare Provider	2657	2014-09-18T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	5-Thu	18	US-NM\n" +
+"PA	Business Associate	1667	2014-10-07T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	3-Tue	7	US-PA\n" +
+"TX	Healthcare Provider	4000	2014-10-09T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	5-Thu	9	US-TX\n" +
+"NC	Healthcare Provider	1872	2014-10-09T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	5-Thu	9	US-NC\n" +
+"NY	Healthcare Provider	10058	2014-10-10T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	10	US-NY\n" +
+"TX	Business Associate	4469	2014-11-25T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	3-Tue	25	US-TX\n" +
+"MD	Health Plan	630	2015-01-29T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	5-Thu	29	US-MD\n" +
+"IN	Healthcare Provider	63325	2015-02-27T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	6-Fri	27	US-IN\n" +
+"OR	Healthcare Provider	2207	2015-03-05T05:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	5	US-OR\n" +
+"FL	Healthcare Provider	1406	2015-03-20T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	20	US-FL\n" +
+"CO	Healthcare Provider	508	2015-04-02T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-CO\n" +
+"TN	Health Plan	862	2015-04-02T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-TN\n" +
+"GA	Health Plan	958	2015-04-02T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-GA\n" +
+"MN	Healthcare Provider	838	2015-04-06T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	2-Mon	6	US-MN\n" +
+"IL	Healthcare Provider	2984	2015-04-13T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	2-Mon	13	US-IL\n" +
+"OH	Healthcare Provider	2000	2015-04-27T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	2-Mon	27	US-OH\n" +
+"GA	Health Plan	6166	2015-05-15T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	15	US-GA\n" +
+"IL	Healthcare Provider	8300	2015-05-21T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	5-Thu	21	US-IL\n" +
+"NY	Healthcare Provider	3403	2015-05-22T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	22	US-NY\n" +
+"WA	Health Plan	2700	2011-06-08T04:00:00.000Z	Other	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	8	US-WA\n" +
+"MO	Healthcare Provider	1288	2011-06-23T04:00:00.000Z	Other	Paper/Films	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	23	US-MO\n" +
+"NC	Healthcare Provider	551	2011-10-28T04:00:00.000Z	Other	Paper/Films	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	28	US-NC\n" +
+"IL	Healthcare Provider	1300	2010-01-28T05:00:00.000Z	Theft	Paper/Films	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	5-Thu	28	US-IL\n" +
+"MN	Health Plan	735	2010-04-27T04:00:00.000Z	Theft	Paper/Films	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	3-Tue	27	US-MN\n" +
+"FL	Healthcare Provider	8000	2011-05-11T04:00:00.000Z	Theft	Paper/Films	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	4-Wed	11	US-FL\n" +
+"MD	Healthcare Provider	5000	2011-11-03T04:00:00.000Z	Theft	Paper/Films	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	5-Thu	3	US-MD\n" +
+"PA	Healthcare Provider	2345	2015-06-03T04:00:00.000Z	Theft	Paper/Films	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	4-Wed	3	US-PA\n" +
+"NY	Healthcare Provider	7448	2015-03-11T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	4-Wed	11	US-NY\n" +
+"MD	Healthcare Provider	500	2015-06-09T04:00:00.000Z	Unauthorized Access/Disclosure	Paper/Films	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	3-Tue	9	US-MD\n" +
+"TX	Healthcare Provider	3800	2010-01-18T05:00:00.000Z	Loss	Portable Electronic Device	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	2-Mon	18	US-TX\n" +
+"TN	Healthcare Provider	1711	2010-08-16T04:00:00.000Z	Loss	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	2-Mon	16	US-TN\n" +
+"NY	Healthcare Provider	1200	2010-08-27T04:00:00.000Z	Loss	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	6-Fri	27	US-NY\n" +
+"PA	Health Plan	808	2010-12-30T05:00:00.000Z	Loss	Portable Electronic Device	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	5-Thu	30	US-PA\n" +
+"TX	Business Associate	16200	2011-01-18T05:00:00.000Z	Loss	Portable Electronic Device	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	18	US-TX\n" +
+"AZ	Healthcare Provider	2291	2011-02-21T05:00:00.000Z	Loss	Portable Electronic Device	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	2-Mon	21	US-AZ\n" +
+"MI	Healthcare Provider	2777	2011-02-23T05:00:00.000Z	Loss	Portable Electronic Device	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	4-Wed	23	US-MI\n" +
+"VA	Business Associate	4000	2011-09-22T04:00:00.000Z	Loss	Portable Electronic Device	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	5-Thu	22	US-VA\n" +
+"CT	Business Associate	1631	2011-10-03T04:00:00.000Z	Loss	Portable Electronic Device	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	3	US-CT\n" +
+"CA	Business Associate	29000	2010-07-06T04:00:00.000Z	Loss	Portable Electronic Device	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	3-Tue	6	US-CA\n" +
+"KY	Healthcare Provider	24600	2010-12-29T05:00:00.000Z	Loss	Portable Electronic Device	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	4-Wed	29	US-KY\n" +
+"TX	Healthcare Provider	9922	2011-02-13T05:00:00.000Z	Loss	Portable Electronic Device	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	1-Sun	13	US-TX\n" +
+"KY	Healthcare Provider	1986	2011-06-02T04:00:00.000Z	Loss	Portable Electronic Device	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	2	US-KY\n" +
+"GA	Business Associate	11440	2010-08-05T04:00:00.000Z	Other	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	5	US-GA\n" +
+"AK	Healthcare Provider	501	2009-10-30T04:00:00.000Z	Theft	Portable Electronic Device	1	2009	10	[10] Oct	 Qtr_4	2009 Qtr_4	6-Fri	30	US-AK\n" +
+"CA	Healthcare Provider	15500	2010-01-12T05:00:00.000Z	Theft	Portable Electronic Device	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	3-Tue	12	US-CA\n" +
+"TX	Healthcare Provider	21000	2010-03-10T05:00:00.000Z	Theft	Portable Electronic Device	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	4-Wed	10	US-TX\n" +
+"KY	Healthcare Provider	5148	2010-04-26T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	2-Mon	26	US-KY\n" +
+"IL	Business Associate	180111	2010-04-29T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	5-Thu	29	US-IL\n" +
+"NY	Healthcare Provider	800	2010-07-07T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	4-Wed	7	US-NY\n" +
+"NM	Healthcare Provider	1000	2010-08-25T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	4-Wed	25	US-NM\n" +
+"NY	Business Associate	956	2010-08-26T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	26	US-NY\n" +
+"AK	Business Associate	2000	2010-09-22T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	4-Wed	22	US-AK\n" +
+"CA	Business Associate	1474	2010-09-23T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	5-Thu	23	US-CA\n" +
+"CA	Business Associate	1474	2010-09-23T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	5-Thu	23	US-CA\n" +
+"AR	Healthcare Provider	1000	2010-10-18T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	2-Mon	18	US-AR\n" +
+"CA	Healthcare Provider	1250	2010-12-22T05:00:00.000Z	Theft	Portable Electronic Device	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	4-Wed	22	US-CA\n" +
+"AL	Healthcare Provider	2000	2010-12-30T05:00:00.000Z	Theft	Portable Electronic Device	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	5-Thu	30	US-AL\n" +
+"WA	Healthcare Provider	12009	2011-01-21T05:00:00.000Z	Theft	Portable Electronic Device	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	6-Fri	21	US-WA\n" +
+"TX	Healthcare Provider	8241	2011-01-25T05:00:00.000Z	Theft	Portable Electronic Device	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	25	US-TX\n" +
+"FL	Business Associate	2700	2011-02-15T05:00:00.000Z	Theft	Portable Electronic Device	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	3-Tue	15	US-FL\n" +
+"AZ	Healthcare Provider	635	2011-03-31T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	5-Thu	31	US-AZ\n" +
+"	Business Associate	10000	2011-04-04T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	4	US-null\n" +
+"OR	Business Associate	17000	2011-06-08T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	8	US-OR\n" +
+"SC	Healthcare Provider	1280	2011-06-09T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	9	US-SC\n" +
+"WA	Healthcare Provider	1105	2011-06-17T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	6-Fri	17	US-WA\n" +
+"NJ	Business Associate	8795	2011-08-08T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	2-Mon	8	US-NJ\n" +
+"GA	Healthcare Provider	63425	2011-08-15T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	2-Mon	15	US-GA\n" +
+"NJ	Business Associate	32008	2011-08-18T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	5-Thu	18	US-NJ\n" +
+"IN	Healthcare Provider	2059	2011-09-08T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	5-Thu	8	US-IN\n" +
+"MA	Healthcare Provider	2200	2011-10-07T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	7	US-MA\n" +
+"TX	Healthcare Provider	567	2011-10-31T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	31	US-TX\n" +
+"CA		2761	2011-11-04T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	6-Fri	4	US-CA\n" +
+"PR	Business Associate	115000	2010-11-09T05:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	9	US-PR\n" +
+"WA	Healthcare Provider	2000	2015-01-29T05:00:00.000Z	Theft	Portable Electronic Device	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	5-Thu	29	US-WA\n" +
+"TX	Business Associate	2260	2014-03-17T04:00:00.000Z	Improper Disposal	Portable Electronic Device	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	17	US-TX\n" +
+"NY	Healthcare Provider	857	2010-09-07T04:00:00.000Z	Loss	Portable Electronic Device	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	3-Tue	7	US-NY\n" +
+"IA	Healthcare Provider	19222	2010-09-11T04:00:00.000Z	Loss	Portable Electronic Device	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	7-Sat	11	US-IA\n" +
+"KY	Healthcare Provider	878	2011-11-23T05:00:00.000Z	Loss	Portable Electronic Device	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	4-Wed	23	US-KY\n" +
+"LA	Healthcare Provider	2088	2012-02-20T05:00:00.000Z	Loss	Portable Electronic Device	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	2-Mon	20	US-LA\n" +
+"AZ	Healthcare Provider	9565	2012-04-09T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	2-Mon	9	US-AZ\n" +
+"CA	Healthcare Provider	3900	2012-05-14T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	2-Mon	14	US-CA\n" +
+"GA	Healthcare Provider	824	2012-06-04T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	2-Mon	4	US-GA\n" +
+"NC	Healthcare Provider	2917	2012-07-17T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	3-Tue	17	US-NC\n" +
+"TX	Healthcare Provider	2264	2012-08-17T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	17	US-TX\n" +
+"NV	Business Associate	5713	2012-09-14T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	6-Fri	14	US-NV\n" +
+"TX	Healthcare Provider	5748	2012-11-16T05:00:00.000Z	Loss	Portable Electronic Device	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	6-Fri	16	US-TX\n" +
+"VA	Healthcare Provider	1846	2012-11-30T05:00:00.000Z	Loss	Portable Electronic Device	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	6-Fri	30	US-VA\n" +
+"MA	Business Associate	6332	2013-03-06T05:00:00.000Z	Loss	Portable Electronic Device	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	4-Wed	6	US-MA\n" +
+"NY	Healthcare Provider	537	2013-05-06T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	2-Mon	6	US-NY\n" +
+"NE	Healthcare Provider	2125	2013-06-26T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	4-Wed	26	US-NE\n" +
+"NY	Healthcare Provider	2700	2013-07-20T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	7-Sat	20	US-NY\n" +
+"NY	Healthcare Provider	610	2013-10-21T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	21	US-NY\n" +
+"PA	Healthcare Provider	1167	2013-11-01T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	1	US-PA\n" +
+"NY	Healthcare Provider	2279	2013-11-13T05:00:00.000Z	Loss	Portable Electronic Device	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	4-Wed	13	US-NY\n" +
+"CA	Healthcare Provider	1039	2013-11-19T05:00:00.000Z	Loss	Portable Electronic Device	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	19	US-CA\n" +
+"CA	Healthcare Provider	49000	2013-11-22T05:00:00.000Z	Loss	Portable Electronic Device	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	22	US-CA\n" +
+"NY	Business Associate	9642	2013-12-12T05:00:00.000Z	Loss	Portable Electronic Device	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	5-Thu	12	US-NY\n" +
+"NY	Healthcare Provider	2172	2014-01-22T05:00:00.000Z	Loss	Portable Electronic Device	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	4-Wed	22	US-NY\n" +
+"WI	Business Associate	41437	2014-01-30T05:00:00.000Z	Loss	Portable Electronic Device	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	5-Thu	30	US-WI\n" +
+"TX	Healthcare Provider	3598	2014-01-31T05:00:00.000Z	Loss	Portable Electronic Device	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	31	US-TX\n" +
+"FL	Healthcare Provider	586	2014-03-24T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	24	US-FL\n" +
+"CA	Healthcare Provider	793	2014-04-14T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	2-Mon	14	US-CA\n" +
+"NY	Healthcare Provider	914	2014-09-09T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	3-Tue	9	US-NY\n" +
+"TX	Health Plan	507	2014-10-28T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	3-Tue	28	US-TX\n" +
+"VA	Healthcare Provider	5534	2014-03-27T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	5-Thu	27	US-VA\n" +
+"TX	Healthcare Provider	3200	2013-08-19T04:00:00.000Z	Loss	Portable Electronic Device	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	2-Mon	19	US-TX\n" +
+"CA	Healthcare Provider	33702	2014-06-13T04:00:00.000Z	Loss	Portable Electronic Device	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	13	US-CA\n" +
+"MN	Business Associate	2533	2012-07-13T04:00:00.000Z	Loss	Portable Electronic Device	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	6-Fri	13	US-MN\n" +
+"MI	Healthcare Provider	10000	2009-12-15T05:00:00.000Z	Theft	Portable Electronic Device	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	3-Tue	15	US-MI\n" +
+"AZ	Healthcare Provider	2773	2010-04-01T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	5-Thu	1	US-AZ\n" +
+"NY	Healthcare Provider	2563	2010-07-07T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	4-Wed	7	US-NY\n" +
+"VA	Healthcare Provider	669	2010-07-15T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	5-Thu	15	US-VA\n" +
+"NY	Business Associate	3630	2010-08-26T04:00:00.000Z	Theft	Portable Electronic Device	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	26	US-NY\n" +
+"MA	Healthcare Provider	638	2011-08-03T04:00:00.000Z	Theft	Portable Electronic Device	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	4-Wed	3	US-MA\n" +
+"FL	Healthcare Provider	1219	2012-01-30T05:00:00.000Z	Theft	Portable Electronic Device	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	2-Mon	30	US-FL\n" +
+"TX	Healthcare Provider	1972	2012-03-16T04:00:00.000Z	Theft	Portable Electronic Device	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	16	US-TX\n" +
+"FL	Healthcare Provider	2557	2012-06-04T04:00:00.000Z	Theft	Portable Electronic Device	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	2-Mon	4	US-FL\n" +
+"IN	Healthcare Provider	55000	2012-08-28T04:00:00.000Z	Theft	Portable Electronic Device	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	3-Tue	28	US-IN\n" +
+"VA	Healthcare Provider	4873	2012-09-13T04:00:00.000Z	Theft	Portable Electronic Device	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	5-Thu	13	US-VA\n" +
+"KY	Healthcare Provider	2376	2012-10-12T04:00:00.000Z	Theft	Portable Electronic Device	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	6-Fri	12	US-KY\n" +
+"CT	Healthcare Provider	14511	2012-11-21T05:00:00.000Z	Theft	Portable Electronic Device	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	4-Wed	21	US-CT\n" +
+"MA	Healthcare Provider	716	2013-02-14T05:00:00.000Z	Theft	Portable Electronic Device	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	5-Thu	14	US-MA\n" +
+"NY	Business Associate	28187	2013-03-01T05:00:00.000Z	Theft	Portable Electronic Device	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	1	US-NY\n" +
+"AZ	Healthcare Provider	3800	2013-05-01T04:00:00.000Z	Theft	Portable Electronic Device	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	4-Wed	1	US-AZ\n" +
+"PA	Business Associate	22000	2013-05-07T04:00:00.000Z	Theft	Portable Electronic Device	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	7	US-PA\n" +
+"WI	Healthcare Provider	9328	2013-11-18T05:00:00.000Z	Theft	Portable Electronic Device	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	2-Mon	18	US-WI\n" +
+"KY	Healthcare Provider	535	2013-12-10T05:00:00.000Z	Theft	Portable Electronic Device	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	3-Tue	10	US-KY\n" +
+"CA	Healthcare Provider	4676	2014-02-05T05:00:00.000Z	Theft	Portable Electronic Device	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	5	US-CA\n" +
+"CA	Healthcare Provider	5499	2014-03-28T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	28	US-CA\n" +
+"MI	Health Plan	2595	2014-04-03T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	3	US-MI\n" +
+"PR	Business Associate	7911	2014-04-15T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	15	US-PR\n" +
+"ID	Healthcare Provider	6900	2014-04-18T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	18	US-ID\n" +
+"KY	Health Plan	2962	2014-05-23T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	6-Fri	23	US-KY\n" +
+"NC	Healthcare Provider	10993	2014-08-29T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	29	US-NC\n" +
+"NM	Healthcare Provider	843	2014-09-12T04:00:00.000Z	Theft	Portable Electronic Device	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	12	US-NM\n" +
+"NY	Healthcare Provider	5117	2015-01-23T05:00:00.000Z	Theft	Portable Electronic Device	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	6-Fri	23	US-NY\n" +
+"TN	Healthcare Provider	56694	2015-02-02T05:00:00.000Z	Theft	Portable Electronic Device	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	2-Mon	2	US-TN\n" +
+"IN	Health Plan	38351	2015-03-06T05:00:00.000Z	Theft	Portable Electronic Device	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	6	US-IN\n" +
+"TX	Healthcare Provider	940	2013-08-05T04:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	2-Mon	5	US-TX\n" +
+"KS	Healthcare Provider	1700	2014-01-21T05:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	3-Tue	21	US-KS\n" +
+"KY	Business Associate	4077	2014-09-22T04:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	2-Mon	22	US-KY\n" +
+"NY	Healthcare Provider	835	2014-10-10T04:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	10	US-NY\n" +
+"AZ	Healthcare Provider	616	2014-12-12T05:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	6-Fri	12	US-AZ\n" +
+"TX	Healthcare Provider	874	2015-04-09T04:00:00.000Z	Unauthorized Access/Disclosure	Portable Electronic Device	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	9	US-TX\n" +
+"IN	Healthcare Provider	660	2012-02-14T05:00:00.000Z	Hacking/IT Incident	Other	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	3-Tue	14	US-IN\n" +
+"IL	Business Associate	1290	2013-09-06T04:00:00.000Z	Hacking/IT Incident	Other	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	6	US-IL\n" +
+"FL	Business Associate	1831	2014-06-12T04:00:00.000Z	Hacking/IT Incident	Other	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	12	US-FL\n" +
+"OR	Healthcare Provider	151626	2015-03-18T04:00:00.000Z	Hacking/IT Incident	Other	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	4-Wed	18	US-OR\n" +
+"MT	Healthcare Provider	7038	2015-04-02T04:00:00.000Z	Hacking/IT Incident	Other	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-MT\n" +
+"PA	Healthcare Provider	11000	2014-06-19T04:00:00.000Z	Hacking/IT Incident	Other	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	19	US-PA\n" +
+"OH	Healthcare Provider	500	2011-04-28T04:00:00.000Z	Improper Disposal	Other	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	5-Thu	28	US-OH\n" +
+"TX	Healthcare Provider	1031	2011-05-19T04:00:00.000Z	Improper Disposal	Other	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	5-Thu	19	US-TX\n" +
+"IN	Business Associate	5388	2013-05-20T04:00:00.000Z	Improper Disposal	Other	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	2-Mon	20	US-IN\n" +
+"TX	Business Associate	277014	2013-07-11T04:00:00.000Z	Improper Disposal	Other	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	5-Thu	11	US-TX\n" +
+"SC	Healthcare Clearing House	4204	2013-09-13T04:00:00.000Z	Improper Disposal	Other	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	13	US-SC\n" +
+"AZ	Healthcare Provider	3529	2014-07-25T04:00:00.000Z	Improper Disposal	Other	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	6-Fri	25	US-AZ\n" +
+"TN	Healthcare Provider	28300	2014-08-12T04:00:00.000Z	Improper Disposal	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	12	US-TN\n" +
+"GA	Healthcare Provider	720	2014-08-28T04:00:00.000Z	Improper Disposal	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	5-Thu	28	US-GA\n" +
+"CA	Business Associate	1674	2014-08-13T04:00:00.000Z	Improper Disposal	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	4-Wed	13	US-CA\n" +
+"	Business Associate	5220	2010-05-24T04:00:00.000Z	Loss	Other	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	2-Mon	24	US-null\n" +
+"GA	Business Associate	14000	2010-06-21T04:00:00.000Z	Loss	Other	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	2-Mon	21	US-GA\n" +
+"	Business Associate	1073	2010-07-30T04:00:00.000Z	Loss	Other	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-null\n" +
+"ID	Business Associate	5500	2010-08-10T04:00:00.000Z	Loss	Other	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	3-Tue	10	US-ID\n" +
+"FL	Healthcare Provider	1055489	2011-10-07T04:00:00.000Z	Loss	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	7	US-FL\n" +
+"AR	Healthcare Provider	1472	2011-10-21T04:00:00.000Z	Loss	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	21	US-AR\n" +
+"VA	Business Associate	4900000	2011-11-04T04:00:00.000Z	Loss	Other	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	6-Fri	4	US-VA\n" +
+"FL	Healthcare Provider	772	2011-12-01T05:00:00.000Z	Loss	Other	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	5-Thu	1	US-FL\n" +
+"OK	Health Plan	844	2012-01-20T05:00:00.000Z	Loss	Other	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	6-Fri	20	US-OK\n" +
+"RI	Healthcare Provider	14004	2012-11-05T05:00:00.000Z	Loss	Other	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	2-Mon	5	US-RI\n" +
+"PA	Healthcare Provider	1184	2013-01-18T05:00:00.000Z	Loss	Other	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	6-Fri	18	US-PA\n" +
+"TN	Healthcare Provider	4268	2013-09-13T04:00:00.000Z	Loss	Other	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	13	US-TN\n" +
+"NJ	Healthcare Provider	36400	2014-08-07T04:00:00.000Z	Loss	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	5-Thu	7	US-NJ\n" +
+"SD	Health Plan	620	2014-07-15T04:00:00.000Z	Loss	Other	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	3-Tue	15	US-SD\n" +
+"IA	Healthcare Provider	7335	2013-06-26T04:00:00.000Z	Loss	Other	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	4-Wed	26	US-IA\n" +
+"MI	Healthcare Provider	83945	2010-04-05T04:00:00.000Z	Other	Other	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	2-Mon	5	US-MI\n" +
+"WI	Healthcare Provider	600	2010-04-16T04:00:00.000Z	Other	Other	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	6-Fri	16	US-WI\n" +
+"PA	Health Plan	560	2010-08-03T04:00:00.000Z	Other	Other	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	3-Tue	3	US-PA\n" +
+"MD	Health Plan	692	2010-10-06T04:00:00.000Z	Other	Other	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	4-Wed	6	US-MD\n" +
+"NJ	Business Associate	1700	2012-02-08T05:00:00.000Z	Other	Other	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	8	US-NJ\n" +
+"FL	Health Plan	9497	2012-04-13T04:00:00.000Z	Other	Other	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	13	US-FL\n" +
+"CA	Health Plan	18000	2012-11-17T05:00:00.000Z	Other	Other	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	7-Sat	17	US-CA\n" +
+"IN	Business Associate	2575	2012-11-26T05:00:00.000Z	Other	Other	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	2-Mon	26	US-IN\n" +
+"CA	Healthcare Provider	1386	2013-05-24T04:00:00.000Z	Other	Other	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	6-Fri	24	US-CA\n" +
+"NC	Healthcare Provider	7300	2013-11-08T05:00:00.000Z	Other	Other	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	8	US-NC\n" +
+"AL	Business Associate	1085	2014-01-24T05:00:00.000Z	Other	Other	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	24	US-AL\n" +
+"GA	Business Associate	600	2014-02-28T05:00:00.000Z	Other	Other	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	28	US-GA\n" +
+"AZ	Healthcare Provider	55207	2014-03-05T05:00:00.000Z	Other	Other	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	4-Wed	5	US-AZ\n" +
+"WI	Business Associate	1400	2014-04-18T04:00:00.000Z	Other	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	18	US-WI\n" +
+"MA	Business Associate	15265	2014-04-29T04:00:00.000Z	Other	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	29	US-MA\n" +
+"TN	Health Plan	1717	2014-08-29T04:00:00.000Z	Other	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	29	US-TN\n" +
+"PA	Business Associate	8845	2014-02-26T05:00:00.000Z	Theft	Other	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	26	US-PA\n" +
+"CO	Health Plan	11551	2014-08-12T04:00:00.000Z	Theft	Other	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	12	US-CO\n" +
+"GA	Healthcare Provider	315000	2012-04-18T04:00:00.000Z	Theft	Other	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	4-Wed	18	US-GA\n" +
+"CA	Healthcare Provider	596	2009-12-10T05:00:00.000Z	Theft	Other	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	5-Thu	10	US-CA\n" +
+"MA	Healthcare Provider	1076	2010-01-08T05:00:00.000Z	Theft	Other	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	6-Fri	8	US-MA\n" +
+"ID	Business Associate	2562	2010-01-14T05:00:00.000Z	Theft	Other	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	5-Thu	14	US-ID\n" +
+"MI	Healthcare Provider	10000	2010-01-15T05:00:00.000Z	Theft	Other	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	6-Fri	15	US-MI\n" +
+"TX	Healthcare Provider	689	2010-01-25T05:00:00.000Z	Theft	Other	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	2-Mon	25	US-TX\n" +
+"UT	Business Associate	5700	2010-02-05T05:00:00.000Z	Theft	Other	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	6-Fri	5	US-UT\n" +
+"NY	Health Plan	344579	2010-04-14T04:00:00.000Z	Theft	Other	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	4-Wed	14	US-NY\n" +
+"VA	Business Associate	1874	2010-04-27T04:00:00.000Z	Theft	Other	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	3-Tue	27	US-VA\n" +
+"PA	Business Associate	130495	2010-06-04T04:00:00.000Z	Theft	Other	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	6-Fri	4	US-PA\n" +
+"CO	Healthcare Provider	2500	2010-10-26T04:00:00.000Z	Theft	Other	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	3-Tue	26	US-CO\n" +
+"TN	Health Plan	1023209	2010-11-01T04:00:00.000Z	Theft	Other	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	2-Mon	1	US-TN\n" +
+"MO	Business Associate	4800	2011-01-18T05:00:00.000Z	Theft	Other	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	18	US-MO\n" +
+"CT	Business Associate	93500	2011-04-05T04:00:00.000Z	Theft	Other	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	3-Tue	5	US-CT\n" +
+"CO	Business Associate	3589	2011-06-29T04:00:00.000Z	Theft	Other	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	29	US-CO\n" +
+"PR	Business Associate	5848	2011-08-15T04:00:00.000Z	Theft	Other	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	2-Mon	15	US-PR\n" +
+"PR	Health Plan	2209	2011-09-29T04:00:00.000Z	Theft	Other	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	5-Thu	29	US-PR\n" +
+"CT	Business Associate	3994	2011-10-11T04:00:00.000Z	Theft	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	11	US-CT\n" +
+"PA	Healthcare Provider	3150	2011-10-14T04:00:00.000Z	Theft	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	14	US-PA\n" +
+"PA	Healthcare Provider	500	2011-10-17T04:00:00.000Z	Theft	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	17	US-PA\n" +
+"MO	Business Associate	7059	2011-10-22T04:00:00.000Z	Theft	Other	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	7-Sat	22	US-MO\n" +
+"KS	Business Associate	8275	2011-11-14T05:00:00.000Z	Theft	Other	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	2-Mon	14	US-KS\n" +
+"IN	Healthcare Provider	10705	2011-12-05T05:00:00.000Z	Theft	Other	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	2-Mon	5	US-IN\n" +
+"WA	Healthcare Provider	4693	2011-12-15T05:00:00.000Z	Theft	Other	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	5-Thu	15	US-WA\n" +
+"CA	Health Plan	703	2012-02-15T05:00:00.000Z	Theft	Other	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	15	US-CA\n" +
+"TX	Business Associate	2559	2012-03-02T05:00:00.000Z	Theft	Other	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	2	US-TX\n" +
+"CA	Business Associate	2000	2012-04-10T04:00:00.000Z	Theft	Other	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	3-Tue	10	US-CA\n" +
+"CA	Healthcare Provider	1900	2012-05-18T04:00:00.000Z	Theft	Other	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	18	US-CA\n" +
+"TX	Healthcare Provider	500	2012-05-26T04:00:00.000Z	Theft	Other	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	7-Sat	26	US-TX\n" +
+"IN	Healthcare Provider	1504	2012-07-25T04:00:00.000Z	Theft	Other	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	4-Wed	25	US-IN\n" +
+"OR	Healthcare Provider	702	2012-07-31T04:00:00.000Z	Theft	Other	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	3-Tue	31	US-OR\n" +
+"GA	Healthcare Provider	3440	2012-10-18T04:00:00.000Z	Theft	Other	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	5-Thu	18	US-GA\n" +
+"OH	Healthcare Provider	2500	2013-05-03T04:00:00.000Z	Theft	Other	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	6-Fri	3	US-OH\n" +
+"IN	Business Associate	5497	2013-08-13T04:00:00.000Z	Theft	Other	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	3-Tue	13	US-IN\n" +
+"AZ	Business Associate	1456	2013-11-13T05:00:00.000Z	Theft	Other	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	4-Wed	13	US-AZ\n" +
+"OH	Health Plan	1139	2014-02-14T05:00:00.000Z	Theft	Other	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	14	US-OH\n" +
+"TX	Healthcare Provider	5000	2014-03-13T04:00:00.000Z	Theft	Other	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	5-Thu	13	US-TX\n" +
+"PR	Health Plan	5795	2014-04-02T04:00:00.000Z	Theft	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	2	US-PR\n" +
+"PR	Health Plan	17776	2014-04-03T04:00:00.000Z	Theft	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	3	US-PR\n" +
+"MS	Healthcare Provider	3750	2014-04-16T04:00:00.000Z	Theft	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	16	US-MS\n" +
+"MA	Health Plan	8830	2014-04-24T04:00:00.000Z	Theft	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	24	US-MA\n" +
+"FL	Business Associate	9255	2014-06-11T04:00:00.000Z	Theft	Other	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	4-Wed	11	US-FL\n" +
+"CA	Healthcare Provider	1863	2014-10-15T04:00:00.000Z	Theft	Other	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	15	US-CA\n" +
+"MA	Healthcare Provider	14100	2015-01-30T05:00:00.000Z	Theft	Other	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	6-Fri	30	US-MA\n" +
+"CA	Healthcare Provider	2500	2015-03-06T05:00:00.000Z	Theft	Other	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	6	US-CA\n" +
+"CA	Healthcare Provider	1787	2015-04-16T04:00:00.000Z	Theft	Other	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	16	US-CA\n" +
+"PA	Healthcare Provider	2259	2015-05-15T04:00:00.000Z	Theft	Other	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	15	US-PA\n" +
+"NC	Business Associate	20512	2015-05-15T04:00:00.000Z	Theft	Other	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	15	US-NC\n" +
+"AR	Healthcare Provider	1900	2013-05-23T04:00:00.000Z	Theft	Other	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	5-Thu	23	US-AR\n" +
+"IN	Business Associate	585	2010-12-27T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	2-Mon	27	US-IN\n" +
+"CA	Healthcare Provider	2250	2011-02-11T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	6-Fri	11	US-CA\n" +
+"MO	Health Plan	935	2011-04-08T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	6-Fri	8	US-MO\n" +
+"IL	Business Associate	675	2011-04-19T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	3-Tue	19	US-IL\n" +
+"MO	Health Plan	850	2011-05-09T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	2-Mon	9	US-MO\n" +
+"FL	Health Plan	3463	2011-06-17T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	6-Fri	17	US-FL\n" +
+"CA	Business Associate	19651	2011-08-29T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	2-Mon	29	US-CA\n" +
+"MT	Business Associate	2700	2012-01-11T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	4-Wed	11	US-MT\n" +
+"MD	Business Associate	632	2012-02-28T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	3-Tue	28	US-MD\n" +
+"NC	Healthcare Provider	1370	2012-03-23T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	23	US-NC\n" +
+"AR	Healthcare Provider	7121	2012-04-20T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	20	US-AR\n" +
+"MN	Health Plan	19100	2012-05-18T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	18	US-MN\n" +
+"NC	Healthcare Provider	591	2012-05-18T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	18	US-NC\n" +
+"OH	Business Associate	15000	2012-05-22T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	3-Tue	22	US-OH\n" +
+"NY	Business Associate	28187	2012-12-21T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	21	US-NY\n" +
+"CA	Health Plan	2643	2012-12-23T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	1-Sun	23	US-CA\n" +
+"WI	Healthcare Provider	43549	2013-02-12T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	3-Tue	12	US-WI\n" +
+"IL	Business Associate	500	2013-03-01T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	1	US-IL\n" +
+"IN	Healthcare Provider	3131	2013-04-12T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	6-Fri	12	US-IN\n" +
+"UT	Healthcare Provider	857	2013-04-26T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	6-Fri	26	US-UT\n" +
+"MO	Business Associate	4560	2013-07-15T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	2-Mon	15	US-MO\n" +
+"OR	Healthcare Provider	1361	2013-07-28T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	1-Sun	28	US-OR\n" +
+"NC	Healthcare Provider	1315	2013-11-08T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	8	US-NC\n" +
+"TX	Healthcare Provider	44000	2013-12-06T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-TX\n" +
+"NC	Health Plan	48752	2014-01-06T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	2-Mon	6	US-NC\n" +
+"GA	Business Associate	1000	2014-03-31T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	31	US-GA\n" +
+"MO	Health Plan	2546	2014-04-11T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	11	US-MO\n" +
+"MD	Health Plan	5000	2014-04-15T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	15	US-MD\n" +
+"OR	Healthcare Provider	17914	2014-05-19T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	2-Mon	19	US-OR\n" +
+"MD	Health Plan	620	2014-06-19T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	19	US-MD\n" +
+"KY	Healthcare Provider	697	2014-09-09T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	3-Tue	9	US-KY\n" +
+"MI	Health Plan	6302	2014-10-01T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	1	US-MI\n" +
+"AZ	Business Associate	15380	2014-10-10T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	10	US-AZ\n" +
+"IL	Healthcare Provider	12621	2014-12-12T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	6-Fri	12	US-IL\n" +
+"TN	Health Plan	79000	2015-01-13T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	3-Tue	13	US-TN\n" +
+"TX	Healthcare Provider	3000	2015-02-18T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	4-Wed	18	US-TX\n" +
+"TX	Health Plan	8700	2015-02-20T05:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	6-Fri	20	US-TX\n" +
+"FL	Healthcare Provider	8700	2015-03-20T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	20	US-FL\n" +
+"	Health Plan	1458	2015-03-31T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	31	US-null\n" +
+"MO	Healthcare Provider	503	2015-06-09T04:00:00.000Z	Unauthorized Access/Disclosure	Other	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	3-Tue	9	US-MO\n" +
+"FL	Health Plan	7366	2011-03-03T05:00:00.000Z	Other	Other	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	5-Thu	3	US-FL\n" +
+"NY	Business Associate	1900000	2011-04-14T04:00:00.000Z	Other	Other	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	5-Thu	14	US-NY\n" +
+"FL	Healthcare Provider	915	2013-09-16T04:00:00.000Z	Other	Other	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	2-Mon	16	US-FL\n" +
+"OH	Healthcare Provider	953	2014-01-13T05:00:00.000Z	Other	Other	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	2-Mon	13	US-OH\n" +
+"CA	Healthcare Provider	6871	2015-06-05T04:00:00.000Z	Theft	Network Server	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	6-Fri	5	US-CA\n" +
+"TX	Healthcare Provider	6601	2012-12-10T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	2-Mon	10	US-TX\n" +
+"WY	Health Plan	9023	2010-03-02T05:00:00.000Z	Other	Network Server	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	3-Tue	2	US-WY\n" +
+"CT	Healthcare Provider	957	2010-03-26T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	6-Fri	26	US-CT\n" +
+"KY	Healthcare Provider	708	2010-06-01T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	1	US-KY\n" +
+"TX	Healthcare Provider	27000	2010-07-23T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	23	US-TX\n" +
+"IN	Health Plan	31700	2010-07-30T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-IN\n" +
+"WA	Healthcare Provider	9493	2010-10-15T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	6-Fri	15	US-WA\n" +
+"NH	Healthcare Provider	231400	2011-01-10T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	2-Mon	10	US-NH\n" +
+"KY	Business Associate	18871	2011-02-07T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	2-Mon	7	US-KY\n" +
+"NC	Healthcare Provider	6000	2011-04-21T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	5-Thu	21	US-NC\n" +
+"IL	Business Associate	5000	2011-07-11T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	2-Mon	11	US-IL\n" +
+"MA	Healthcare Provider	2021	2011-07-19T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	3-Tue	19	US-MA\n" +
+"AR	Healthcare Provider	3116	2011-09-07T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	7	US-AR\n" +
+"UT	Business Associate	780000	2012-04-11T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	4-Wed	11	US-UT\n" +
+"MI	Healthcare Provider	3000	2012-05-03T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	5-Thu	3	US-MI\n" +
+"NM	Healthcare Provider	2365	2012-09-12T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	4-Wed	12	US-NM\n" +
+"IN	Healthcare Provider	2900	2012-10-23T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	3-Tue	23	US-IN\n" +
+"MA	Business Associate	4343	2012-12-28T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	28	US-MA\n" +
+"MA	Business Associate	4125	2013-01-07T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	2-Mon	7	US-MA\n" +
+"MA	Business Associate	7250	2013-01-10T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	10	US-MA\n" +
+"MA	Business Associate	4100	2013-01-10T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	10	US-MA\n" +
+"MN	Business Associate	6400	2013-03-12T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	3-Tue	12	US-MN\n" +
+"MA	Healthcare Provider	8727	2013-03-20T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	4-Wed	20	US-MA\n" +
+"NC	Business Associate	9988	2013-05-08T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	4-Wed	8	US-NC\n" +
+"NC	Business Associate	1924	2013-05-10T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	6-Fri	10	US-NC\n" +
+"PA	Healthcare Provider	7803	2013-05-20T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	2-Mon	20	US-PA\n" +
+"GA	Business Associate	2029	2013-09-13T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	13	US-GA\n" +
+"GA	Business Associate	998	2013-09-13T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	13	US-GA\n" +
+"IL	Business Associate	7120	2013-10-09T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	4-Wed	9	US-IL\n" +
+"MI	Healthcare Provider	3947	2013-10-11T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	11	US-MI\n" +
+"CA	Healthcare Provider	59000	2013-12-10T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	3-Tue	10	US-CA\n" +
+"MS	Healthcare Provider	1489	2014-01-10T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	10	US-MS\n" +
+"TX	Health Plan	405000	2014-02-05T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	5	US-TX\n" +
+"TX	Business Associate	3300	2014-03-05T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	4-Wed	5	US-TX\n" +
+"AL	Business Associate	1179	2014-03-10T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	10	US-AL\n" +
+"CA	Healthcare Provider	5178	2014-04-02T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	2	US-CA\n" +
+"UT	Business Associate	9800	2014-04-24T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	24	US-UT\n" +
+"IN	Business Associate	1361	2014-04-25T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-IN\n" +
+"MT	Health Plan	1062509	2014-07-07T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	2-Mon	7	US-MT\n" +
+"MN	Business Associate	4487	2014-07-31T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	5-Thu	31	US-MN\n" +
+"UT	Healthcare Provider	31677	2014-08-07T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	5-Thu	7	US-UT\n" +
+"GA	Business Associate	10104	2014-08-08T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	8	US-GA\n" +
+"TX	Business Associate	60582	2014-08-08T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	8	US-TX\n" +
+"CA	Healthcare Provider	1251	2014-08-12T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	12	US-CA\n" +
+"LA	Healthcare Provider	6073	2014-08-15T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	15	US-LA\n" +
+"TX	Business Associate	4500	2014-10-10T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	10	US-TX\n" +
+"TX	Healthcare Provider	7029	2015-01-07T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	4-Wed	7	US-TX\n" +
+"GA	Healthcare Provider	570	2015-03-02T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	2-Mon	2	US-GA\n" +
+"GA	Health Plan	557779	2015-03-02T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	2-Mon	2	US-GA\n" +
+"GA	Health Plan	355127	2015-03-02T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	2-Mon	2	US-GA\n" +
+"VA	Health Plan	697586	2015-03-12T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	12	US-VA\n" +
+"IN	Health Plan	78800000	2015-03-13T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	13	US-IN\n" +
+"WA	Health Plan	11000000	2015-03-17T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	17	US-WA\n" +
+"IL	Health Plan	2743	2015-03-19T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	19	US-IL\n" +
+"TX	Health Plan	50000	2015-03-23T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	2-Mon	23	US-TX\n" +
+"NY	Health Plan	43068	2015-03-24T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	24	US-NY\n" +
+"IL	Health Plan	880	2015-03-24T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	3-Tue	24	US-IL\n" +
+"TX	Health Plan	1688	2015-03-25T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	4-Wed	25	US-TX\n" +
+"SC	Health Plan	550	2015-04-02T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-SC\n" +
+"IL	Health Plan	782	2015-04-03T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	3	US-IL\n" +
+"MN	Health Plan	10946	2015-04-03T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	3	US-MN\n" +
+"FL	Health Plan	3074	2015-04-07T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	7	US-FL\n" +
+"KY	Health Plan	5440	2015-04-09T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	9	US-KY\n" +
+"MO	Health Plan	12500	2015-04-16T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	16	US-MO\n" +
+"TX	Health Plan	880	2015-04-27T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	2-Mon	27	US-TX\n" +
+"MA	Healthcare Provider	3321	2015-05-01T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	1	US-MA\n" +
+"MD	Health Plan	1100000	2015-05-20T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	4-Wed	20	US-MD\n" +
+"GA	Business Associate	520	2014-08-14T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	5-Thu	14	US-GA\n" +
+"OR	Healthcare Provider	4354	2012-07-16T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	2-Mon	16	US-OR\n" +
+"NJ	Healthcare Provider	27800	2012-12-27T05:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	5-Thu	27	US-NJ\n" +
+"FL	Healthcare Provider	13000	2012-10-15T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	2-Mon	15	US-FL\n" +
+"PR	Business Associate	475000	2010-11-04T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	5-Thu	4	US-PR\n" +
+"MI	Business Associate	11387	2011-05-26T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	5-Thu	26	US-MI\n" +
+"TX	Healthcare Provider	1300	2011-09-20T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	3-Tue	20	US-TX\n" +
+"AZ	Healthcare Provider	42000	2012-05-01T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	3-Tue	1	US-AZ\n" +
+"TX	Healthcare Provider	7000	2012-05-08T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	3-Tue	8	US-TX\n" +
+"NV	Healthcare Provider	800	2012-09-05T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	4-Wed	5	US-NV\n" +
+"MD	Business Associate	10766	2014-04-17T04:00:00.000Z	Hacking/IT Incident	Network Server	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	17	US-MD\n" +
+"PA	Healthcare Provider	55000	2011-11-02T04:00:00.000Z	Improper Disposal	Network Server	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	4-Wed	2	US-PA\n" +
+"TX	Health Plan	74944	2014-11-10T05:00:00.000Z	Loss	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	2-Mon	10	US-TX\n" +
+"PA	Business Associate	22642	2010-09-07T04:00:00.000Z	Other	Network Server	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	3-Tue	7	US-PA\n" +
+"IL	Healthcare Provider	750	2012-03-23T04:00:00.000Z	Other	Network Server	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	23	US-IL\n" +
+"IL	Healthcare Provider	7067	2012-07-25T04:00:00.000Z	Other	Network Server	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	4-Wed	25	US-IL\n" +
+"AL	Business Associate	50918	2014-07-11T04:00:00.000Z	Other	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	6-Fri	11	US-AL\n" +
+"NY	Business Associate	3334	2014-07-23T04:00:00.000Z	Other	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	23	US-NY\n" +
+"FL	Healthcare Provider	14519	2013-04-03T04:00:00.000Z	Theft	Network Server	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	4-Wed	3	US-FL\n" +
+"MO	Healthcare Provider	1000	2009-10-28T04:00:00.000Z	Theft	Network Server	1	2009	10	[10] Oct	 Qtr_4	2009 Qtr_4	4-Wed	28	US-MO\n" +
+"CA	Healthcare Provider	3500	2010-02-23T05:00:00.000Z	Theft	Network Server	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	3-Tue	23	US-CA\n" +
+"CA	Healthcare Provider	40000	2010-05-13T04:00:00.000Z	Theft	Network Server	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	5-Thu	13	US-CA\n" +
+"TX	Healthcare Provider	600	2010-06-21T04:00:00.000Z	Theft	Network Server	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	2-Mon	21	US-TX\n" +
+"NV	Healthcare Provider	7526	2010-06-22T04:00:00.000Z	Theft	Network Server	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	22	US-NV\n" +
+"TX	Healthcare Provider	25000	2010-08-05T04:00:00.000Z	Theft	Network Server	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	5	US-TX\n" +
+"NY	Healthcare Provider	6800	2010-09-24T04:00:00.000Z	Theft	Network Server	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	6-Fri	24	US-NY\n" +
+"NY	Business Associate	1744	2010-11-24T05:00:00.000Z	Theft	Network Server	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	4-Wed	24	US-NY\n" +
+"FL	Healthcare Provider	156000	2011-01-03T05:00:00.000Z	Theft	Network Server	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	2-Mon	3	US-FL\n" +
+"OK	Healthcare Provider	84000	2011-04-06T04:00:00.000Z	Theft	Network Server	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	4-Wed	6	US-OK\n" +
+"IN	Healthcare Provider	757	2011-10-25T04:00:00.000Z	Theft	Network Server	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	25	US-IN\n" +
+"FL	Healthcare Provider	2900	2011-10-31T04:00:00.000Z	Theft	Network Server	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	31	US-FL\n" +
+"MD	Healthcare Provider	10480	2012-02-29T05:00:00.000Z	Theft	Network Server	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	29	US-MD\n" +
+"CA	Healthcare Provider	961	2012-04-26T04:00:00.000Z	Theft	Network Server	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	5-Thu	26	US-CA\n" +
+"AZ	Healthcare Provider	4800	2012-07-27T04:00:00.000Z	Theft	Network Server	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	6-Fri	27	US-AZ\n" +
+"NY	Business Associate	1017	2012-11-01T04:00:00.000Z	Theft	Network Server	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	1	US-NY\n" +
+"VA	Business Associate	2360	2013-04-04T04:00:00.000Z	Theft	Network Server	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	5-Thu	4	US-VA\n" +
+"TN	Business Associate	32000	2013-08-30T04:00:00.000Z	Theft	Network Server	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	30	US-TN\n" +
+"PR	Business Associate	5000	2013-09-11T04:00:00.000Z	Theft	Network Server	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	4-Wed	11	US-PR\n" +
+"NY	Healthcare Provider	8000	2013-09-16T04:00:00.000Z	Theft	Network Server	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	2-Mon	16	US-NY\n" +
+"OH	Healthcare Provider	517	2013-09-30T04:00:00.000Z	Theft	Network Server	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	2-Mon	30	US-OH\n" +
+"OH	Health Plan	4230	2014-01-13T05:00:00.000Z	Theft	Network Server	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	2-Mon	13	US-OH\n" +
+"MI	Healthcare Provider	5370	2014-01-16T05:00:00.000Z	Theft	Network Server	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	5-Thu	16	US-MI\n" +
+"PR	Business Associate	398000	2014-01-24T05:00:00.000Z	Theft	Network Server	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	24	US-PR\n" +
+"NV	Healthcare Provider	12000	2014-07-12T04:00:00.000Z	Theft	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	7-Sat	12	US-NV\n" +
+"TN	Business Associate	4500000	2014-08-20T04:00:00.000Z	Theft	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	4-Wed	20	US-TN\n" +
+"OH	Healthcare Provider	6141	2014-08-22T04:00:00.000Z	Theft	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	22	US-OH\n" +
+"FL	Healthcare Provider	3500	2014-10-28T04:00:00.000Z	Theft	Network Server	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	3-Tue	28	US-FL\n" +
+"NC	Healthcare Provider	76258	2014-11-07T05:00:00.000Z	Theft	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	7	US-NC\n" +
+"CA	Healthcare Provider	13177	2014-11-14T05:00:00.000Z	Theft	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	14	US-CA\n" +
+"CA	Healthcare Provider	30000	2014-11-15T05:00:00.000Z	Theft	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	7-Sat	15	US-CA\n" +
+"TX	Health Plan	47683	2014-11-21T05:00:00.000Z	Theft	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	21	US-TX\n" +
+"AL	Business Associate	25764	2014-11-26T05:00:00.000Z	Theft	Network Server	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	4-Wed	26	US-AL\n" +
+"CA	Healthcare Provider	3224	2015-02-27T05:00:00.000Z	Theft	Network Server	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	6-Fri	27	US-CA\n" +
+"TX	Healthcare Provider	7700	2015-03-27T04:00:00.000Z	Theft	Network Server	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	27	US-TX\n" +
+"IN	Business Associate	1678	2013-03-14T04:00:00.000Z	Theft	Network Server	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	5-Thu	14	US-IN\n" +
+"CO	Healthcare Provider	532	2013-07-31T04:00:00.000Z	Theft	Network Server	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	4-Wed	31	US-CO\n" +
+"PR	Business Associate	8000	2014-01-24T05:00:00.000Z	Theft	Network Server	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	24	US-PR\n" +
+"CT	Health Plan	2345	2010-11-07T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	1-Sun	7	US-CT\n" +
+"PA	Business Associate	1085	2010-12-15T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	4-Wed	15	US-PA\n" +
+"WV	Business Associate	3655	2011-02-16T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	4-Wed	16	US-WV\n" +
+"IL	Business Associate	25330	2011-07-21T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	5-Thu	21	US-IL\n" +
+"NY	Business Associate	7226	2011-12-09T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	6-Fri	9	US-NY\n" +
+"IL	Business Associate	500	2012-11-29T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-IL\n" +
+"GA	Healthcare Provider	18000	2013-02-18T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	2-Mon	18	US-GA\n" +
+"CT	Healthcare Provider	1382	2013-03-08T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	8	US-CT\n" +
+"NV	Business Associate	32151	2013-08-08T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	5-Thu	8	US-NV\n" +
+"NY	Business Associate	37000	2013-10-25T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	25	US-NY\n" +
+"PA	Healthcare Clearing House	2300	2013-10-31T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	5-Thu	31	US-PA\n" +
+"IL	Healthcare Provider	2080	2013-11-29T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	29	US-IL\n" +
+"CA	Business Associate	1499	2013-12-16T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	16	US-CA\n" +
+"WY	Health Plan	11935	2013-12-16T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	16	US-WY\n" +
+"PA	Healthcare Provider	593	2014-02-13T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	5-Thu	13	US-PA\n" +
+"MN	Business Associate	10024	2014-02-21T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	520	2014-02-21T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	4786	2014-02-21T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	1511	2014-02-25T05:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	3-Tue	25	US-MN\n" +
+"MN	Business Associate	1746	2014-03-18T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	3-Tue	18	US-MN\n" +
+"NJ	Business Associate	680	2014-07-23T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	23	US-NJ\n" +
+"CA	Business Associate	4000	2014-07-28T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	2-Mon	28	US-CA\n" +
+"GA	Business Associate	7016	2014-08-07T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	5-Thu	7	US-GA\n" +
+"TN	Healthcare Provider	307528	2014-10-03T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	3	US-TN\n" +
+"NJ	Business Associate	585	2014-10-06T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	2-Mon	6	US-NJ\n" +
+"NJ	Business Associate	35357	2014-10-22T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	22	US-NJ\n" +
+"CA	Health Plan	843	2015-06-09T04:00:00.000Z	Unauthorized Access/Disclosure	Network Server	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	3-Tue	9	US-CA\n" +
+"KS	Healthcare Provider	1200	2010-09-19T04:00:00.000Z	Theft	Laptop	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	1-Sun	19	US-KS\n" +
+"OK	Healthcare Provider	132940	2011-04-11T04:00:00.000Z	Theft	Laptop	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	11	US-OK\n" +
+"CA	Healthcare Provider	3553	2013-10-03T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	5-Thu	3	US-CA\n" +
+"CA	Healthcare Provider	8294	2013-11-22T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	22	US-CA\n" +
+"PA	Business Associate	507	2011-09-23T04:00:00.000Z	Theft	Laptop	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	6-Fri	23	US-PA\n" +
+"NC	Healthcare Provider	5370	2013-04-04T04:00:00.000Z	Theft	Laptop	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	5-Thu	4	US-NC\n" +
+"KY	Healthcare Provider	1432	2011-08-25T04:00:00.000Z	Theft	Laptop	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	5-Thu	25	US-KY\n" +
+"TX	Healthcare Provider	789	2014-09-09T04:00:00.000Z	Loss	Laptop	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	3-Tue	9	US-TX\n" +
+"TN	Healthcare Provider	2185	2011-12-21T05:00:00.000Z	Theft	Laptop	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	4-Wed	21	US-TN\n" +
+"PR	Business Associate	10000	2012-03-12T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	2-Mon	12	US-PR\n" +
+"PR	Business Associate	7606	2012-03-15T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	5-Thu	15	US-PR\n" +
+"MT	Healthcare Provider	708	2012-06-22T04:00:00.000Z	Theft	Laptop	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	6-Fri	22	US-MT\n" +
+"IL	Healthcare Provider	4211	2012-07-27T04:00:00.000Z	Theft	Laptop	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	6-Fri	27	US-IL\n" +
+"CT	Healthcare Provider	5827	2012-09-14T04:00:00.000Z	Theft	Laptop	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	6-Fri	14	US-CT\n" +
+"MO	Healthcare Provider	2600	2013-08-30T04:00:00.000Z	Theft	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	30	US-MO\n" +
+"MA	Healthcare Provider	595	2014-08-26T04:00:00.000Z	Theft	Laptop	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	26	US-MA\n" +
+"MA	Healthcare Provider	999	2014-11-17T05:00:00.000Z	Theft	Laptop	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	2-Mon	17	US-MA\n" +
+"NY	Health Plan	2772	2015-02-06T05:00:00.000Z	Theft	Laptop	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	6-Fri	6	US-NY\n" +
+"LA	Healthcare Provider	707	2014-09-26T04:00:00.000Z	Theft	Laptop	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	26	US-LA\n" +
+"TX	Healthcare Provider	4700	2010-10-05T04:00:00.000Z	Theft	Laptop	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	3-Tue	5	US-TX\n" +
+"OH	Healthcare Provider	850	2012-12-20T05:00:00.000Z	Theft	Laptop	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	5-Thu	20	US-OH\n" +
+"DC	Health Plan	3800	2009-11-17T05:00:00.000Z	Loss	Laptop	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	3-Tue	17	US-DC\n" +
+"TN	Healthcare Provider	1745	2010-06-08T04:00:00.000Z	Loss	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	8	US-TN\n" +
+"GA	Healthcare Provider	500	2013-02-11T05:00:00.000Z	Loss	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	2-Mon	11	US-GA\n" +
+"MS	Healthcare Provider	500	2013-03-21T04:00:00.000Z	Loss	Laptop	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	5-Thu	21	US-MS\n" +
+"OH	Healthcare Provider	9577	2013-05-20T04:00:00.000Z	Loss	Laptop	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	2-Mon	20	US-OH\n" +
+"GA	Healthcare Provider	4879	2013-12-10T05:00:00.000Z	Loss	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	3-Tue	10	US-GA\n" +
+"CA	Healthcare Provider	1233	2015-03-06T05:00:00.000Z	Loss	Laptop	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	6	US-CA\n" +
+"NY	Healthcare Provider	563	2015-04-10T04:00:00.000Z	Loss	Laptop	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	10	US-NY\n" +
+"WV	Healthcare Provider	12563	2011-11-08T05:00:00.000Z	Loss	Laptop	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	3-Tue	8	US-WV\n" +
+"LA	Healthcare Provider	17000	2012-05-18T04:00:00.000Z	Loss	Laptop	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	18	US-LA\n" +
+"TX	Healthcare Provider	596	2013-08-28T04:00:00.000Z	Loss	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	4-Wed	28	US-TX\n" +
+"IL	Healthcare Provider	1891	2013-12-06T05:00:00.000Z	Loss	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-IL\n" +
+"NC	Healthcare Provider	548	2014-02-26T05:00:00.000Z	Loss	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	26	US-NC\n" +
+"TX	Healthcare Provider	5700	2012-05-26T04:00:00.000Z	Loss	Laptop	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	7-Sat	26	US-TX\n" +
+"OH	Healthcare Provider	1309	2010-08-03T04:00:00.000Z	Other	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	3-Tue	3	US-OH\n" +
+"MI	Healthcare Provider	4100	2012-12-23T05:00:00.000Z	Other	Laptop	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	1-Sun	23	US-MI\n" +
+"DE	Healthcare Provider	1883	2014-01-31T05:00:00.000Z	Other	Laptop	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	31	US-DE\n" +
+"CO	Healthcare Provider	11500	2013-11-05T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	5	US-CO\n" +
+"NY	Business Associate	6475	2014-02-12T05:00:00.000Z	Theft	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	12	US-NY\n" +
+"CA	Healthcare Provider	5900	2009-11-23T05:00:00.000Z	Theft	Laptop	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	2-Mon	23	US-CA\n" +
+"PA	Healthcare Provider	943	2009-11-24T05:00:00.000Z	Theft	Laptop	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	3-Tue	24	US-PA\n" +
+"TN	Business Associate	6400	2009-11-25T05:00:00.000Z	Theft	Laptop	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	4-Wed	25	US-TN\n" +
+"TX	Healthcare Provider	900	2010-01-19T05:00:00.000Z	Theft	Laptop	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	3-Tue	19	US-TX\n" +
+"IL	Healthcare Provider	812	2010-01-22T05:00:00.000Z	Theft	Laptop	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	6-Fri	22	US-IL\n" +
+"CA	Healthcare Provider	7300	2010-01-27T05:00:00.000Z	Theft	Laptop	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	4-Wed	27	US-CA\n" +
+"AZ	Healthcare Provider	1100	2010-02-10T05:00:00.000Z	Theft	Laptop	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	4-Wed	10	US-AZ\n" +
+"FL	Healthcare Provider	12580	2010-03-01T05:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	2-Mon	1	US-FL\n" +
+"WI	Health Plan	9500	2010-03-03T05:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	4-Wed	3	US-WI\n" +
+"NY	Healthcare Provider	625	2010-03-09T05:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	3-Tue	9	US-NY\n" +
+"WA	Healthcare Provider	5080	2010-03-18T04:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	5-Thu	18	US-WA\n" +
+"FL	Healthcare Provider	2600	2010-03-23T04:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	3-Tue	23	US-FL\n" +
+"AL	Healthcare Provider	2465	2010-03-27T04:00:00.000Z	Theft	Laptop	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	7-Sat	27	US-AL\n" +
+"TX	Healthcare Provider	955	2010-04-09T04:00:00.000Z	Theft	Laptop	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	6-Fri	9	US-TX\n" +
+"CT	Healthcare Provider	54165	2010-04-19T04:00:00.000Z	Theft	Laptop	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	2-Mon	19	US-CT\n" +
+"MA	Healthcare Provider	3594	2010-04-20T04:00:00.000Z	Theft	Laptop	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	3-Tue	20	US-MA\n" +
+"CA	Healthcare Provider	5450	2010-04-24T04:00:00.000Z	Theft	Laptop	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	7-Sat	24	US-CA\n" +
+"TX	Healthcare Provider	4200	2010-05-11T04:00:00.000Z	Theft	Laptop	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	3-Tue	11	US-TX\n" +
+"TX	Business Associate	656	2010-05-14T04:00:00.000Z	Theft	Laptop	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	6-Fri	14	US-TX\n" +
+"SC	Healthcare Provider	653	2010-05-20T04:00:00.000Z	Theft	Laptop	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	5-Thu	20	US-SC\n" +
+"NE	Business Associate	800	2010-05-21T04:00:00.000Z	Theft	Laptop	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	6-Fri	21	US-NE\n" +
+"IL	Healthcare Provider	1000	2010-05-26T04:00:00.000Z	Theft	Laptop	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	4-Wed	26	US-IL\n" +
+"OH	Healthcare Provider	60998	2010-06-01T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	1	US-OH\n" +
+"KS	Healthcare Provider	1105	2010-06-01T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	3-Tue	1	US-KS\n" +
+"FL	Health Plan	1220000	2010-06-03T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	5-Thu	3	US-FL\n" +
+"MI	Healthcare Provider	2300	2010-06-04T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	6-Fri	4	US-MI\n" +
+"MA	Business Associate	10515	2010-06-09T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	4-Wed	9	US-MA\n" +
+"KY	Healthcare Provider	2027	2010-06-18T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	6-Fri	18	US-KY\n" +
+"AZ	Healthcare Provider	5893	2010-06-28T04:00:00.000Z	Theft	Laptop	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	2-Mon	28	US-AZ\n" +
+"NM	Healthcare Provider	3830	2010-07-08T04:00:00.000Z	Theft	Laptop	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	5-Thu	8	US-NM\n" +
+"DC	Health Plan	540	2010-07-23T04:00:00.000Z	Theft	Laptop	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	23	US-DC\n" +
+"TX	Healthcare Provider	1646	2010-07-30T04:00:00.000Z	Theft	Laptop	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-TX\n" +
+"TX	Healthcare Provider	694	2010-07-30T04:00:00.000Z	Theft	Laptop	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	30	US-TX\n" +
+"OH	Healthcare Provider	13867	2010-08-05T04:00:00.000Z	Theft	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	5	US-OH\n" +
+"KY	Healthcare Provider	2089	2010-08-05T04:00:00.000Z	Theft	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	5-Thu	5	US-KY\n" +
+"PA	Healthcare Provider	21000	2010-08-09T04:00:00.000Z	Theft	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	2-Mon	9	US-PA\n" +
+"CT	Healthcare Provider	1000	2010-08-18T04:00:00.000Z	Theft	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	4-Wed	18	US-CT\n" +
+"IL	Healthcare Provider	7081	2010-08-20T04:00:00.000Z	Theft	Laptop	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	6-Fri	20	US-IL\n" +
+"VA	Healthcare Provider	2739	2010-09-08T04:00:00.000Z	Theft	Laptop	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	4-Wed	8	US-VA\n" +
+"IN	Healthcare Provider	1199	2010-09-23T04:00:00.000Z	Theft	Laptop	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	5-Thu	23	US-IN\n" +
+"NY	Healthcare Provider	578	2010-10-05T04:00:00.000Z	Theft	Laptop	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	3-Tue	5	US-NY\n" +
+"TX	Healthcare Provider	585	2010-10-08T04:00:00.000Z	Theft	Laptop	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	6-Fri	8	US-TX\n" +
+"CT	Healthcare Provider	12000	2010-11-11T05:00:00.000Z	Theft	Laptop	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	5-Thu	11	US-CT\n" +
+"NY	Healthcare Provider	535	2010-11-12T05:00:00.000Z	Theft	Laptop	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	6-Fri	12	US-NY\n" +
+"MO	Healthcare Provider	1400	2010-11-15T05:00:00.000Z	Theft	Laptop	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	2-Mon	15	US-MO\n" +
+"MI	Healthcare Provider	3700	2010-11-15T05:00:00.000Z	Theft	Laptop	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	2-Mon	15	US-MI\n" +
+"WI	Healthcare Provider	3288	2010-12-20T05:00:00.000Z	Theft	Laptop	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	2-Mon	20	US-WI\n" +
+"IN	Business Associate	757	2010-12-27T05:00:00.000Z	Theft	Laptop	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	2-Mon	27	US-IN\n" +
+"MN	Healthcare Provider	3159	2010-12-28T05:00:00.000Z	Theft	Laptop	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	3-Tue	28	US-MN\n" +
+"FL	Healthcare Provider	2200	2011-01-11T05:00:00.000Z	Theft	Laptop	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	11	US-FL\n" +
+"VA	Healthcare Provider	11982	2011-01-12T05:00:00.000Z	Theft	Laptop	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	4-Wed	12	US-VA\n" +
+"TX	Healthcare Provider	4486	2011-01-24T05:00:00.000Z	Theft	Laptop	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	2-Mon	24	US-TX\n" +
+"MT	Healthcare Provider	37000	2011-02-08T05:00:00.000Z	Theft	Laptop	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	3-Tue	8	US-MT\n" +
+"KY	Healthcare Provider	8845	2011-03-10T05:00:00.000Z	Theft	Laptop	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	5-Thu	10	US-KY\n" +
+"CA	Healthcare Provider	667	2011-03-30T04:00:00.000Z	Theft	Laptop	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	4-Wed	30	US-CA\n" +
+"AK	Business Associate	1700	2011-03-31T04:00:00.000Z	Theft	Laptop	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	5-Thu	31	US-AK\n" +
+"NH	Healthcare Provider	5960	2011-05-02T04:00:00.000Z	Theft	Laptop	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	2-Mon	2	US-NH\n" +
+"TX	Healthcare Provider	1500	2011-05-05T04:00:00.000Z	Theft	Laptop	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	5-Thu	5	US-TX\n" +
+"MA	Healthcare Provider	563	2011-05-06T04:00:00.000Z	Theft	Laptop	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	6-Fri	6	US-MA\n" +
+"IN	Healthcare Provider	22001	2011-05-06T04:00:00.000Z	Theft	Laptop	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	6-Fri	6	US-IN\n" +
+"CA	Healthcare Provider	620	2011-05-17T04:00:00.000Z	Theft	Laptop	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	3-Tue	17	US-CA\n" +
+"TN	Healthcare Provider	810	2011-06-22T04:00:00.000Z	Theft	Laptop	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	22	US-TN\n" +
+"TN	Healthcare Provider	705	2011-06-22T04:00:00.000Z	Theft	Laptop	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	4-Wed	22	US-TN\n" +
+"OH	Business Associate	78042	2011-06-27T04:00:00.000Z	Theft	Laptop	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	2-Mon	27	US-OH\n" +
+"NY	Healthcare Provider	712	2011-07-08T04:00:00.000Z	Theft	Laptop	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	8	US-NY\n" +
+"KY	Healthcare Provider	3604	2011-07-28T04:00:00.000Z	Theft	Laptop	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	5-Thu	28	US-KY\n" +
+"TX	Healthcare Provider	1870	2011-07-28T04:00:00.000Z	Theft	Laptop	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	5-Thu	28	US-TX\n" +
+"TX	Business Associate	10345	2011-08-17T04:00:00.000Z	Theft	Laptop	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	4-Wed	17	US-TX\n" +
+"TX	Health Plan	1696	2011-09-09T04:00:00.000Z	Theft	Laptop	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	6-Fri	9	US-TX\n" +
+"GA	Healthcare Provider	863	2011-09-15T04:00:00.000Z	Theft	Laptop	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	5-Thu	15	US-GA\n" +
+"TX	Healthcare Provider	1259	2011-09-23T04:00:00.000Z	Theft	Laptop	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	6-Fri	23	US-TX\n" +
+"IN	Healthcare Provider	3266	2011-10-04T04:00:00.000Z	Theft	Laptop	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	4	US-IN\n" +
+"MA	Healthcare Provider	599	2011-10-11T04:00:00.000Z	Theft	Laptop	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	11	US-MA\n" +
+"NY	Healthcare Provider	927	2011-10-27T04:00:00.000Z	Theft	Laptop	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	5-Thu	27	US-NY\n" +
+"ND	Healthcare Provider	650	2011-11-17T05:00:00.000Z	Theft	Laptop	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	5-Thu	17	US-ND\n" +
+"GA	Healthcare Provider	17000	2011-12-13T05:00:00.000Z	Theft	Laptop	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	3-Tue	13	US-GA\n" +
+"WA	Health Plan	7581	2011-12-23T05:00:00.000Z	Theft	Laptop	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	6-Fri	23	US-WA\n" +
+"TX	Healthcare Provider	870	2011-12-28T05:00:00.000Z	Theft	Laptop	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	4-Wed	28	US-TX\n" +
+"MA	Healthcare Provider	2988	2011-12-28T05:00:00.000Z	Theft	Laptop	1	2011	12	[12] Dec	 Qtr_4	2011 Qtr_4	4-Wed	28	US-MA\n" +
+"PA	Healthcare Provider	1300	2012-01-10T05:00:00.000Z	Theft	Laptop	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	3-Tue	10	US-PA\n" +
+"KS	Healthcare Provider	7757	2012-01-19T05:00:00.000Z	Theft	Laptop	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	5-Thu	19	US-KS\n" +
+"NY	Healthcare Provider	549	2012-01-24T05:00:00.000Z	Theft	Laptop	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	3-Tue	24	US-NY\n" +
+"NC	Healthcare Provider	2000	2012-02-01T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	4-Wed	1	US-NC\n" +
+"IL	Business Associate	14000	2012-02-06T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	2-Mon	6	US-IL\n" +
+"WI	Healthcare Provider	698	2012-02-14T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	3-Tue	14	US-WI\n" +
+"PA	Healthcare Provider	728	2012-02-27T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	2-Mon	27	US-PA\n" +
+"NM	Business Associate	7000	2012-02-28T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	3-Tue	28	US-NM\n" +
+"PR	Business Associate	7706	2012-02-28T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	3-Tue	28	US-PR\n" +
+"IN	Healthcare Provider	20000	2012-03-09T05:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	6-Fri	9	US-IN\n" +
+"PR	Business Associate	4645	2012-03-12T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	2-Mon	12	US-PR\n" +
+"NY	Healthcare Provider	577	2012-03-13T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	3-Tue	13	US-NY\n" +
+"PR	Business Associate	7923	2012-03-13T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	3-Tue	13	US-PR\n" +
+"GA	Healthcare Provider	513	2012-03-15T04:00:00.000Z	Theft	Laptop	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	5-Thu	15	US-GA\n" +
+"MN	Healthcare Provider	4000	2012-05-14T04:00:00.000Z	Theft	Laptop	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	2-Mon	14	US-MN\n" +
+"NE	Health Plan	3000	2012-05-21T04:00:00.000Z	Theft	Laptop	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	2-Mon	21	US-NE\n" +
+"MA	Healthcare Provider	2159	2012-05-22T04:00:00.000Z	Theft	Laptop	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	3-Tue	22	US-MA\n" +
+"MD	Business Associate	1444	2012-06-04T04:00:00.000Z	Theft	Laptop	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	2-Mon	4	US-MD\n" +
+"KY	Healthcare Provider	4490	2012-06-19T04:00:00.000Z	Theft	Laptop	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	3-Tue	19	US-KY\n" +
+"KY	Healthcare Provider	824	2012-06-22T04:00:00.000Z	Theft	Laptop	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	6-Fri	22	US-KY\n" +
+"TX	Healthcare Provider	585	2012-07-03T04:00:00.000Z	Theft	Laptop	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	3-Tue	3	US-TX\n" +
+"MA	Healthcare Provider	3900	2012-07-20T04:00:00.000Z	Theft	Laptop	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	6-Fri	20	US-MA\n" +
+"CT	Business Associate	7461	2012-07-30T04:00:00.000Z	Theft	Laptop	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	2-Mon	30	US-CT\n" +
+"PA	Business Associate	66601	2012-08-10T04:00:00.000Z	Theft	Laptop	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	10	US-PA\n" +
+"PA	Healthcare Provider	3183	2012-08-17T04:00:00.000Z	Theft	Laptop	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	17	US-PA\n" +
+"FL	Healthcare Provider	500	2012-08-28T04:00:00.000Z	Theft	Laptop	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	3-Tue	28	US-FL\n" +
+"GA	Healthcare Provider	4000	2012-08-31T04:00:00.000Z	Theft	Laptop	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	31	US-GA\n" +
+"WA	Healthcare Provider	942	2012-09-07T04:00:00.000Z	Theft	Laptop	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	6-Fri	7	US-WA\n" +
+"NY	Healthcare Provider	13000	2012-09-14T04:00:00.000Z	Theft	Laptop	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	6-Fri	14	US-NY\n" +
+"CA	Healthcare Provider	65700	2012-10-10T04:00:00.000Z	Theft	Laptop	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	4-Wed	10	US-CA\n" +
+"TN	Healthcare Provider	27799	2012-10-17T04:00:00.000Z	Theft	Laptop	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	4-Wed	17	US-TN\n" +
+"CA	Healthcare Provider	116506	2012-10-18T04:00:00.000Z	Theft	Laptop	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	5-Thu	18	US-CA\n" +
+"NM	Healthcare Provider	540	2012-11-21T05:00:00.000Z	Theft	Laptop	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	4-Wed	21	US-NM\n" +
+"OH	Healthcare Provider	613	2012-11-29T05:00:00.000Z	Theft	Laptop	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-OH\n" +
+"RI	Healthcare Provider	683	2012-11-30T05:00:00.000Z	Theft	Laptop	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	6-Fri	30	US-RI\n" +
+"IN	Healthcare Provider	28893	2012-12-26T05:00:00.000Z	Theft	Laptop	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	4-Wed	26	US-IN\n" +
+"KY	Business Associate	1090	2012-12-28T05:00:00.000Z	Theft	Laptop	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	28	US-KY\n" +
+"CA	Business Associate	56820	2012-12-31T05:00:00.000Z	Theft	Laptop	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	2-Mon	31	US-CA\n" +
+"LA	Healthcare Provider	1400	2013-01-10T05:00:00.000Z	Theft	Laptop	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	10	US-LA\n" +
+"NY	Healthcare Provider	19178	2013-01-11T05:00:00.000Z	Theft	Laptop	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	6-Fri	11	US-NY\n" +
+"MO	Healthcare Provider	1105	2013-01-11T05:00:00.000Z	Theft	Laptop	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	6-Fri	11	US-MO\n" +
+"MD	Healthcare Provider	3230	2013-01-17T05:00:00.000Z	Theft	Laptop	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	17	US-MD\n" +
+"TX	Healthcare Provider	29021	2013-01-24T05:00:00.000Z	Theft	Laptop	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	5-Thu	24	US-TX\n" +
+"GA	Business Associate	1103	2013-02-04T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	2-Mon	4	US-GA\n" +
+"MD	Healthcare Provider	5822	2013-02-12T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	3-Tue	12	US-MD\n" +
+"MO	Healthcare Provider	4027	2013-02-14T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	5-Thu	14	US-MO\n" +
+"GA	Healthcare Provider	1819	2013-02-15T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	6-Fri	15	US-GA\n" +
+"NM	Healthcare Provider	778	2013-02-17T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	1-Sun	17	US-NM\n" +
+"AZ	Healthcare Provider	501	2013-02-21T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	5-Thu	21	US-AZ\n" +
+"GA	Healthcare Provider	3000	2013-02-27T05:00:00.000Z	Theft	Laptop	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	4-Wed	27	US-GA\n" +
+"CA	Business Associate	18162	2013-03-04T05:00:00.000Z	Theft	Laptop	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	2-Mon	4	US-CA\n" +
+"FL	Healthcare Provider	12299	2013-03-09T05:00:00.000Z	Theft	Laptop	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	7-Sat	9	US-FL\n" +
+"WA	Business Associate	629	2013-03-29T04:00:00.000Z	Theft	Laptop	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	29	US-WA\n" +
+"SC	Healthcare Provider	7405	2013-04-10T04:00:00.000Z	Theft	Laptop	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	4-Wed	10	US-SC\n" +
+"OR	Healthcare Provider	1076	2013-04-11T04:00:00.000Z	Theft	Laptop	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	5-Thu	11	US-OR\n" +
+"IN	Healthcare Provider	10350	2013-05-13T04:00:00.000Z	Theft	Laptop	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	2-Mon	13	US-IN\n" +
+"CA	Business Associate	3164	2013-05-24T04:00:00.000Z	Theft	Laptop	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	6-Fri	24	US-CA\n" +
+"NY	Health Plan	2434	2013-05-24T04:00:00.000Z	Theft	Laptop	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	6-Fri	24	US-NY\n" +
+"CA	Healthcare Provider	12900	2013-06-13T04:00:00.000Z	Theft	Laptop	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	5-Thu	13	US-CA\n" +
+"TX	Healthcare Provider	1955	2013-06-28T04:00:00.000Z	Theft	Laptop	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	6-Fri	28	US-TX\n" +
+"PR	Business Associate	679	2013-06-28T04:00:00.000Z	Theft	Laptop	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	6-Fri	28	US-PR\n" +
+"FL	Healthcare Provider	900	2013-07-03T04:00:00.000Z	Theft	Laptop	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	4-Wed	3	US-FL\n" +
+"CA	Healthcare Provider	1837	2013-08-02T04:00:00.000Z	Theft	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	2	US-CA\n" +
+"AR	Business Associate	1911	2013-08-05T04:00:00.000Z	Theft	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	2-Mon	5	US-AR\n" +
+"OH	Healthcare Provider	2045	2013-08-12T04:00:00.000Z	Theft	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	2-Mon	12	US-OH\n" +
+"TN	Healthcare Provider	5690	2013-08-15T04:00:00.000Z	Theft	Laptop	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	5-Thu	15	US-TN\n" +
+"CO	Healthcare Provider	1500	2013-09-03T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	3-Tue	3	US-CO\n" +
+"CA	Healthcare Provider	2182	2013-09-06T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	6	US-CA\n" +
+"OH	Healthcare Provider	1360	2013-09-27T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	27	US-OH\n" +
+"CA	Healthcare Provider	579	2013-09-27T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	27	US-CA\n" +
+"CO	Business Associate	3512	2013-09-28T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	7-Sat	28	US-CO\n" +
+"TN	Healthcare Provider	6932	2013-09-30T04:00:00.000Z	Theft	Laptop	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	2-Mon	30	US-TN\n" +
+"PA	Healthcare Provider	2810	2013-10-04T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	4	US-PA\n" +
+"IN	Healthcare Provider	566	2013-10-14T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	14	US-IN\n" +
+"VT	Healthcare Provider	550	2013-10-15T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	3-Tue	15	US-VT\n" +
+"TX	Healthcare Provider	5500	2013-10-23T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	4-Wed	23	US-TX\n" +
+"CA	Healthcare Provider	3833	2013-10-25T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	25	US-CA\n" +
+"WI	Healthcare Provider	631	2013-10-25T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	25	US-WI\n" +
+"CA	Healthcare Provider	729000	2013-10-25T04:00:00.000Z	Theft	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	25	US-CA\n" +
+"NJ	Healthcare Provider	1100	2013-11-05T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	5	US-NJ\n" +
+"IL	Business Associate	4837	2013-11-14T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	5-Thu	14	US-IL\n" +
+"GA	Healthcare Provider	1300	2013-11-15T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	6-Fri	15	US-GA\n" +
+"WA	Healthcare Provider	950	2013-11-26T05:00:00.000Z	Theft	Laptop	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	26	US-WA\n" +
+"GA	Healthcare Provider	4500	2013-12-06T05:00:00.000Z	Theft	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-GA\n" +
+"SC	Business Associate	3432	2013-12-18T05:00:00.000Z	Theft	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	4-Wed	18	US-SC\n" +
+"TN	Business Associate	2777	2013-12-19T05:00:00.000Z	Theft	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	5-Thu	19	US-TN\n" +
+"NM	Healthcare Provider	12354	2013-12-31T05:00:00.000Z	Theft	Laptop	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	3-Tue	31	US-NM\n" +
+"NJ	Business Associate	839711	2014-01-03T05:00:00.000Z	Theft	Laptop	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	3	US-NJ\n" +
+"NY	Business Associate	2500	2014-01-08T05:00:00.000Z	Theft	Laptop	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	4-Wed	8	US-NY\n" +
+"TN	Healthcare Provider	9602	2014-01-15T05:00:00.000Z	Theft	Laptop	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	4-Wed	15	US-TN\n" +
+"CA	Business Associate	611	2014-01-24T05:00:00.000Z	Theft	Laptop	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	24	US-CA\n" +
+"CA	Healthcare Provider	3026	2014-02-07T05:00:00.000Z	Theft	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	7	US-CA\n" +
+"GA	Healthcare Provider	841	2014-02-07T05:00:00.000Z	Theft	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	7	US-GA\n" +
+"IN	Healthcare Provider	1142	2014-02-18T05:00:00.000Z	Theft	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	3-Tue	18	US-IN\n" +
+"VA	Healthcare Provider	3458	2014-02-26T05:00:00.000Z	Theft	Laptop	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	26	US-VA\n" +
+"AZ	Healthcare Provider	1706	2014-03-16T04:00:00.000Z	Theft	Laptop	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	1-Sun	16	US-AZ\n" +
+"WA	Business Associate	1079	2014-03-24T04:00:00.000Z	Theft	Laptop	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	24	US-WA\n" +
+"TX	Healthcare Provider	1000	2014-05-10T04:00:00.000Z	Theft	Laptop	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	7-Sat	10	US-TX\n" +
+"OK	Business Associate	3814	2014-05-30T04:00:00.000Z	Theft	Laptop	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	6-Fri	30	US-OK\n" +
+"NY	Healthcare Provider	872	2014-06-20T04:00:00.000Z	Theft	Laptop	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	20	US-NY\n" +
+"CO	Healthcare Provider	750	2014-06-23T04:00:00.000Z	Theft	Laptop	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	2-Mon	23	US-CO\n" +
+"CA	Healthcare Provider	563	2014-06-24T04:00:00.000Z	Theft	Laptop	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	3-Tue	24	US-CA\n" +
+"MD	Healthcare Provider	42713	2014-06-27T04:00:00.000Z	Theft	Laptop	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	27	US-MD\n" +
+"SC	Healthcare Provider	38906	2014-07-25T04:00:00.000Z	Theft	Laptop	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	6-Fri	25	US-SC\n" +
+"IL	Healthcare Provider	982	2014-07-30T04:00:00.000Z	Theft	Laptop	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	30	US-IL\n" +
+"IL	Healthcare Provider	13646	2014-08-19T04:00:00.000Z	Theft	Laptop	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	19	US-IL\n" +
+"CA	Healthcare Provider	33136	2014-09-10T04:00:00.000Z	Theft	Laptop	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	4-Wed	10	US-CA\n" +
+"CO	Healthcare Provider	523	2014-09-26T04:00:00.000Z	Theft	Laptop	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	26	US-CO\n" +
+"AL	Healthcare Provider	2588	2014-09-30T04:00:00.000Z	Theft	Laptop	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	3-Tue	30	US-AL\n" +
+"NY	Healthcare Provider	10793	2014-10-03T04:00:00.000Z	Theft	Laptop	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	3	US-NY\n" +
+"OR	Healthcare Provider	1320	2014-10-06T04:00:00.000Z	Theft	Laptop	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	2-Mon	6	US-OR\n" +
+"GA	Healthcare Provider	3397	2014-10-09T04:00:00.000Z	Theft	Laptop	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	5-Thu	9	US-GA\n" +
+"TX	Healthcare Provider	1000	2014-10-15T04:00:00.000Z	Theft	Laptop	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	15	US-TX\n" +
+"PA	Healthcare Provider	13907	2014-10-31T04:00:00.000Z	Theft	Laptop	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	6-Fri	31	US-PA\n" +
+"OH	Healthcare Provider	542	2014-11-21T05:00:00.000Z	Theft	Laptop	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	21	US-OH\n" +
+"UT	Healthcare Provider	623	2014-12-05T05:00:00.000Z	Theft	Laptop	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	6-Fri	5	US-UT\n" +
+"KY	Healthcare Provider	4500	2014-12-09T05:00:00.000Z	Theft	Laptop	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	3-Tue	9	US-KY\n" +
+"IN	Healthcare Provider	43890	2015-01-07T05:00:00.000Z	Theft	Laptop	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	4-Wed	7	US-IN\n" +
+"CA	Healthcare Provider	7925	2015-01-29T05:00:00.000Z	Theft	Laptop	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	5-Thu	29	US-CA\n" +
+"TX	Healthcare Provider	678	2015-01-29T05:00:00.000Z	Theft	Laptop	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	5-Thu	29	US-TX\n" +
+"NV	Healthcare Provider	2153	2015-02-26T05:00:00.000Z	Theft	Laptop	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	5-Thu	26	US-NV\n" +
+"TX	Healthcare Provider	600	2015-03-19T04:00:00.000Z	Theft	Laptop	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	19	US-TX\n" +
+"IL	Healthcare Provider	3000	2015-04-28T04:00:00.000Z	Theft	Laptop	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	28	US-IL\n" +
+"MN	Healthcare Provider	4725	2015-05-18T04:00:00.000Z	Theft	Laptop	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	2-Mon	18	US-MN\n" +
+"FL	Healthcare Provider	506	2015-05-20T04:00:00.000Z	Theft	Laptop	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	4-Wed	20	US-FL\n" +
+"OR	Health Plan	14000	2015-06-01T04:00:00.000Z	Theft	Laptop	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	2-Mon	1	US-OR\n" +
+"CA	Business Associate	995	2015-06-03T04:00:00.000Z	Theft	Laptop	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	4-Wed	3	US-CA\n" +
+"OR	Business Associate	2300	2012-02-20T05:00:00.000Z	Theft	Laptop	1	2012	2	[02] Feb	 Qtr_1	2012 Qtr_1	2-Mon	20	US-OR\n" +
+"FL	Healthcare Provider	2365	2014-04-23T04:00:00.000Z	Theft	Laptop	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	4-Wed	23	US-FL\n" +
+"IL	Healthcare Provider	815	2011-08-18T04:00:00.000Z	Unauthorized Access/Disclosure	Laptop	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	5-Thu	18	US-IL\n" +
+"FL	Healthcare Provider	10680	2013-10-29T04:00:00.000Z	Unauthorized Access/Disclosure	Laptop	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	3-Tue	29	US-FL\n" +
+"MD	Health Plan	214000	2014-04-01T04:00:00.000Z	Unauthorized Access/Disclosure	Laptop	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	1	US-MD\n" +
+"PA	Healthcare Provider	1801	2014-06-06T04:00:00.000Z	Other	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	6	US-PA\n" +
+"DC	Healthcare Provider	2416	2010-05-13T04:00:00.000Z	Theft	Email	1	2010	5	[05] May	 Qtr_2	2010 Qtr_2	5-Thu	13	US-DC\n" +
+"NY	Healthcare Provider	568	2012-06-08T04:00:00.000Z	Theft	Email	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	6-Fri	8	US-NY\n" +
+"CA	Healthcare Provider	6307	2014-06-25T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	4-Wed	25	US-CA\n" +
+"IN	Healthcare Provider	1848	2011-01-12T05:00:00.000Z	Hacking/IT Incident	Email	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	4-Wed	12	US-IN\n" +
+"AZ	Healthcare Provider	13877	2014-07-29T04:00:00.000Z	Theft	Email	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	3-Tue	29	US-AZ\n" +
+"NC	Business Associate	50000	2012-01-10T05:00:00.000Z	Theft	Email	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	3-Tue	10	US-NC\n" +
+"MO	Healthcare Provider	4000	2015-01-07T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	4-Wed	7	US-MO\n" +
+"IA	Health Plan	2042	2014-03-10T04:00:00.000Z	Other	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	10	US-IA\n" +
+"WA	Healthcare Provider	2500	2014-01-03T05:00:00.000Z	Theft	Email	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	3	US-WA\n" +
+"NJ	Business Associate	342197	2014-05-22T04:00:00.000Z	Theft	Email	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	5-Thu	22	US-NJ\n" +
+"AL	Business Associate	768	2010-03-30T04:00:00.000Z	Other	Email	1	2010	3	[03] Mar	 Qtr_1	2010 Qtr_1	3-Tue	30	US-AL\n" +
+"NC	Healthcare Provider	5600	2012-12-07T05:00:00.000Z	Hacking/IT Incident	Email	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	7	US-NC\n" +
+"CA	Healthcare Provider	2269	2014-02-14T05:00:00.000Z	Hacking/IT Incident	Email	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	14	US-CA\n" +
+"IL	Healthcare Provider	1256	2014-03-31T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	2-Mon	31	US-IL\n" +
+"CO	Healthcare Provider	12286	2014-04-22T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	3-Tue	22	US-CO\n" +
+"TX	Healthcare Provider	1253	2014-04-25T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-TX\n" +
+"TX	Healthcare Provider	2308	2014-04-25T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-TX\n" +
+"TX	Healthcare Provider	1981	2014-04-25T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-TX\n" +
+"TX	Healthcare Provider	2742	2014-04-25T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	6-Fri	25	US-TX\n" +
+"CA	Healthcare Provider	1326	2014-10-08T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	8	US-CA\n" +
+"DC	Healthcare Provider	18000	2015-02-24T05:00:00.000Z	Hacking/IT Incident	Email	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	3-Tue	24	US-DC\n" +
+"IN	Healthcare Provider	3952	2015-03-05T05:00:00.000Z	Hacking/IT Incident	Email	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	5-Thu	5	US-IN\n" +
+"FL	Healthcare Provider	14177	2015-03-16T04:00:00.000Z	Hacking/IT Incident	Email	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	2-Mon	16	US-FL\n" +
+"IN	Healthcare Provider	756	2015-04-10T04:00:00.000Z	Hacking/IT Incident	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	10	US-IN\n" +
+"MD	Healthcare Provider	24967	2015-04-24T04:00:00.000Z	Hacking/IT Incident	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	24	US-MD\n" +
+"TX	Healthcare Provider	39000	2015-04-24T04:00:00.000Z	Hacking/IT Incident	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	24	US-TX\n" +
+"IN	Healthcare Provider	306789	2015-05-22T04:00:00.000Z	Hacking/IT Incident	Email	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	22	US-IN\n" +
+"CO	Healthcare Provider	3200	2012-01-27T05:00:00.000Z	Hacking/IT Incident	Email	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	6-Fri	27	US-CO\n" +
+"MN	Business Associate	502	2014-05-19T04:00:00.000Z	Hacking/IT Incident	Email	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	2-Mon	19	US-MN\n" +
+"MO	Health Plan	1127	2013-06-17T04:00:00.000Z	Improper Disposal	Email	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	2-Mon	17	US-MO\n" +
+"CA	Healthcare Provider	610	2009-12-15T05:00:00.000Z	Other	Email	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	3-Tue	15	US-CA\n" +
+"OH	Healthcare Provider	1001	2010-06-14T04:00:00.000Z	Other	Email	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	2-Mon	14	US-OH\n" +
+"PA	Business Associate	937	2010-06-24T04:00:00.000Z	Other	Email	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	5-Thu	24	US-PA\n" +
+"ME	Healthcare Provider	1920	2013-03-04T05:00:00.000Z	Other	Email	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	2-Mon	4	US-ME\n" +
+"TX	Healthcare Provider	818	2013-04-25T04:00:00.000Z	Other	Email	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	5-Thu	25	US-TX\n" +
+"NY	Healthcare Provider	10000	2013-05-14T04:00:00.000Z	Other	Email	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	14	US-NY\n" +
+"NC	Healthcare Provider	609	2013-07-05T04:00:00.000Z	Other	Email	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	6-Fri	5	US-NC\n" +
+"GA	Healthcare Provider	654	2013-08-30T04:00:00.000Z	Other	Email	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	30	US-GA\n" +
+"NC	Healthcare Provider	1310	2013-10-04T04:00:00.000Z	Other	Email	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	6-Fri	4	US-NC\n" +
+"NE	Healthcare Provider	3857	2013-12-11T05:00:00.000Z	Other	Email	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	4-Wed	11	US-NE\n" +
+"IL	Healthcare Provider	22511	2014-01-11T05:00:00.000Z	Other	Email	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	7-Sat	11	US-IL\n" +
+"KY	Healthcare Provider	2992	2014-03-28T04:00:00.000Z	Other	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	28	US-KY\n" +
+"WA	Healthcare Provider	8300	2014-03-28T04:00:00.000Z	Other	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	28	US-WA\n" +
+"IN	Business Associate	1008	2014-05-06T04:00:00.000Z	Other	Email	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	3-Tue	6	US-IN\n" +
+"MN	Healthcare Provider	1304	2014-06-05T04:00:00.000Z	Other	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	5	US-MN\n" +
+"GA	Healthcare Provider	1175	2014-06-09T04:00:00.000Z	Other	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	2-Mon	9	US-GA\n" +
+"IL	Business Associate	767	2014-09-17T04:00:00.000Z	Other	Email	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	4-Wed	17	US-IL\n" +
+"AZ	Healthcare Provider	1296	2014-11-14T05:00:00.000Z	Other	Email	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	14	US-AZ\n" +
+"NY	Health Plan	31980	2014-11-20T05:00:00.000Z	Other	Email	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	5-Thu	20	US-NY\n" +
+"FL	Healthcare Provider	2477	2014-12-08T05:00:00.000Z	Other	Email	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	2-Mon	8	US-FL\n" +
+"PA	Healthcare Provider	2928	2010-12-28T05:00:00.000Z	Theft	Email	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	3-Tue	28	US-PA\n" +
+"OH	Healthcare Provider	1167	2013-06-03T04:00:00.000Z	Theft	Email	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	2-Mon	3	US-OH\n" +
+"VA	Healthcare Provider	10228	2013-09-26T04:00:00.000Z	Theft	Email	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	5-Thu	26	US-VA\n" +
+"GA	Business Associate	5232	2013-10-02T04:00:00.000Z	Theft	Email	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	4-Wed	2	US-GA\n" +
+"MD	Healthcare Provider	7606	2013-11-12T05:00:00.000Z	Theft	Email	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	12	US-MD\n" +
+"IL	Business Associate	1573	2013-12-06T05:00:00.000Z	Theft	Email	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-IL\n" +
+"CA	Healthcare Provider	7800	2014-03-12T04:00:00.000Z	Theft	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	4-Wed	12	US-CA\n" +
+"NY	Health Plan	642	2012-04-03T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	3-Tue	3	US-NY\n" +
+"MI	Health Plan	1229	2012-04-06T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	6	US-MI\n" +
+"CA	Healthcare Provider	1000	2012-04-10T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	3-Tue	10	US-CA\n" +
+"SC	Health Plan	228435	2012-04-24T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	3-Tue	24	US-SC\n" +
+"MO	Health Plan	1134	2012-05-11T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	11	US-MO\n" +
+"KY	Health Plan	2500	2012-09-19T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	4-Wed	19	US-KY\n" +
+"TN	Healthcare Provider	1180	2013-05-07T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	7	US-TN\n" +
+"CA	Business Associate	4479	2013-07-05T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	6-Fri	5	US-CA\n" +
+"MO	Healthcare Provider	3100	2013-10-07T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	7	US-MO\n" +
+"IL	Healthcare Provider	1067	2013-10-14T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	14	US-IL\n" +
+"AK	Healthcare Provider	1556	2013-10-16T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	4-Wed	16	US-AK\n" +
+"MA	Healthcare Provider	832	2013-12-23T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	23	US-MA\n" +
+"CO	Business Associate	1918	2014-01-02T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	5-Thu	2	US-CO\n" +
+"PA	Healthcare Provider	657	2014-03-27T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	5-Thu	27	US-PA\n" +
+"UT	Healthcare Provider	643	2014-03-29T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	7-Sat	29	US-UT\n" +
+"NY	Health Plan	4830	2014-04-24T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	4	[04] Apr	 Qtr_2	2014 Qtr_2	5-Thu	24	US-NY\n" +
+"KS	Healthcare Provider	9640	2014-06-05T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	5	US-KS\n" +
+"MI	Health Plan	2289	2014-06-16T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	2-Mon	16	US-MI\n" +
+"CA	Healthcare Provider	14121	2014-06-24T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	3-Tue	24	US-CA\n" +
+"OK	Healthcare Provider	6000	2014-08-22T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	22	US-OK\n" +
+"FL	Healthcare Provider	1782	2014-10-30T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	5-Thu	30	US-FL\n" +
+"MI	Healthcare Provider	1488	2014-12-12T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	6-Fri	12	US-MI\n" +
+"FL	Healthcare Provider	1859	2015-01-05T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	2-Mon	5	US-FL\n" +
+"CA	Healthcare Provider	1285	2015-01-28T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	4-Wed	28	US-CA\n" +
+"FL	Healthcare Provider	600	2015-02-12T05:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	5-Thu	12	US-FL\n" +
+"CA	Healthcare Provider	845	2015-04-02T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-CA\n" +
+"TX	Healthcare Provider	873	2015-04-03T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	3	US-TX\n" +
+"NJ	Healthcare Provider	1447	2015-04-17T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	17	US-NJ\n" +
+"NY	Healthcare Provider	3334	2015-04-28T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	28	US-NY\n" +
+"NY	Healthcare Provider	90060	2015-04-28T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	28	US-NY\n" +
+"NY	Healthcare Provider	3957	2015-06-01T04:00:00.000Z	Unauthorized Access/Disclosure	Email	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	2-Mon	1	US-NY\n" +
+"NC	Healthcare Provider	1263	2011-06-09T04:00:00.000Z	Other	Email	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	9	US-NC\n" +
+"GA	Healthcare Provider	12937	2012-05-24T04:00:00.000Z	Theft	Electronic Medical Record	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	5-Thu	24	US-GA\n" +
+"TX	Healthcare Provider	2875	2012-08-03T04:00:00.000Z	Theft	Electronic Medical Record	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	3	US-TX\n" +
+"TX	Healthcare Provider	2464	2011-11-17T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	5-Thu	17	US-TX\n" +
+"MA	Healthcare Provider	2387	2014-05-05T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	2-Mon	5	US-MA\n" +
+"PA	Business Associate	800000	2010-07-19T04:00:00.000Z	Loss	Electronic Medical Record	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	2-Mon	19	US-PA\n" +
+"MA	Business Associate	1860	2010-01-07T05:00:00.000Z	Theft	Electronic Medical Record	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	5-Thu	7	US-MA\n" +
+"NJ	Business Associate	1700000	2011-02-11T05:00:00.000Z	Theft	Electronic Medical Record	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	6-Fri	11	US-NJ\n" +
+"IL	Healthcare Provider	16446	2014-02-10T05:00:00.000Z	Theft	Electronic Medical Record	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	2-Mon	10	US-IL\n" +
+"VA	Healthcare Provider	2318	2014-07-31T04:00:00.000Z	Theft	Electronic Medical Record	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	5-Thu	31	US-VA\n" +
+"FL	Healthcare Provider	1562	2011-07-08T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	8	US-FL\n" +
+"OH	Healthcare Provider	594	2014-05-28T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	4-Wed	28	US-OH\n" +
+"NV	Healthcare Provider	12000	2015-06-10T04:00:00.000Z	Theft	Electronic Medical Record	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	4-Wed	10	US-NV\n" +
+"MN	Healthcare Provider	2600	2011-10-11T04:00:00.000Z	Theft	Electronic Medical Record	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	3-Tue	11	US-MN\n" +
+"NY	Healthcare Provider	3936	2014-11-07T05:00:00.000Z	Theft	Electronic Medical Record	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	6-Fri	7	US-NY\n" +
+"OH	Healthcare Provider	504	2014-02-26T05:00:00.000Z	Other	Electronic Medical Record	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	4-Wed	26	US-OH\n" +
+"KY	Healthcare Provider	1000	2014-03-20T04:00:00.000Z	Other	Electronic Medical Record	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	5-Thu	20	US-KY\n" +
+"MN	Healthcare Provider	1740	2010-09-08T04:00:00.000Z	Theft	Electronic Medical Record	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	4-Wed	8	US-MN\n" +
+"FL	Healthcare Provider	105646	2012-08-16T04:00:00.000Z	Theft	Electronic Medical Record	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	5-Thu	16	US-FL\n" +
+"FL	Healthcare Provider	2560	2012-11-05T05:00:00.000Z	Theft	Electronic Medical Record	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	2-Mon	5	US-FL\n" +
+"FL	Healthcare Provider	1025	2013-04-02T04:00:00.000Z	Theft	Electronic Medical Record	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	3-Tue	2	US-FL\n" +
+"IL	Healthcare Provider	12542	2013-04-03T04:00:00.000Z	Theft	Electronic Medical Record	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	4-Wed	3	US-IL\n" +
+"VA	Healthcare Provider	5764	2013-05-29T04:00:00.000Z	Theft	Electronic Medical Record	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	4-Wed	29	US-VA\n" +
+"NY	Healthcare Provider	2000	2014-06-24T04:00:00.000Z	Theft	Electronic Medical Record	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	3-Tue	24	US-NY\n" +
+"AL	Healthcare Provider	1200	2014-06-26T04:00:00.000Z	Theft	Electronic Medical Record	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	5-Thu	26	US-AL\n" +
+"LA	Healthcare Provider	10271	2012-11-05T05:00:00.000Z	Theft	Electronic Medical Record	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	2-Mon	5	US-LA\n" +
+"FL	Healthcare Provider	5875	2013-05-30T04:00:00.000Z	Theft	Electronic Medical Record	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	5-Thu	30	US-FL\n" +
+"CO	Healthcare Provider	651	2013-11-02T04:00:00.000Z	Theft	Electronic Medical Record	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	7-Sat	2	US-CO\n" +
+"VA	Healthcare Provider	3861	2014-01-16T05:00:00.000Z	Theft	Electronic Medical Record	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	5-Thu	16	US-VA\n" +
+"FL	Business Associate	82601	2014-09-09T04:00:00.000Z	Theft	Electronic Medical Record	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	3-Tue	9	US-FL\n" +
+"FL	Healthcare Provider	12784	2011-10-13T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	5-Thu	13	US-FL\n" +
+"TX	Healthcare Provider	2462	2012-07-05T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	5-Thu	5	US-TX\n" +
+"TX	Healthcare Provider	678	2013-01-22T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	3-Tue	22	US-TX\n" +
+"FL	Healthcare Provider	834	2013-03-02T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	7-Sat	2	US-FL\n" +
+"CA	Healthcare Provider	2864	2013-07-11T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	5-Thu	11	US-CA\n" +
+"IN	Healthcare Provider	1396	2013-08-12T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	2-Mon	12	US-IN\n" +
+"OR	Health Plan	647	2013-09-03T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	3-Tue	3	US-OR\n" +
+"CA	Healthcare Provider	1009	2013-09-20T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	6-Fri	20	US-CA\n" +
+"IA	Healthcare Provider	1825	2013-10-02T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	4-Wed	2	US-IA\n" +
+"PA	Healthcare Provider	1279	2013-11-27T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	4-Wed	27	US-PA\n" +
+"TX	Healthcare Provider	2874	2014-06-13T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	13	US-TX\n" +
+"FL	Healthcare Provider	675	2014-09-12T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	12	US-FL\n" +
+"FL	Healthcare Provider	1449	2014-11-20T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	5-Thu	20	US-FL\n" +
+"CA	Healthcare Provider	845	2015-01-23T05:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	6-Fri	23	US-CA\n" +
+"NV	Healthcare Provider	8791	2015-04-03T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	6-Fri	3	US-NV\n" +
+"NY	Healthcare Provider	567	2015-05-28T04:00:00.000Z	Unauthorized Access/Disclosure	Electronic Medical Record	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	5-Thu	28	US-NY\n" +
+"TX	Healthcare Provider	654	2011-03-23T04:00:00.000Z	Other	Electronic Medical Record	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	4-Wed	23	US-TX\n" +
+"UT	Business Associate	1298	2010-10-13T04:00:00.000Z	Other	Desktop Computer	1	2010	10	[10] Oct	 Qtr_4	2010 Qtr_4	4-Wed	13	US-UT\n" +
+"TN	Healthcare Provider	1537	2010-07-02T04:00:00.000Z	Theft	Desktop Computer	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	2	US-TN\n" +
+"FL	Healthcare Provider	628	2013-03-15T04:00:00.000Z	Theft	Desktop Computer	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	15	US-FL\n" +
+"NY	Healthcare Provider	937	2014-01-21T05:00:00.000Z	Theft	Desktop Computer	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	3-Tue	21	US-NY\n" +
+"IL	Healthcare Provider	540	2014-06-06T04:00:00.000Z	Theft	Desktop Computer	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	6	US-IL\n" +
+"PA	Healthcare Provider	81463	2015-04-02T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	5-Thu	2	US-PA\n" +
+"OK	Healthcare Provider	600	2011-03-16T04:00:00.000Z	Theft	Desktop Computer	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	4-Wed	16	US-OK\n" +
+"NY	Healthcare Provider	97000	2014-06-20T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	20	US-NY\n" +
+"WA	Healthcare Provider	756	2012-05-29T04:00:00.000Z	Theft	Desktop Computer	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	3-Tue	29	US-WA\n" +
+"ND	Health Plan	10000	2013-08-21T04:00:00.000Z	Improper Disposal	Desktop Computer	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	4-Wed	21	US-ND\n" +
+"CA	Healthcare Provider	3206	2014-08-29T04:00:00.000Z	Theft	Desktop Computer	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	29	US-CA\n" +
+"AL	Healthcare Provider	20744	2011-03-28T04:00:00.000Z	Theft	Desktop Computer	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	2-Mon	28	US-AL\n" +
+"MD	Healthcare Provider	1000	2010-12-13T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	2-Mon	13	US-MD\n" +
+"OK	Healthcare Provider	4000	2015-03-13T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	13	US-OK\n" +
+"CA	Business Associate	800	2013-07-18T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	5-Thu	18	US-CA\n" +
+"	Business Associate	10190	2011-07-04T04:00:00.000Z	Theft	Desktop Computer	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	2-Mon	4	US-null\n" +
+"IL	Healthcare Provider	2000	2011-08-29T04:00:00.000Z	Theft	Desktop Computer	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	2-Mon	29	US-IL\n" +
+"FL	Healthcare Provider	1670	2012-01-06T05:00:00.000Z	Theft	Desktop Computer	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	6-Fri	6	US-FL\n" +
+"NY	Healthcare Provider	6745	2012-04-12T04:00:00.000Z	Theft	Desktop Computer	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	5-Thu	12	US-NY\n" +
+"MO	Healthcare Provider	10000	2013-09-03T04:00:00.000Z	Theft	Desktop Computer	1	2013	9	[09] Sep	 Qtr_3	2013 Qtr_3	3-Tue	3	US-MO\n" +
+"FL	Healthcare Provider	7888	2014-11-03T05:00:00.000Z	Theft	Desktop Computer	1	2014	11	[11] Nov	 Qtr_4	2014 Qtr_4	2-Mon	3	US-FL\n" +
+"CA		1342	2015-05-19T04:00:00.000Z	Theft	Desktop Computer	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	3-Tue	19	US-CA\n" +
+"OR	Healthcare Provider	4328	2010-08-20T04:00:00.000Z	Theft	Desktop Computer	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	6-Fri	20	US-OR\n" +
+"MN	Health Plan	27839	2014-03-21T04:00:00.000Z	Loss	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	796	2014-03-21T04:00:00.000Z	Loss	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	1699	2014-03-21T04:00:00.000Z	Loss	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"MN	Business Associate	715	2014-03-21T04:00:00.000Z	Loss	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	21	US-MN\n" +
+"CA	Health Plan	30000	2014-12-12T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2014	12	[12] Dec	 Qtr_4	2014 Qtr_4	6-Fri	12	US-CA\n" +
+"PR	Healthcare Provider	1000	2010-12-13T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	2-Mon	13	US-PR\n" +
+"FL	Healthcare Provider	500	2015-01-15T05:00:00.000Z	Improper Disposal	Desktop Computer	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	5-Thu	15	US-FL\n" +
+"CO	Healthcare Provider	5415	2014-03-14T04:00:00.000Z	Other	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	6-Fri	14	US-CO\n" +
+"MI	Healthcare Provider	646	2009-12-15T05:00:00.000Z	Theft	Desktop Computer	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	3-Tue	15	US-MI\n" +
+"VA	Healthcare Provider	500	2010-04-29T04:00:00.000Z	Theft	Desktop Computer	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	5-Thu	29	US-VA\n" +
+"IN	Healthcare Provider	2000	2010-09-15T04:00:00.000Z	Theft	Desktop Computer	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	4-Wed	15	US-IN\n" +
+"OH	Healthcare Provider	501	2011-01-04T05:00:00.000Z	Theft	Desktop Computer	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	4	US-OH\n" +
+"MI	Healthcare Provider	656	2011-01-18T05:00:00.000Z	Theft	Desktop Computer	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	3-Tue	18	US-MI\n" +
+"WA	Healthcare Provider	2367	2011-09-21T04:00:00.000Z	Theft	Desktop Computer	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	4-Wed	21	US-WA\n" +
+"WA	Healthcare Provider	6000	2014-07-08T04:00:00.000Z	Theft	Desktop Computer	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	3-Tue	8	US-WA\n" +
+"TX	Business Associate	2000000	2014-09-10T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	4-Wed	10	US-TX\n" +
+"IL	Healthcare Provider	845	2011-04-25T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	25	US-IL\n" +
+"IL	Healthcare Provider	686	2011-04-25T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	25	US-IL\n" +
+"AZ	Health Plan	9393	2011-04-25T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	25	US-AZ\n" +
+"IL	Healthcare Provider	532	2011-04-25T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	25	US-IL\n" +
+"IL	Healthcare Provider	1070	2011-04-25T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	2-Mon	25	US-IL\n" +
+"NY	Health Plan	1020	2010-06-14T04:00:00.000Z	Theft	Desktop Computer	1	2010	6	[06] Jun	 Qtr_2	2010 Qtr_2	2-Mon	14	US-NY\n" +
+"MT	Healthcare Provider	1900	2013-12-17T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	3-Tue	17	US-MT\n" +
+"NC	Business Associate	2000	2009-12-11T05:00:00.000Z	Theft	Desktop Computer	1	2009	12	[12] Dec	 Qtr_4	2009 Qtr_4	6-Fri	11	US-NC\n" +
+"LA	Healthcare Provider	3000	2015-06-15T04:00:00.000Z	Theft	Desktop Computer	1	2015	6	[06] Jun	 Qtr_2	2015 Qtr_2	2-Mon	15	US-LA\n" +
+"LA	Healthcare Provider	6909	2015-03-01T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	1-Sun	1	US-LA\n" +
+"FL	Healthcare Provider	9626	2013-06-17T04:00:00.000Z	Theft	Desktop Computer	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	2-Mon	17	US-FL\n" +
+"FL	Health Plan	500	2015-03-27T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2015	3	[03] Mar	 Qtr_1	2015 Qtr_1	6-Fri	27	US-FL\n" +
+"NJ	Business Associate	3000	2011-08-28T04:00:00.000Z	Theft	Desktop Computer	1	2011	8	[08] Aug	 Qtr_3	2011 Qtr_3	1-Sun	28	US-NJ\n" +
+"LA	Healthcare Provider	2000	2011-06-28T04:00:00.000Z	Theft	Desktop Computer	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	3-Tue	28	US-LA\n" +
+"CA	Healthcare Provider	4885	2015-04-28T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	3-Tue	28	US-CA\n" +
+"WA	Healthcare Provider	2100	2012-04-13T04:00:00.000Z	Theft	Desktop Computer	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	13	US-WA\n" +
+"OR	Healthcare Provider	3269	2013-03-15T04:00:00.000Z	Theft	Desktop Computer	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	6-Fri	15	US-OR\n" +
+"FL	Healthcare Provider	686	2015-02-27T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2015	2	[02] Feb	 Qtr_1	2015 Qtr_1	6-Fri	27	US-FL\n" +
+"NC	Healthcare Provider	2300	2010-08-09T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	2-Mon	9	US-NC\n" +
+"OK	Healthcare Provider	19200	2010-09-27T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	2-Mon	27	US-OK\n" +
+"MO	Healthcare Provider	800	2011-02-10T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	5-Thu	10	US-MO\n" +
+"WI	Business Associate	3000	2011-09-13T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2011	9	[09] Sep	 Qtr_3	2011 Qtr_3	3-Tue	13	US-WI\n" +
+"HI	Healthcare Provider	674	2012-11-20T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	3-Tue	20	US-HI\n" +
+"TX	Healthcare Provider	2988	2012-12-31T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	2-Mon	31	US-TX\n" +
+"IN	Healthcare Provider	2723	2013-05-21T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	3-Tue	21	US-IN\n" +
+"MA	Healthcare Provider	1670	2013-06-05T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	4-Wed	5	US-MA\n" +
+"CO	Healthcare Provider	921	2013-08-27T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	3-Tue	27	US-CO\n" +
+"WA	Healthcare Provider	76183	2013-11-27T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	4-Wed	27	US-WA\n" +
+"AL	Health Plan	1100	2014-07-07T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	2-Mon	7	US-AL\n" +
+"TX	Healthcare Provider	1600	2015-01-23T05:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	6-Fri	23	US-TX\n" +
+"OH	Healthcare Provider	981	2015-05-15T04:00:00.000Z	Hacking/IT Incident	Desktop Computer	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	15	US-OH\n" +
+"GA	Healthcare Provider	6989	2014-01-03T05:00:00.000Z	Loss	Desktop Computer	1	2014	1	[01] Jan	 Qtr_1	2014 Qtr_1	6-Fri	3	US-GA\n" +
+"TX	Business Associate	6672	2011-10-24T04:00:00.000Z	Loss	Desktop Computer	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	24	US-TX\n" +
+"CA	Healthcare Provider	532	2010-02-21T05:00:00.000Z	Other	Desktop Computer	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	1-Sun	21	US-CA\n" +
+"NM	Healthcare Provider	1900	2010-02-23T05:00:00.000Z	Other	Desktop Computer	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	3-Tue	23	US-NM\n" +
+"TN	Business Associate	539	2013-05-08T04:00:00.000Z	Other	Desktop Computer	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	4-Wed	8	US-TN\n" +
+"GA	Healthcare Provider	5000	2013-12-06T05:00:00.000Z	Other	Desktop Computer	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	6-Fri	6	US-GA\n" +
+"CA	Healthcare Provider	5257	2009-11-20T05:00:00.000Z	Theft	Desktop Computer	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	6-Fri	20	US-CA\n" +
+"CA	Healthcare Provider	857	2009-11-20T05:00:00.000Z	Theft	Desktop Computer	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	6-Fri	20	US-CA\n" +
+"CA	Healthcare Provider	6145	2009-11-20T05:00:00.000Z	Theft	Desktop Computer	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	6-Fri	20	US-CA\n" +
+"CA	Healthcare Provider	952	2009-11-20T05:00:00.000Z	Theft	Desktop Computer	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	6-Fri	20	US-CA\n" +
+"CA	Healthcare Provider	5166	2009-11-20T05:00:00.000Z	Theft	Desktop Computer	1	2009	11	[11] Nov	 Qtr_4	2009 Qtr_4	6-Fri	20	US-CA\n" +
+"MO	Healthcare Provider	9309	2010-01-19T05:00:00.000Z	Theft	Desktop Computer	1	2010	1	[01] Jan	 Qtr_1	2010 Qtr_1	3-Tue	19	US-MO\n" +
+"FL	Healthcare Provider	8000	2010-02-18T05:00:00.000Z	Theft	Desktop Computer	1	2010	2	[02] Feb	 Qtr_1	2010 Qtr_1	5-Thu	18	US-FL\n" +
+"CA	Healthcare Provider	22012	2010-04-23T04:00:00.000Z	Theft	Desktop Computer	1	2010	4	[04] Apr	 Qtr_2	2010 Qtr_2	6-Fri	23	US-CA\n" +
+"CO	Business Associate	105470	2010-07-09T04:00:00.000Z	Theft	Desktop Computer	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	9	US-CO\n" +
+"NY	Healthcare Provider	16820	2010-07-23T04:00:00.000Z	Theft	Desktop Computer	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	23	US-NY\n" +
+"NY	Healthcare Provider	23753	2010-07-23T04:00:00.000Z	Theft	Desktop Computer	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	6-Fri	23	US-NY\n" +
+"TX	Healthcare Provider	6873	2010-07-28T04:00:00.000Z	Theft	Desktop Computer	1	2010	7	[07] Jul	 Qtr_3	2010 Qtr_3	4-Wed	28	US-TX\n" +
+"WA	Healthcare Provider	2698	2010-08-11T04:00:00.000Z	Theft	Desktop Computer	1	2010	8	[08] Aug	 Qtr_3	2010 Qtr_3	4-Wed	11	US-WA\n" +
+"NY	Healthcare Provider	9000	2010-09-21T04:00:00.000Z	Theft	Desktop Computer	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	3-Tue	21	US-NY\n" +
+"CA	Healthcare Provider	928	2010-09-29T04:00:00.000Z	Theft	Desktop Computer	1	2010	9	[09] Sep	 Qtr_3	2010 Qtr_3	4-Wed	29	US-CA\n" +
+"MS	Healthcare Provider	1104	2010-11-08T05:00:00.000Z	Theft	Desktop Computer	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	2-Mon	8	US-MS\n" +
+"NE	Healthcare Provider	1550	2010-11-12T05:00:00.000Z	Theft	Desktop Computer	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	6-Fri	12	US-NE\n" +
+"PA	Healthcare Provider	613	2010-11-30T05:00:00.000Z	Theft	Desktop Computer	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	30	US-PA\n" +
+"NY	Healthcare Provider	542	2010-11-30T05:00:00.000Z	Theft	Desktop Computer	1	2010	11	[11] Nov	 Qtr_4	2010 Qtr_4	3-Tue	30	US-NY\n" +
+"TX	Healthcare Provider	800	2010-12-07T05:00:00.000Z	Theft	Desktop Computer	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	3-Tue	7	US-TX\n" +
+"IL	Healthcare Provider	556	2010-12-17T05:00:00.000Z	Theft	Desktop Computer	1	2010	12	[12] Dec	 Qtr_4	2010 Qtr_4	6-Fri	17	US-IL\n" +
+"WA	Healthcare Clearing House	1250	2011-01-13T05:00:00.000Z	Theft	Desktop Computer	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	5-Thu	13	US-WA\n" +
+"SC	Health Plan	5596	2011-01-14T05:00:00.000Z	Theft	Desktop Computer	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	6-Fri	14	US-SC\n" +
+"TN	Healthcare Provider	500	2011-01-28T05:00:00.000Z	Theft	Desktop Computer	1	2011	1	[01] Jan	 Qtr_1	2011 Qtr_1	6-Fri	28	US-TN\n" +
+"NY	Healthcare Provider	670	2011-03-28T04:00:00.000Z	Theft	Desktop Computer	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	2-Mon	28	US-NY\n" +
+"CA	Healthcare Provider	514330	2011-03-30T04:00:00.000Z	Theft	Desktop Computer	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	4-Wed	30	US-CA\n" +
+"WY	Healthcare Provider	15000	2011-04-20T04:00:00.000Z	Theft	Desktop Computer	1	2011	4	[04] Apr	 Qtr_2	2011 Qtr_2	4-Wed	20	US-WY\n" +
+"PR	Health Plan	32390	2011-05-09T04:00:00.000Z	Theft	Desktop Computer	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	2-Mon	9	US-PR\n" +
+"PR	Health Plan	24361	2011-05-09T04:00:00.000Z	Theft	Desktop Computer	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	2-Mon	9	US-PR\n" +
+"	Business Associate	400000	2011-05-27T04:00:00.000Z	Theft	Desktop Computer	1	2011	5	[05] May	 Qtr_2	2011 Qtr_2	6-Fri	27	US-null\n" +
+"CA	Healthcare Provider	15677	2011-06-16T04:00:00.000Z	Theft	Desktop Computer	1	2011	6	[06] Jun	 Qtr_2	2011 Qtr_2	5-Thu	16	US-CA\n" +
+"PR	Healthcare Provider	2800	2011-07-13T04:00:00.000Z	Theft	Desktop Computer	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	4-Wed	13	US-PR\n" +
+"OR	Healthcare Provider	1200	2011-07-29T04:00:00.000Z	Theft	Desktop Computer	1	2011	7	[07] Jul	 Qtr_3	2011 Qtr_3	6-Fri	29	US-OR\n" +
+"MI	Healthcare Provider	520	2011-10-03T04:00:00.000Z	Theft	Desktop Computer	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	2-Mon	3	US-MI\n" +
+"MA	Healthcare Provider	14750	2011-10-20T04:00:00.000Z	Theft	Desktop Computer	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	5-Thu	20	US-MA\n" +
+"CT	Business Associate	1089	2011-10-28T04:00:00.000Z	Theft	Desktop Computer	1	2011	10	[10] Oct	 Qtr_4	2011 Qtr_4	6-Fri	28	US-CT\n" +
+"AL	Healthcare Provider	943434	2011-11-17T05:00:00.000Z	Theft	Desktop Computer	1	2011	11	[11] Nov	 Qtr_4	2011 Qtr_4	5-Thu	17	US-AL\n" +
+"WA	Healthcare Provider	3100	2012-01-27T05:00:00.000Z	Theft	Desktop Computer	1	2012	1	[01] Jan	 Qtr_1	2012 Qtr_1	6-Fri	27	US-WA\n" +
+"CA	Healthcare Provider	4400	2012-04-20T04:00:00.000Z	Theft	Desktop Computer	1	2012	4	[04] Apr	 Qtr_2	2012 Qtr_2	6-Fri	20	US-CA\n" +
+"CT	Healthcare Provider	925	2012-05-25T04:00:00.000Z	Theft	Desktop Computer	1	2012	5	[05] May	 Qtr_2	2012 Qtr_2	6-Fri	25	US-CT\n" +
+"OR	Healthcare Provider	11136	2012-06-06T04:00:00.000Z	Theft	Desktop Computer	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	4-Wed	6	US-OR\n" +
+"NY	Healthcare Provider	8488	2012-07-23T04:00:00.000Z	Theft	Desktop Computer	1	2012	7	[07] Jul	 Qtr_3	2012 Qtr_3	2-Mon	23	US-NY\n" +
+"CA	Healthcare Provider	2300	2012-08-03T04:00:00.000Z	Theft	Desktop Computer	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	6-Fri	3	US-CA\n" +
+"CA	Healthcare Provider	603	2012-08-15T04:00:00.000Z	Theft	Desktop Computer	1	2012	8	[08] Aug	 Qtr_3	2012 Qtr_3	4-Wed	15	US-CA\n" +
+"CA	Healthcare Provider	3031	2012-09-17T04:00:00.000Z	Theft	Desktop Computer	1	2012	9	[09] Sep	 Qtr_3	2012 Qtr_3	2-Mon	17	US-CA\n" +
+"CA	Healthcare Provider	980	2012-10-22T04:00:00.000Z	Theft	Desktop Computer	1	2012	10	[10] Oct	 Qtr_4	2012 Qtr_4	2-Mon	22	US-CA\n" +
+"MA	Healthcare Provider	615	2012-11-26T05:00:00.000Z	Theft	Desktop Computer	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	2-Mon	26	US-MA\n" +
+"CT	Healthcare Provider	1749	2012-11-28T05:00:00.000Z	Theft	Desktop Computer	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	4-Wed	28	US-CT\n" +
+"FL	Healthcare Clearing House	10000	2012-11-29T05:00:00.000Z	Theft	Desktop Computer	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-FL\n" +
+"NY	Healthcare Provider	4929	2012-12-14T05:00:00.000Z	Theft	Desktop Computer	1	2012	12	[12] Dec	 Qtr_4	2012 Qtr_4	6-Fri	14	US-NY\n" +
+"CA	Healthcare Provider	532	2013-01-04T05:00:00.000Z	Theft	Desktop Computer	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	6-Fri	4	US-CA\n" +
+"IL	Business Associate	8911	2013-01-30T05:00:00.000Z	Theft	Desktop Computer	1	2013	1	[01] Jan	 Qtr_1	2013 Qtr_1	4-Wed	30	US-IL\n" +
+"AL	Healthcare Provider	2400	2013-02-02T05:00:00.000Z	Theft	Desktop Computer	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	7-Sat	2	US-AL\n" +
+"NC	Business Associate	1000	2013-02-06T05:00:00.000Z	Theft	Desktop Computer	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	4-Wed	6	US-NC\n" +
+"SD	Healthcare Provider	8500	2013-02-21T05:00:00.000Z	Theft	Desktop Computer	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	5-Thu	21	US-SD\n" +
+"CA	Healthcare Provider	109000	2013-02-22T05:00:00.000Z	Theft	Desktop Computer	1	2013	2	[02] Feb	 Qtr_1	2013 Qtr_1	6-Fri	22	US-CA\n" +
+"OH	Healthcare Provider	1200	2013-03-06T05:00:00.000Z	Theft	Desktop Computer	1	2013	3	[03] Mar	 Qtr_1	2013 Qtr_1	4-Wed	6	US-OH\n" +
+"NY	Healthcare Provider	1416	2013-04-17T04:00:00.000Z	Theft	Desktop Computer	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	4-Wed	17	US-NY\n" +
+"UT	Healthcare Provider	700	2013-04-26T04:00:00.000Z	Theft	Desktop Computer	1	2013	4	[04] Apr	 Qtr_2	2013 Qtr_2	6-Fri	26	US-UT\n" +
+"NC	Healthcare Provider	1580	2013-05-01T04:00:00.000Z	Theft	Desktop Computer	1	2013	5	[05] May	 Qtr_2	2013 Qtr_2	4-Wed	1	US-NC\n" +
+"FL	Healthcare Provider	710	2013-07-19T04:00:00.000Z	Theft	Desktop Computer	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	6-Fri	19	US-FL\n" +
+"IL	Healthcare Provider	4029530	2013-08-23T04:00:00.000Z	Theft	Desktop Computer	1	2013	8	[08] Aug	 Qtr_3	2013 Qtr_3	6-Fri	23	US-IL\n" +
+"TX	Healthcare Provider	949	2013-10-22T04:00:00.000Z	Theft	Desktop Computer	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	3-Tue	22	US-TX\n" +
+"TX	Healthcare Provider	5840	2013-10-28T04:00:00.000Z	Theft	Desktop Computer	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	2-Mon	28	US-TX\n" +
+"IN	Healthcare Provider	1500	2013-11-26T05:00:00.000Z	Theft	Desktop Computer	1	2013	11	[11] Nov	 Qtr_4	2013 Qtr_4	3-Tue	26	US-IN\n" +
+"CA	Healthcare Provider	1400	2013-12-23T05:00:00.000Z	Theft	Desktop Computer	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	23	US-CA\n" +
+"NJ	Healthcare Provider	1411	2014-02-21T05:00:00.000Z	Theft	Desktop Computer	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	6-Fri	21	US-NJ\n" +
+"TX	Healthcare Provider	7500	2014-02-27T05:00:00.000Z	Theft	Desktop Computer	1	2014	2	[02] Feb	 Qtr_1	2014 Qtr_1	5-Thu	27	US-TX\n" +
+"CA	Healthcare Provider	9861	2014-03-12T04:00:00.000Z	Theft	Desktop Computer	1	2014	3	[03] Mar	 Qtr_1	2014 Qtr_1	4-Wed	12	US-CA\n" +
+"NH	Healthcare Provider	1208	2014-05-21T04:00:00.000Z	Theft	Desktop Computer	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	4-Wed	21	US-NH\n" +
+"CA	Healthcare Provider	5845	2014-06-06T04:00:00.000Z	Theft	Desktop Computer	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	6	US-CA\n" +
+"CA	Healthcare Provider	5471	2014-06-20T04:00:00.000Z	Theft	Desktop Computer	1	2014	6	[06] Jun	 Qtr_2	2014 Qtr_2	6-Fri	20	US-CA\n" +
+"CA	Healthcare Provider	2780	2014-07-16T04:00:00.000Z	Theft	Desktop Computer	1	2014	7	[07] Jul	 Qtr_3	2014 Qtr_3	4-Wed	16	US-CA\n" +
+"FL	Healthcare Provider	948	2014-08-26T04:00:00.000Z	Theft	Desktop Computer	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	3-Tue	26	US-FL\n" +
+"PA	Healthcare Provider	3780	2014-09-05T04:00:00.000Z	Theft	Desktop Computer	1	2014	9	[09] Sep	 Qtr_3	2014 Qtr_3	6-Fri	5	US-PA\n" +
+"TX	Healthcare Provider	810	2014-10-08T04:00:00.000Z	Theft	Desktop Computer	1	2014	10	[10] Oct	 Qtr_4	2014 Qtr_4	4-Wed	8	US-TX\n" +
+"CA	Healthcare Provider	1030	2015-01-12T05:00:00.000Z	Theft	Desktop Computer	1	2015	1	[01] Jan	 Qtr_1	2015 Qtr_1	2-Mon	12	US-CA\n" +
+"	Health Plan	500	2015-04-22T04:00:00.000Z	Theft	Desktop Computer	1	2015	4	[04] Apr	 Qtr_2	2015 Qtr_2	4-Wed	22	US-null\n" +
+"PA	Healthcare Provider	1551	2015-05-15T04:00:00.000Z	Theft	Desktop Computer	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	6-Fri	15	US-PA\n" +
+"CA	Business Associate	1500	2012-11-29T05:00:00.000Z	Theft	Desktop Computer	1	2012	11	[11] Nov	 Qtr_4	2012 Qtr_4	5-Thu	29	US-CA\n" +
+"MA	Healthcare Provider	942	2011-03-07T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2011	3	[03] Mar	 Qtr_1	2011 Qtr_1	2-Mon	7	US-MA\n" +
+"AK	Healthcare Provider	2743	2012-03-03T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2012	3	[03] Mar	 Qtr_1	2012 Qtr_1	7-Sat	3	US-AK\n" +
+"NC	Healthcare Provider	9953	2012-06-25T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2012	6	[06] Jun	 Qtr_2	2012 Qtr_2	2-Mon	25	US-NC\n" +
+"FL	Healthcare Provider	877	2013-06-11T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	6	[06] Jun	 Qtr_2	2013 Qtr_2	3-Tue	11	US-FL\n" +
+"TX	Health Plan	21000	2013-07-16T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	3-Tue	16	US-TX\n" +
+"LA	Healthcare Provider	6994	2013-07-22T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	7	[07] Jul	 Qtr_3	2013 Qtr_3	2-Mon	22	US-LA\n" +
+"FL	Healthcare Provider	960	2013-10-17T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	10	[10] Oct	 Qtr_4	2013 Qtr_4	5-Thu	17	US-FL\n" +
+"FL	Healthcare Provider	4400	2013-12-09T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	9	US-FL\n" +
+"FL	Healthcare Provider	2354	2013-12-23T05:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2013	12	[12] Dec	 Qtr_4	2013 Qtr_4	2-Mon	23	US-FL\n" +
+"NY	Healthcare Provider	26162	2014-05-23T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2014	5	[05] May	 Qtr_2	2014 Qtr_2	6-Fri	23	US-NY\n" +
+"TX	Healthcare Provider	10604	2014-08-29T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2014	8	[08] Aug	 Qtr_3	2014 Qtr_3	6-Fri	29	US-TX\n" +
+"IL	Healthcare Provider	632	2015-05-19T04:00:00.000Z	Unauthorized Access/Disclosure	Desktop Computer	1	2015	5	[05] May	 Qtr_2	2015 Qtr_2	3-Tue	19	US-IL\n" +
+"PR	Healthcare Provider	2621	2011-02-22T05:00:00.000Z	Other	Desktop Computer	1	2011	2	[02] Feb	 Qtr_1	2011 Qtr_1	3-Tue	22	US-PR\n";
+    </script>
+</head>
+<body onresize="doResize();">
+    <div id="main" style="width:100%; height:100vh; margin-top:0px; padding:8px; overflow:hidden">
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@
     Tabbed.prototype._class += " layout_Tabbed";
 
     Tabbed.prototype.publish("showTabs", true, "boolean", "Show Tabs", null, {});
-    Tabbed.prototype.publish("padding", 4, "number", "Padding");
+    Tabbed.prototype.publish("padding", 0, "number", "Padding");
     Tabbed.prototype.publish("activeTabIdx", 0, "number", "Index of active tab", null, {});
 
     Tabbed.prototype.publish("labels", [], "array", "Array of tab labels sharing an index with ", null, { tags: ["Private"] });
@@ -27,16 +27,20 @@
         return this;
     };
 
-    Tabbed.prototype.addTab = function (widget, label, isActive) {
+    Tabbed.prototype.addTab = function (widget, label, isActive, callback) {
         var labels = this.labels();
         var widgets = this.widgets();
         if (isActive) {
             this.activeTabIdx(this.widgets().length);
         }
         labels.push(label);
-        widgets.push(new Surface().widget(widget ? widget : new Text().text("No widget defined for tab")));
+        var surface = new Surface().widget(widget ? widget : new Text().text("No widget defined for tab"));
+        widgets.push(surface);
         this.labels(labels);
         this.widgets(widgets);
+        if (callback) {
+            callback(surface)
+        }
         return this;
     };
 
@@ -68,6 +72,7 @@
             .attr("class", "tab-button id" + this.id())
             .style("cursor", "pointer")
             .on("click", function (d, idx) {
+                context.click(context.widgets()[idx].widget(), d, idx);
                 context
                     .activeTabIdx(idx)
                     .render()
@@ -91,12 +96,14 @@
             .classed("active", function (d, idx) { return context.activeTabIdx() === idx; })
             .style("display", function (d, idx) { return context.activeTabIdx() === idx ? "block" : "none"; })
             .each(function (surface, idx) {
-                var wSize = context.widgetSize(d3.select(this));
-                surface
-                    .surfaceBorderWidth(context.showTabs() ? null : 0)
-                    .surfacePadding(context.showTabs() ? null : 0)
-                    .resize(wSize)
-                ;
+                if (context.activeTabIdx() === idx) {
+                    var wSize = context.widgetSize(d3.select(this));
+                    surface
+                        .surfaceBorderWidth(context.showTabs() ? null : 0)
+                        .surfacePadding(context.showTabs() ? null : 0)
+                        .resize(wSize)
+                    ;
+                }
             })
         ;
         content.exit()
@@ -107,6 +114,9 @@
             })
             .remove();
     };
+
+    Tabbed.prototype.click = function (widget, column, idx) {
+    }
 
     return Tabbed;
 }));
