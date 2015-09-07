@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://viz.hpccsystems.com/v1.4.8/dist-amd/hpcc-viz.js"></script>
+    <script src="http://viz.hpccsystems.com/v1.4.8/dist-amd/hpcc-bundles.js"></script>
+    <script>
+        require.config({
+            paths: {
+                "src": "http://viz.hpccsystems.com/v1.4.8/dist-amd",
+                "font-awesome": "http://viz.hpccsystems.com/v1.4.8/dist-amd/font-awesome/css/font-awesome.min"
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="chart" style="width:480px; height:480px; float:left">
+    </div>
+    <div id="table" style="width:480px; height:480px; float:right">
+    </div>
+    <script>
+        require(["src/other/Comms", "src/other/Table", "src/chart/Column"], function (Comms, Table, Column) {
+            //  Create Table  ---
+            var table = new Table()
+                .target("table")
+                .columns(["Subject", "Score"])
+            ;
+
+            //  Create Chart  ---
+            var chart = new Column()
+                .target("chart")
+                .columns(["Subject", "Result"])
+                .yAxisTitle("Result %")
+            ;
+
+            //  Connect to WsWorkunit  ---
+            var connection = new Comms.WsWorkunits()
+                .url("http://localhost:8010")
+            ;
+
+            //  Fetch Result  ---
+            connection.fetchResult({
+                //jobname: "Bar Chart",
+                wuid: "W20150907-122114",
+                resultname: "Result 1"
+            }, function (response) {
+
+                //  Convert JSON to an Array of Arrays  ---
+                var resultSet = response.map(function (row) { return [row.subject, row.result]; });
+
+                // Update Table ---
+                table
+                    .data(resultSet)
+                    .render()
+                ;
+
+                // Update Chart ---
+                chart
+                    .data(resultSet)
+                    .render()
+                ;
+            });
+        });
+    </script>
+</body>
+</html>
