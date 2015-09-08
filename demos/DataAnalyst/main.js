@@ -183,7 +183,7 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
         this._dupTable = new Table()
             .fixedHeader(false)
             .pagination(true)
-            .pageLinks(1)
+            .adjacentPages(1)
             .columns(["Field", "Count"])
             .data([["", ""]])
         ;
@@ -225,6 +225,7 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
 
     DataAnalyst.prototype.doClear = function () {
         this.resetProgress();
+        this._inputTable.columns([]).data([]);
         this._rowSummary.data("").render();
         this._colSummary.data("").render();
         this._dupChart.data([]).render();
