@@ -36,7 +36,7 @@
     };
 
     Grid.prototype.fieldByLabel = function (_) {
-        return this.fields().filter(function (field) { return field.label === _; })[0];
+        return this.fields().filter(function (field, idx) { field.idx = idx; return field.label === _; })[0];
     };
 
     Grid.prototype.data = function (_, clone) {
@@ -154,6 +154,24 @@
         return new Grid()
             .fields(this.fields(), deep)
             .data(this.data(), deep)
+        ;
+    };
+
+    Grid.prototype.filter = function (filter) {
+        var filterIdx = {};
+        this.row(0).forEach(function(col, idx) {
+            filterIdx[col] = idx;
+        });
+        return new Grid()
+            .fields(this.fields(), true)
+            .data(this.data().filter(function (row) {
+                for (var key in filter) {
+                    if (filter[key] !== row[filterIdx[key]]) {
+                        return false;
+                    }
+                }
+                return true;
+            }));
         ;
     };
 

@@ -7,7 +7,7 @@ require(
         "src/layout/Border", "src/layout/Grid", "src/layout/Tabbed",
         "src/form/Form", "src/form/Input", "src/form/TextArea",
         "src/common/Database",
-        "src/chart/Summary", "src/chart/Column", "src/chart/Pie",
+        "src/chart/Summary", "src/chart/Column", "src/chart/Line", "src/chart/Pie",
         "src/other/Table", "src/other/Comms",
         "src/map/ChoroplethStates",
         "src/c3chart/Gauge"
@@ -15,11 +15,84 @@ require(
     function (Border, Grid, Tabbed,
         Form, Input, TextArea,
         Database,
-        Summary, Column, Pie,
+        Summary, Column, Line, Pie,
         Table, Comms,
         ChoroplethStates,
         Gauge) {
     var loading = "...loading...";
+
+    function Dashboard(db, filters) {
+        Grid.call(this);
+        this._db = db.clone();
+        this._filter = {};
+
+        var row = 0;
+        var col = 0;
+
+        var rows = Math.floor(Math.sqrt(filters.length));
+        var cols = Math.floor(filters.length / rows);
+        var remainder = filters.length % rows;
+
+        filters.forEach(function (filter) {
+            var field = this._db.fieldByLabel(filter);
+            var dedupInfo = this._db.analyse([field.idx])[0];
+            var widget = null;
+
+            if (field.isUSState) {
+                widget = new ChoroplethStates().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+            } else if (field.isDateTime || field.isDate) {
+                widget = new Line().columns([filter, "Records"]).xAxisTypeTimePattern(field.isDateTime || field.isDate).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+            } else if (dedupInfo.length < 10) {
+                widget = new Pie().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+            } else if (dedupInfo.length < 50) {
+                widget = new Column().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+            }
+            if (widget) {
+                var context = this;
+                widget
+                    .on("click", function (row, col, selected) {
+                        for (var key in row) {
+                            if (selected) {
+                                context._filter[key] = row[key];
+                            } else {
+                                delete context._filter[key];
+                            }
+                            break;
+                        }
+                        context.refresh(this);
+                    })
+                ;
+                widget.__hpcc_field = filter;
+                this.setContent(row, col++, widget, filter);
+            }
+
+            if (col >= cols) {
+                ++row;
+                col = 0;
+            }
+        }, this);
+    };
+    Dashboard.prototype = Object.create(Grid.prototype);
+    Dashboard.prototype.constructor = Dashboard;
+
+    Dashboard.prototype.refresh = function (clickWidget) {
+        this.content().forEach(function (_widget) {
+            var widget = _widget.widget();
+            if (widget !== clickWidget) {
+                var filter = {};
+                for (var key in this._filter) {
+                    if (key !== widget.__hpcc_field) {
+                        filter[key] = this._filter[key];
+                    }
+                }
+                var db = this._db.filter(filter);
+                var field = db.fieldByLabel(widget.__hpcc_field);
+                var dedupInfo = db.analyse([field.idx])[0];
+                widget.data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+            }
+        }, this);
+        this.render();
+    };
 
     function DataAnalyst() {
         Tabbed.call(this);
@@ -124,6 +197,7 @@ require(
         this._colSummary = new Summary()
             .moreText("Total Columns")
             .valueIcon("fa-table")
+            .colorFill("#00cc66")
             .fixedSize(false)
         ;
         this._rowSummary = new Summary()
@@ -139,30 +213,8 @@ require(
             .type("button")
             .value("Generate Dashboard")
             .on("click", function (d) {
-                var grid = new Grid();
-                var row = 0;
-                var col = 0;
-                var filters = JSON.parse(context._inputFilters.value());
-                var rows = Math.floor(Math.sqrt(filters.length));
-                var cols = Math.floor(filters.length / rows);
-                var remainder = filters.length % rows;
-
-                filters.forEach(function (filter) {
-                    var field = context._db.fieldByLabel(filter);
-                    var dedupInfo = context.dupScoreMap[filter];
-                    if (field.isUSState) {
-                        grid.setContent(row, col++, new ChoroplethStates().columns([filter, "Records"]).data(dedupInfo.map(function(row) { return [row.key, row.values]; })), filter);
-                    } else if (dedupInfo.length < 10) {
-                        grid.setContent(row, col++, new Pie().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; })), filter);
-                    } else if (dedupInfo.length < 50) {
-                        grid.setContent(row, col++, new Column().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; })), filter);
-                    }
-                    if (col >= cols) {
-                        ++row;
-                        col = 0;
-                    }
-                });
-                context.addTab(grid, "Dash").render();
+                var grid = new Dashboard(context._db, JSON.parse(context._inputFilters.value()));
+                context.addTab(grid, "Dash", true).render();
             })
         ;
         this._summary = new Grid()
@@ -244,7 +296,7 @@ require(
         ;
     }
     DataAnalyst.prototype = Object.create(Tabbed.prototype);
-    DataAnalyst.prototype.constructor = Border;
+    DataAnalyst.prototype.constructor = DataAnalyst;
 
     DataAnalyst.prototype.resetProgress = function (total) {
         total = total || 1;
