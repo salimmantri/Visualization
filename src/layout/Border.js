@@ -395,7 +395,10 @@
             .style("left", function (d) { return d._fixedLeft + "px"; })
             .style("top", function (d) { return d._fixedTop + "px"; })
             .style("width", function (d) { return d._fixedWidth - context.gutter() + "px"; })
-            .style("height", function (d) { return d._fixedHeight - context.gutter() + "px"; })
+            .style("height", function (d) {
+                console.log(d._fixedHeight + " - " + context.gutter());
+                return d._fixedHeight - context.gutter() + "px";
+            })
             .each(function (d) {
                 d._parentElement
                     .attr("draggable", context.designMode())

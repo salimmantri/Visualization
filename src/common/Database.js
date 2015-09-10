@@ -35,6 +35,10 @@
         return this;
     };
 
+    Grid.prototype.fieldByLabel = function (_) {
+        return this.fields().filter(function (field) { return field.label === _; })[0];
+    };
+
     Grid.prototype.data = function (_, clone) {
         if (!arguments.length) return this._data;
         this._data = clone ? _.map(function (d) { return d.map(function (d2) { return d2; }); }) : _;

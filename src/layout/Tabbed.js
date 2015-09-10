@@ -96,6 +96,7 @@
             .classed("active", function (d, idx) { return context.activeTabIdx() === idx; })
             .style("display", function (d, idx) { return context.activeTabIdx() === idx ? "block" : "none"; })
             .each(function (surface, idx) {
+                surface.visible(context.activeTabIdx() === idx);
                 if (context.activeTabIdx() === idx) {
                     var wSize = context.widgetSize(d3.select(this));
                     surface

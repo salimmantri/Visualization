@@ -2,11 +2,27 @@ var body = document.getElementById("body");
 var mainDiv = document.getElementById("main");
 var dataAnalyst;
 
-require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/Form", "src/form/Input", "src/form/TextArea", "src/common/Database", "src/chart/Summary", "src/chart/Column", "src/other/Table", "src/other/Comms", "src/c3chart/Gauge"], function (Border, Grid, Tabbed, Form, Input, TextArea, Database, Summary, Column, Table, Comms, Gauge) {
+require(
+    [
+        "src/layout/Border", "src/layout/Grid", "src/layout/Tabbed",
+        "src/form/Form", "src/form/Input", "src/form/TextArea",
+        "src/common/Database",
+        "src/chart/Summary", "src/chart/Column", "src/chart/Pie",
+        "src/other/Table", "src/other/Comms",
+        "src/map/ChoroplethStates",
+        "src/c3chart/Gauge"
+    ],
+    function (Border, Grid, Tabbed,
+        Form, Input, TextArea,
+        Database,
+        Summary, Column, Pie,
+        Table, Comms,
+        ChoroplethStates,
+        Gauge) {
     var loading = "...loading...";
 
     function DataAnalyst() {
-        Border.call(this);
+        Tabbed.call(this);
 
         this._db = new Database.Grid();
         var context = this;
@@ -55,12 +71,10 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
             ])
             .on("click", function (d) {
                 context.doClear();
-                context._summary.getCell(0, 0).title("...downloading...").render();
                 context._analysis
-                    //.moreText("Fetching Data")
-                    //.valueIcon("fa-cloud-download")
-                    //.columns(["...downloading..."])
-                    .data(0)
+                    .moreText("...downloading...")
+                    .valueIcon("fa-cloud-download")
+                    .data("...")
                     .render()
                 ;
                 var connection = new Comms.WsWorkunits();
@@ -101,13 +115,10 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
         ;
 
         //  Summary  ---
-        this._analysis = new Gauge()
-            //.moreText("Analysis")
-            //.valueIcon("fa-gears")
-            //.fixedSize(false)
-            .columns(["Analysis"])
-            .showLabels(false)
-            .arcWidth(20)
+        this._analysis = new Summary()
+            .moreText("Analysis")
+            .valueIcon("fa-gears")
+            .fixedSize(false)
             .render()
         ;
         this._colSummary = new Summary()
@@ -128,13 +139,36 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
             .type("button")
             .value("Generate Dashboard")
             .on("click", function (d) {
-                alert("TODO");
+                var grid = new Grid();
+                var row = 0;
+                var col = 0;
+                var filters = JSON.parse(context._inputFilters.value());
+                var rows = Math.floor(Math.sqrt(filters.length));
+                var cols = Math.floor(filters.length / rows);
+                var remainder = filters.length % rows;
+
+                filters.forEach(function (filter) {
+                    var field = context._db.fieldByLabel(filter);
+                    var dedupInfo = context.dupScoreMap[filter];
+                    if (field.isUSState) {
+                        grid.setContent(row, col++, new ChoroplethStates().columns([filter, "Records"]).data(dedupInfo.map(function(row) { return [row.key, row.values]; })), filter);
+                    } else if (dedupInfo.length < 10) {
+                        grid.setContent(row, col++, new Pie().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; })), filter);
+                    } else if (dedupInfo.length < 50) {
+                        grid.setContent(row, col++, new Column().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; })), filter);
+                    }
+                    if (col >= cols) {
+                        ++row;
+                        col = 0;
+                    }
+                });
+                context.addTab(grid, "Dash").render();
             })
         ;
         this._summary = new Grid()
             .fitTo("width")
             .cellPadding(0)
-            .setContent(0, 0, this._analysis, "Analysis", 2, 3)
+            .setContent(0, 0, this._analysis, "", 2, 3)
             .setContent(2, 0, this._colSummary, "", 2, 3)
             .setContent(4, 0, this._rowSummary, "", 2, 3)
             .setContent(6, 0, this._inputFilters, "Filters", 1, 3)
@@ -172,6 +206,7 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
                 }, 0)
             })
         ;
+
         this._fieldSummary = new Table()
             .fixedHeader(true)
             .fixedColumn(false)
@@ -195,15 +230,20 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
             .setContent(3, 8, this._fieldSummary, "", 2, 4)
             .setContent(5, 8, this._dupTable, "", 3, 4)
         ;
-        this
-            .target("main")
+
+        var border = new Border()
             .setContent("center", this._frame)
             .setContent("right", this._summary)
             .rightSize(240)
             .rightPercentage(0)
         ;
+
+        this
+            .target("main")
+            .addTab(border, "Analysis")
+        ;
     }
-    DataAnalyst.prototype = Object.create(Border.prototype);
+    DataAnalyst.prototype = Object.create(Tabbed.prototype);
     DataAnalyst.prototype.constructor = Border;
 
     DataAnalyst.prototype.resetProgress = function (total) {
@@ -213,12 +253,10 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
     }
 
     DataAnalyst.prototype.incProgress = function () {
-        this._summary.getCell(0, 0).title("Analysis").render();
         this._analysis
-            //.moreText("Analysis")
-            //.valueIcon("fa-gears")
-            .columns(["Analysis"])
-            .data(parseInt(++this._progress * 100 / this._progressTotal))
+            .moreText("Analysis")
+            .valueIcon("fa-gears")
+            .data(parseInt(++this._progress * 100 / this._progressTotal) + "%")
             .render()
         ;
     }
@@ -271,6 +309,7 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
 
         this.resetProgress(this._db.width());
         var i = 0;
+        this.dupScoreMap = {};
         var dupScore = [];
         var filters = [];
         var series = [];
@@ -282,6 +321,7 @@ require(["src/layout/Border", "src/layout/Grid", "src/layout/Tabbed", "src/form/
                 var column = context._db.row(0)[i];
                 dedupDB[i] = context._db.analyse([i])[0];
                 dupScore.push([column, (100 - ((dedupDB[i].length - 1) * 100 / context._db.length())).toFixed(2), { idx: i, analysis: dedupDB[i] }]);
+                context.dupScoreMap[column] = dedupDB[i];
                 context.incProgress();
                 var field = context._db.fields()[i];
                 if (dedupDB[i].length > 1 && dedupDB[i].length <= 32 || field.isUSState) {
