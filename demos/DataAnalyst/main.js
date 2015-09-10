@@ -32,8 +32,15 @@ require(
         var rows = Math.floor(Math.sqrt(filters.length));
         var cols = Math.floor(filters.length / rows);
         var remainder = filters.length % rows;
+        var inputArray = [];
 
+        var context = this;
         filters.forEach(function (filter) {
+            if (col >= cols) {
+                ++row;
+                col = 0;
+            }
+
             var field = this._db.fieldByLabel(filter);
             var dedupInfo = this._db.analyse([field.idx])[0];
             var widget = null;
@@ -48,7 +55,6 @@ require(
                 widget = new Column().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
             }
             if (widget) {
-                var context = this;
                 widget
                     .on("click", function (row, col, selected) {
                         for (var key in row) {
@@ -66,11 +72,22 @@ require(
                 this.setContent(row, col++, widget, filter);
             }
 
-            if (col >= cols) {
-                ++row;
-                col = 0;
-            }
+            inputArray.push(new Input().label(filter).name(filter))
         }, this);
+
+        this._form = new Form()
+            .omitBlank(true)
+            .inputs(inputArray)
+            .on("submit", function (values) {
+                context._filter = values;
+                context.refresh();
+            })
+            .on("clear", function (values) {
+                context._filter = {};
+                context.refresh();
+            })
+        ;
+        this.setContent(0, cols, this._form, "Filter", row + 1);
     };
     Dashboard.prototype = Object.create(Grid.prototype);
     Dashboard.prototype.constructor = Dashboard;
@@ -78,7 +95,7 @@ require(
     Dashboard.prototype.refresh = function (clickWidget) {
         this.content().forEach(function (_widget) {
             var widget = _widget.widget();
-            if (widget !== clickWidget) {
+            if (widget !== clickWidget && widget !== this._form) {
                 var filter = {};
                 for (var key in this._filter) {
                     if (key !== widget.__hpcc_field) {
@@ -91,6 +108,7 @@ require(
                 widget.data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
             }
         }, this);
+        this._form.values(this._filter);
         this.render();
     };
 
@@ -98,6 +116,7 @@ require(
         Tabbed.call(this);
 
         this._db = new Database.Grid();
+        this._dashID = 0;
         var context = this;
 
         //  Input  ---
@@ -214,7 +233,7 @@ require(
             .value("Generate Dashboard")
             .on("click", function (d) {
                 var grid = new Dashboard(context._db, JSON.parse(context._inputFilters.value()));
-                context.addTab(grid, "Dash", true).render();
+                context.addTab(grid, "Dash-" + ++context._dashID, true).render();
             })
         ;
         this._summary = new Grid()
