@@ -109,6 +109,71 @@
         return Grid.prototype.rows.apply(this, arguments)
     };
 
+    //  Hipie Helpers  ---
+    Grid.prototype.hipieSort = function (sort) {
+        this._data.sort(function (l, r) {
+            for (var i = 0; i < sort.length; ++i) {
+                var sortField = sort[i];
+                var reverse = false;
+                if (sortField.indexOf("-") === 0) {
+                    sortField = sortField.substring(1);
+                    reverse = true;
+                }
+                var lVal = l[sortField];
+                if (lVal === undefined) {
+                    lVal = l[sortField.toLowerCase()];
+                }
+                var rVal = r[sortField];
+                if (rVal === undefined) {
+                    rVal = r[sortField.toLowerCase()];
+                }
+
+                if (lVal !== rVal) {
+                    return reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal, rVal);
+                }
+            }
+            return 0;
+        });
+        return this;
+    };
+
+    Grid.prototype.hipieReverse = function () {
+        this._data.reverse();
+        return this;
+    };
+
+    Grid.prototype.hipieFirst = function (first) {
+        if (this.first && data.length > this.first) {
+            data.length = this.first;
+        }
+        return this;
+    };
+
+    Grid.prototype.hipieMappings = function (mappings) {
+        var context = this;
+        //var mappings = d3.map(this.mappings);
+        var isRollup = false;
+        for (var key in mappings) {
+            var mapping = mappings[key];
+            if (mapping instanceof Object) {
+                var functionID = mapping.function;
+                var params = [];
+                for (var param in mapping.params) {
+                    params.push(mapping.params[param]);
+                }
+                switch (functionID) {
+                    case "SUM":
+                    case "SUM":
+                    case "SUM":
+                    case "SUM":
+                        break;
+                }
+
+            }
+        }
+        return [];
+    };
+
     //  Nesting  ---
     Grid.prototype._nest = function (columns, rollup) {
         if (!(columns instanceof Array)) {

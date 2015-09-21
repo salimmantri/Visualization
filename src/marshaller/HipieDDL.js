@@ -1,11 +1,11 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../other/Comms", "../common/Widget", "require"], factory);
+        define(["d3", "../common/Database", "../other/Comms", "../common/Widget", "require"], factory);
     } else {
-        root.marshaller_HipieDDL = factory(root.d3, root.other_Comms, root.common_Widget, root.require);
+        root.marshaller_HipieDDL = factory(root.d3, root.common_Database, root.other_Comms, root.common_Widget, root.require);
     }
-}(this, function (d3, Comms, Widget, require) {
+}(this, function (d3, Database, Comms, Widget, require) {
     var Vertex = null;
     var Edge = null;
     var exists = function (prop, scope) {
@@ -79,10 +79,7 @@
     };
 
     SourceMappings.prototype.doMapAll = function (data) {
-        var context = this;
-        return data.map(function (item) {
-            return context.doMap(item);
-        });
+        return data.hipieMap(this.mappings);
     };
 
     SourceMappings.prototype.getMap = function (key) {
@@ -344,37 +341,15 @@
         var context = this;
         var data = this.getOutput().data;
         if (this.sort) {
-            data.sort(function (l, r) {
-                for (var i = 0; i < context.sort.length; ++i) {
-                    var sortField = context.sort[i];
-                    var reverse = false;
-                    if (sortField.indexOf("-") === 0) {
-                        sortField = sortField.substring(1);
-                        reverse = true;
-                    }
-                    var lVal = l[sortField];
-                    if (lVal === undefined) {
-                        lVal = l[sortField.toLowerCase()];
-                    }
-                    var rVal = r[sortField];
-                    if (rVal === undefined) {
-                        rVal = r[sortField.toLowerCase()];
-                    }
-
-                    if (lVal !== rVal) {
-                        return reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal,  rVal);
-                    }
-                }
-                return 0;
-            });
+            data.hipieSort(this.sort);
         }
         if (this.reverse) {
-            data.reverse();
+            data.hipieReverse();
         }
-        if (this.first && data.length > this.first) {
-            data.length = this.first;
+        if (this.first) {
+            data.hipieFirst(first);
         }
-        return this.mappings.doMapAll(data);
+        return data.hipieMappings(this.mappings.mappings);
     };
 
     //  Viz Events ---
@@ -775,7 +750,7 @@
     Output.prototype.setData = function (data, request, updates) {
         var context = this;
         this.request = request;
-        this.data = data;
+        this.data = new Database.Grid().jsonObj(data);
         this.notify.forEach(function (item) {
             if (!updates || updates.indexOf(item) >= 0) {
                 var viz = context.dataSource.dashboard.getVisualization(item);
