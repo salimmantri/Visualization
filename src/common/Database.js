@@ -157,28 +157,39 @@
 
     Grid.prototype.hipieMappings = function (columns) {
         var context = this;
-        //var mappings = d3.map(this.mappings);
         var rollupField = -1;
-        var rollupParamsIndicies = [];
+        var rollupValueIdx = [];
         var rollupBy = [];
+        var scaleField = -1;
+        var scaleFieldIdx = -1;
+        var scaleValue = 1;
         var fieldIndicies = [];
         columns.forEach(function (mapping, key) {
-            //var mapping = mappings[key];
-            console.log(key + ":  " + mapping);
             if (mapping instanceof Object) {
                 switch (mapping.function) {
                     case "SUM":
                     case "AVE":
                     case "MIN":
                     case "MAX":
-                        if (rollupField) {
+                        if (rollupField >= 0) {
                             console.log("Rollup field already exists - there should only be one?");
                         }
                         rollupField = key;
-                        mapping.params.forEach(function (param) {
-                            for (var p_key in param) {
-                                rollupParamsIndicies.push(this.fieldByLabel(param[p_key], true).idx);
-                            }
+                        mapping.params.forEach(function (params) {
+                            rollupValueIdx.push(this.fieldByLabel(params.param1, true).idx);
+                        }, this);
+                        break;
+                    case "SCALE":
+                        if (scaleField >= 0) {
+                            console.log("Scale field already exists - there should only be one?");
+                        }
+                        scaleField = key;
+                        mapping.params.forEach(function (params) {
+                            var idx = this.fieldByLabel(params.param1, true).idx;
+                            var scale = params.param2; 
+                            fieldIndicies.push(function(row) {
+                                return row[idx] / scale;
+                            });
                         }, this);
                         break;
                     default:
@@ -188,10 +199,15 @@
                 try {
                     rollupBy.push(this.fieldByLabel(mapping, true).idx);
                 } catch (e) {
+                    var x = 0;
                 }
                 try {
-                    fieldIndicies.push(this.fieldByLabel(mapping, true).idx);
+                    var idx = this.fieldByLabel(mapping, true).idx;
+                    fieldIndicies.push(function(row) {
+                        return row[idx];
+                    });
                 } catch (e) {
+                    var x = 0;
                 }
             }
         }, this);
@@ -218,13 +234,13 @@
             var nested = this.rollup(rollupBy, function (leaves) {
                 switch (mapping.function) {
                     case "SUM":
-                        return d3.sum(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                        return d3.sum(leaves, function (d) { return d[rollupValueIdx[0]]; });
                     case "AVE":
-                        return d3.mean(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                        return d3.mean(leaves, function (d) { return d[rollupValueIdx[0]]; });
                     case "MIN":
-                        return d3.min(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                        return d3.min(leaves, function (d) { return d[rollupValueIdx[0]]; });
                     case "MAX":
-                        return d3.max(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                        return d3.max(leaves, function (d) { return d[rollupValueIdx[0]]; });
                 }
                 return "???";
             });
@@ -240,8 +256,8 @@
         } else {
             return this._data.map(function (row) {
                 var retVal = [];
-                fieldIndicies.forEach(function (idx) {
-                    retVal.push(row[idx]);
+                fieldIndicies.forEach(function (func) {
+                    retVal.push(func(row));
                 });
                 return retVal;
             });
