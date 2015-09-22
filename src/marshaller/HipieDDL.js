@@ -79,7 +79,7 @@
     };
 
     SourceMappings.prototype.doMapAll = function (data) {
-        return data.hipieMap(this.mappings);
+        return data.hipieMappings(this.mappings.mappings);
     };
 
     SourceMappings.prototype.getMap = function (key) {
@@ -349,7 +349,7 @@
         if (this.first) {
             data.hipieFirst(first);
         }
-        return data.hipieMappings(this.mappings.mappings);
+        return this.doMapAll();
     };
 
     //  Viz Events ---

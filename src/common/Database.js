@@ -179,7 +179,10 @@
                         console.log("Unknown field function - " + mapping.function);
                 }
             } else {
-                rollupBy.push(key);
+                try {
+                    rollupBy.push(this.fieldByLabel(mapping).idx);
+                } catch (e) {
+                }
                 //fieldIndicies[mapping] = this.fieldByLabel(mapping).idx;
             }
         }
@@ -202,9 +205,7 @@
             for (var param in mapping.params) {
                 params.push(mapping.params[param]);
             }
-            var nested = this.rollup(rollupBy.map(function (field) {
-                return mappings[field];
-            }), function (leaves) {
+            var nested = this.rollup(rollupBy, function (leaves) {
                 switch (mapping.function) {
                     case "SUM":
                         return d3.sum(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
@@ -232,15 +233,12 @@
     };
 
     //  Nesting  ---
-    Grid.prototype._nest = function (columns, rollup) {
-        if (!(columns instanceof Array)) {
-            columns = [columns];
+    Grid.prototype._nest = function (columnIndicies, rollup) {
+        if (!(columnIndicies instanceof Array)) {
+            columnIndicies = [columnIndicies];
         }
-        var columnIndices = columns.map(function (column) {
-            return this.fieldByLabel(column).idx;
-        }, this);
         var nest = d3.nest();
-        columnIndices.forEach(function (idx) {
+        columnIndicies.forEach(function (idx) {
             nest.key(function (d){
                 return d[idx];
             })
@@ -248,14 +246,14 @@
         return nest;
     };
 
-    Grid.prototype.nest = function (columns) {
-        return this._nest(columns)
+    Grid.prototype.nest = function (columnIndicies) {
+        return this._nest(columnIndicies)
             .entries(this._data)
         ;
     };
 
-    Grid.prototype.rollup = function (columns, rollup) {
-        return this._nest(columns)
+    Grid.prototype.rollup = function (columnIndicies, rollup) {
+        return this._nest(columnIndicies)
             .rollup(rollup)
             .entries(this._data)
         ;
