@@ -79,7 +79,7 @@
     };
 
     SourceMappings.prototype.doMapAll = function (data) {
-        return data.hipieMappings(this.mappings.mappings);
+        return data.hipieMappings(this.columnsRHS);
     };
 
     SourceMappings.prototype.getMap = function (key) {
@@ -211,7 +211,8 @@
         return null;
     };
 
-    GraphMappings.prototype.doMapAll = function (data) {
+    GraphMappings.prototype.doMapAll = function (db) {
+        var data = db.jsonObj();
         var context = this;
         var vertexMap = {};
         var vertices = [];
@@ -339,7 +340,8 @@
 
     Source.prototype.getData = function () {
         var context = this;
-        var data = this.getOutput().data;
+        var data = new Database.Grid().jsonObj(this.getOutput().data, this.mappings.columnsRHS);
+        ;
         if (this.sort) {
             data.hipieSort(this.sort);
         }
@@ -349,7 +351,8 @@
         if (this.first) {
             data.hipieFirst(first);
         }
-        return this.doMapAll();
+        return this.mappings.doMapAll(data);
+
     };
 
     //  Viz Events ---
@@ -750,7 +753,7 @@
     Output.prototype.setData = function (data, request, updates) {
         var context = this;
         this.request = request;
-        this.data = new Database.Grid().jsonObj(data);
+        this.data = data;
         this.notify.forEach(function (item) {
             if (!updates || updates.indexOf(item) >= 0) {
                 var viz = context.dataSource.dashboard.getVisualization(item);

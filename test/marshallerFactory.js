@@ -8,14 +8,6 @@
 }(this, function () {
     return {
         HTML: {
-            databomb: function (callback) {
-                require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
-                    callback(new HTML()
-                        .ddlUrl(DataFactory.Marshaller.simple.ddlUrl)
-                        .databomb(DataFactory.Marshaller.simple.databomb)
-                    );
-                });
-            },
             rollups: function (callback) {
                 require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
                     callback(new HTML()
@@ -28,6 +20,14 @@
                 require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
                     callback(new HTML()
                         .ddlUrl(DataFactory.Marshaller.hipie.ddlUrl)
+                    );
+                });
+            },
+            databomb: function (callback) {
+                require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
+                    callback(new HTML()
+                        .ddlUrl(DataFactory.Marshaller.simple.ddlUrl)
+                        .databomb(DataFactory.Marshaller.simple.databomb)
                     );
                 });
             }

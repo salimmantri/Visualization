@@ -35,8 +35,8 @@
         return this;
     };
 
-    Grid.prototype.fieldByLabel = function (_) {
-        return this.fields().filter(function (field, idx) { field.idx = idx; return field.label === _; })[0];
+    Grid.prototype.fieldByLabel = function (_, ignoreCase) {
+        return this.fields().filter(function (field, idx) { field.idx = idx; return ignoreCase ? field.label.toLowerCase() === _.toLowerCase() : field.label === _; })[0];
     };
 
     Grid.prototype.data = function (_, clone) {
@@ -112,25 +112,30 @@
 
     //  Hipie Helpers  ---
     Grid.prototype.hipieSort = function (sort) {
-        this._data.sort(function (l, r) {
-            for (var i = 0; i < sort.length; ++i) {
-                var sortField = sort[i];
-                var reverse = false;
-                if (sortField.indexOf("-") === 0) {
-                    sortField = sortField.substring(1);
-                    reverse = true;
-                }
-                var lVal = l[sortField];
-                if (lVal === undefined) {
-                    lVal = l[sortField.toLowerCase()];
-                }
-                var rVal = r[sortField];
-                if (rVal === undefined) {
-                    rVal = r[sortField.toLowerCase()];
-                }
+        var columns = this.legacyColumns();
+        var columnsLower = columns.map(function (d) { return d.toLowerCase(); });
+        var sortFields = sort.map(function (sortField) {
+            var reverse = false;
+            if (sortField.indexOf("-") === 0) {
+                sortField = sortField.substring(1);
+                reverse = true;
+            }
+            var idx = columns.indexOf(sortField);
+            if (idx === -1) {
+                idx = columnsLower.indexOf(sortField);
+            }
+            return {
+                idx: idx,
+                reverse: reverse
+            }
+        }, this);
 
+        this._data.sort(function (l, r) {
+            for (var i = 0; i < sortFields.length; ++i) {
+                var lVal = l[sortFields[i].idx];
+                var rVal = r[sortFields[i].idx];
                 if (lVal !== rVal) {
-                    return reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal, rVal);
+                    return sortFields[i].reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal, rVal);
                 }
             }
             return 0;
@@ -144,21 +149,22 @@
     };
 
     Grid.prototype.hipieFirst = function (first) {
-        if (this.first && data.length > this.first) {
-            data.length = this.first;
+        if (first && this._data.length > first) {
+            this._data.length = first;
         }
         return this;
     };
 
-    Grid.prototype.hipieMappings = function (mappings) {
+    Grid.prototype.hipieMappings = function (columns) {
         var context = this;
         //var mappings = d3.map(this.mappings);
-        var rollupField = null;
+        var rollupField = -1;
         var rollupParamsIndicies = [];
         var rollupBy = [];
-        var fieldIndicies = {};
-        for (var key in mappings) {
-            var mapping = mappings[key];
+        var fieldIndicies = [];
+        columns.forEach(function (mapping, key) {
+            //var mapping = mappings[key];
+            console.log(key + ":  " + mapping);
             if (mapping instanceof Object) {
                 switch (mapping.function) {
                     case "SUM":
@@ -171,7 +177,7 @@
                         rollupField = key;
                         mapping.params.forEach(function (param) {
                             for (var p_key in param) {
-                                rollupParamsIndicies.push(this.fieldByLabel(param[p_key]).idx);
+                                rollupParamsIndicies.push(this.fieldByLabel(param[p_key], true).idx);
                             }
                         }, this);
                         break;
@@ -180,12 +186,15 @@
                 }
             } else {
                 try {
-                    rollupBy.push(this.fieldByLabel(mapping).idx);
+                    rollupBy.push(this.fieldByLabel(mapping, true).idx);
                 } catch (e) {
                 }
-                //fieldIndicies[mapping] = this.fieldByLabel(mapping).idx;
+                try {
+                    fieldIndicies.push(this.fieldByLabel(mapping, true).idx);
+                } catch (e) {
+                }
             }
-        }
+        }, this);
 
         function nodeToRow(node, idx, _row, retVal) {
             var row = _row.map(function (d) { return d; });
@@ -199,7 +208,8 @@
                 retVal.push(row);
             }
         }
-        if (rollupField) {
+        if (rollupField >= 0) {
+            var mapping = columns[rollupField];
             var functionID = mapping.function;
             var params = [];
             for (var param in mapping.params) {
@@ -228,7 +238,13 @@
             }
             return retVal;
         } else {
-            return this._data;
+            return this._data.map(function (row) {
+                var retVal = [];
+                fieldIndicies.forEach(function (idx) {
+                    retVal.push(row[idx]);
+                });
+                return retVal;
+            });
         }
     };
 
@@ -322,7 +338,7 @@
     };
 
     //  Import/Export  ---
-    Grid.prototype.jsonObj = function (_) {
+    Grid.prototype.jsonObj = function (_) {//, legacyColumns) {
         if (!arguments.length) return this._data.map(function (row) {
             var retVal = {};
             this.row(0).forEach(function (col, idx) {
@@ -330,11 +346,17 @@
             });
             return retVal;
         }, this);
+        this.clear();
+        //if (legacyColumns) {
+            //this.legacyColumns(legacyColumns);
+        //}
         this.data(_.map(function (row, idx) {
-            this.clear();
             var retVal = [];
             for (var key in row) {
                 var colIdx = this.row(0).indexOf(key);
+                //if (colIdx < 0) {
+                    //colIdx = this.row(0).map(function (d) { return d.toLowerCase(); }).indexOf(key);
+                //}
                 if (colIdx < 0) {
                     colIdx = this._fields.length;
                     this._fields.push({ label: key });
