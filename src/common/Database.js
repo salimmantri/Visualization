@@ -44,6 +44,7 @@
         this._data = clone ? _.map(function (d) { return d.map(function (d2) { return d2; }); }) : _;
         return this;
     };
+
     //  Row Access  ---
     Grid.prototype.row = function (row, _) {
         if (arguments.length < 2) return row === 0 ? this._fields.map(function (d) { return d.label; }) : this._data[row - 1];
@@ -152,26 +153,82 @@
     Grid.prototype.hipieMappings = function (mappings) {
         var context = this;
         //var mappings = d3.map(this.mappings);
-        var isRollup = false;
+        var rollupField = null;
+        var rollupParamsIndicies = [];
+        var rollupBy = [];
+        var fieldIndicies = {};
         for (var key in mappings) {
             var mapping = mappings[key];
             if (mapping instanceof Object) {
-                var functionID = mapping.function;
-                var params = [];
-                for (var param in mapping.params) {
-                    params.push(mapping.params[param]);
-                }
-                switch (functionID) {
+                switch (mapping.function) {
                     case "SUM":
-                    case "SUM":
-                    case "SUM":
-                    case "SUM":
+                    case "AVE":
+                    case "MIN":
+                    case "MAX":
+                        if (rollupField) {
+                            console.log("Rollup field already exists - there should only be one?");
+                        }
+                        rollupField = key;
+                        mapping.params.forEach(function (param) {
+                            for (var p_key in param) {
+                                rollupParamsIndicies.push(this.fieldByLabel(param[p_key]).idx);
+                            }
+                        }, this);
                         break;
+                    default:
+                        console.log("Unknown field function - " + mapping.function);
                 }
-
+            } else {
+                rollupBy.push(key);
+                //fieldIndicies[mapping] = this.fieldByLabel(mapping).idx;
             }
         }
-        return [];
+
+        function nodeToRow(node, idx, _row, retVal) {
+            var row = _row.map(function (d) { return d; });
+            row[idx] = node.key;
+            if (node.values instanceof Array) {
+                node.values.forEach(function (d) {
+                    nodeToRow(d, idx + 1, row, retVal);
+                });
+            } else {
+                row[idx + 1] = node.values;
+                retVal.push(row);
+            }
+        }
+        if (rollupField) {
+            var functionID = mapping.function;
+            var params = [];
+            for (var param in mapping.params) {
+                params.push(mapping.params[param]);
+            }
+            var nested = this.rollup(rollupBy.map(function (field) {
+                return mappings[field];
+            }), function (leaves) {
+                switch (mapping.function) {
+                    case "SUM":
+                        return d3.sum(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                    case "AVE":
+                        return d3.mean(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                    case "MIN":
+                        return d3.min(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                    case "MAX":
+                        return d3.max(leaves, function (d) { return d[rollupParamsIndicies[0]]; });
+                }
+                return "???";
+            });
+            var retVal = [];
+            if (nested instanceof Array) {
+                nested.forEach(function (d) {
+                    nodeToRow(d, 0, [], retVal);
+                });
+            } else {
+                retVal.push([nested]);
+            }
+            return retVal;
+        } else {
+            return this._data;
+        }
     };
 
     //  Nesting  ---
@@ -179,10 +236,13 @@
         if (!(columns instanceof Array)) {
             columns = [columns];
         }
+        var columnIndices = columns.map(function (column) {
+            return this.fieldByLabel(column).idx;
+        }, this);
         var nest = d3.nest();
-        columns.forEach(function (col) {
+        columnIndices.forEach(function (idx) {
             nest.key(function (d){
-                return d[col];
+                return d[idx];
             })
         });
         return nest;

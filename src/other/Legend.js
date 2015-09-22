@@ -9,6 +9,7 @@
     function Legend() {
         Table.call(this);
         this._tag = "div";
+        this._drawStartPos = "center";
     }
     Legend.prototype = Object.create(Table.prototype);
     Legend.prototype.constructor = Legend;
