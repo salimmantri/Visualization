@@ -20,6 +20,8 @@
     }
 
     Main.prototype.clear = function () {
+        d3.select("#mapPage q strong").text("Address History");
+        d3.select("#addressPage q strong").text("Address History");
         this.peopleTable.data([]).render();
         this.addressChart.data([]).render();
         this.addressTable.data([]).render();
