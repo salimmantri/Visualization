@@ -95,6 +95,7 @@
                 inp.value("").render();
             }
         });
+        this.clickClear();
     };
 
     Form.prototype.checkValidation = function(){
@@ -203,7 +204,11 @@
     };
 
     Form.prototype.click = function (row) {
-        console.log("Clicked Submit: "+JSON.stringify(row));
+        console.log("Clicked Submit:  " + JSON.stringify(row));
+    };
+
+    Form.prototype.clickClear = function () {
+        console.log("Clicked Clear.");
     };
 
     return Form;

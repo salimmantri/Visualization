@@ -3,7 +3,7 @@
     if (typeof define === "function" && define.amd) {
         define(["d3", "src/common/Utility", "src/other/Comms", "src/form/Form", "src/common/WidgetArray", "src/form/Input", "src/form/Slider", "src/chart/Column", "src/chart/Line", "src/chart/Scatter", "src/other/Table", "src/map/GMapGraph", "src/common/Shape", "src/graph/Edge"], factory);
     }
-}(this, function (d3, Utility, Comms, Form, WidgetArray, Input, Slider, Column, Line, Scatter, Table, GMap, Shape, Edge) {
+}(this, function (d3, Utility, Comms, Form, WidgetArray, Input, Slider, Column, Line, Scatter, Table, GMapGraph, Shape, Edge) {
     var params = Utility.urlParams();
     var demomode = params.demomode !== undefined ? params.demomode : true;
 
@@ -18,6 +18,15 @@
 
         this.addressMarkers = [];
     }
+
+    Main.prototype.clear = function () {
+        this.peopleTable.data([]).render();
+        this.addressChart.data([]).render();
+        this.addressTable.data([]).render();
+        this.syncSelection(null, []);
+        this.addressMap.data([]).zoomToFit();
+        return this;
+    };
 
     Main.prototype.cleanAddress = function (address, callback) {
         this.geoDecode.call({
@@ -246,7 +255,10 @@
             ])
             .showSubmit(true)
             .omitBlank(true)
-            .on("click", function (request) {
+            .on("clickClear", function (request) {
+                context.clear();
+            }).on("click", function (request) {
+                context.clear();
                 var data = JSON.stringify(context.form.data());
                 localStorage.setItem("formData", data);
 
@@ -300,7 +312,7 @@
                                     }
                                     return retVal;
                                 });
-                                return [row.name, row.score, row.crim_records, row.__details.length, row];
+                                return [row.name, row.score, row.crim_records, row.__details.length, row.did, row];
                             }))
                             .render()
                         ;
@@ -321,7 +333,7 @@
         var context = this;
         this.peopleTable = new Table()
             .target(id)
-            .columns(["Name", "Score", "# Crims", "Details"])
+            .columns(["Name", "Score", "# Crims", "Details", "Lex ID"])
             .on("click", function (row, col, selected) {
                 context.syncSelection(context.peopleTable, selected ? [row] : []);
             }, true)
@@ -330,7 +342,7 @@
     };
 
     Main.prototype.initAddressMap = function (id) {
-        this.addressMap = new GMap()
+        this.addressMap = new GMapGraph()
             .target(id)
             .render()
         ;
