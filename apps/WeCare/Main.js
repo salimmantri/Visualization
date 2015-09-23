@@ -1,9 +1,12 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "src/other/Comms", "src/form/Form", "src/common/WidgetArray", "src/form/Input", "src/form/Slider", "src/chart/Column", "src/chart/Line", "src/chart/Scatter", "src/other/Table", "src/map/GMapGraph", "src/common/Shape", "src/graph/Edge"], factory);
+        define(["d3", "src/common/Utility", "src/other/Comms", "src/form/Form", "src/common/WidgetArray", "src/form/Input", "src/form/Slider", "src/chart/Column", "src/chart/Line", "src/chart/Scatter", "src/other/Table", "src/map/GMapGraph", "src/common/Shape", "src/graph/Edge"], factory);
     }
-}(this, function (d3, Comms, Form, WidgetArray, Input, Slider, Column, Line, Scatter, Table, GMap, Shape, Edge) {
+}(this, function (d3, Utility, Comms, Form, WidgetArray, Input, Slider, Column, Line, Scatter, Table, GMap, Shape, Edge) {
+    var params = Utility.urlParams();
+    var demomode = params.demomode !== undefined ? params.demomode : true;
+
     function Main() {
         this.connWeCare = Comms.createESPConnection("http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/wecare");
         this.connPersonAddresses = Comms.createESPConnection("http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/personaddresses");
@@ -267,6 +270,7 @@
                 newRequest.radius = request.radius;
                 newRequest.agelow = request.age[0];
                 newRequest.agehigh = request.age[1];
+                newRequest.demomode = demomode;
 
                 context.connWeCare.send(newRequest, function (response) {
                     localStorage.setItem("connWeCare." + JSON.stringify(request), JSON.stringify(response));
@@ -279,7 +283,8 @@
                             individualIdx["_" + row.did] = idx;
                             return row.did;
                         }).join(","),
-                        locations: locations.join("|")
+                        locations: locations.join("|"),
+                        demomode: demomode
                     }, function (response2) {
                         response2.BestFit.forEach(function (bestFit) {
                             response.IndividualList[individualIdx["_" + bestFit.did]].score += bestFit.close_count * 100;
@@ -412,7 +417,8 @@
                         d3.select("#mapPage q strong").text(row.Name);
                         d3.select("#addressPage q strong").text(row.Name);
                         this.connPersonAddresses.send({
-                            lexid: row.__lparam.did
+                            lexid: row.__lparam.did,
+                            demomode: demomode
                         }, function (response) {
                             var addresses = response.Addresses.map(function (addrRow) {
                                 addrRow.__details = null;
