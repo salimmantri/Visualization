@@ -379,7 +379,7 @@
                 ;
                 if (first) {
                     first = false;
-                    testWidget(widgetTest ? d3.map(testFactory.widgets[widgetPath])[widgetTest].factory : d3.map(testFactory.widgets[widgetPath]).values()[0].factory, params);
+                    testWidget(widgetTest ? testFactory.widgets[widgetPath][widgetTest].factory : d3.map(testFactory.widgets[widgetPath]).values()[0].factory, params);
                     /*
                     var factory = testFactory.categories[0].factory;
                     var widget = testFactory.categories[0].widgets[0].id;
