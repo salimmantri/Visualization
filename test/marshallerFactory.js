@@ -31,6 +31,13 @@
                     );
                 });
             },
+            wu: function (callback) {
+                require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
+                    callback(new HTML()
+                        .ddlUrl("http://10.241.100.159:8010/WsWorkunits/WUInfo?Wuid=W20150915-131533&ResultName=chittahx_anthemsuspectbadaddresses_Comp_Ins119_DDL")
+                    );
+                });
+            },
             databomb: function (callback) {
                 require(["test/DataFactory", "src/marshaller/HTML"], function (DataFactory, HTML) {
                     callback(new HTML()

@@ -1,6 +1,6 @@
 "use strict";
 define(["d3", "src/common/Database"], function (d3, Database) {
-    describe.only("Database", function (done) {
+    describe("Database", function (done) {
         var testColumns = ["Subject", "Year 1", "Year 2", "Year 3"];
         var testData = [
                     ["Geography", 75, 68, 65],

@@ -111,48 +111,30 @@
     };
 
     //  Hipie Helpers  ---
-    Grid.prototype.hipieSort = function (sort) {
-        var columns = this.legacyColumns();
-        var columnsLower = columns.map(function (d) { return d.toLowerCase(); });
-        var sortFields = sort.map(function (sortField) {
+    Grid.prototype.hipieFieldsByMappings = function (mappings) {
+        return mappings.map(function (mapping) {
+            return this.fieldByLabel(mapping, true);
+        }, this);
+    };
+
+    Grid.prototype.hipieFieldIdxByMappings = function (mappings) {
+        return this.hipieFieldsByMappings(mappings).map(function (field) {
+            return field.idx;
+        });
+    };
+
+    Grid.prototype.hipieMapSortArray = function (sort) {
+        return sort.map(function (sortField) {
             var reverse = false;
             if (sortField.indexOf("-") === 0) {
                 sortField = sortField.substring(1);
                 reverse = true;
             }
-            var idx = columns.indexOf(sortField);
-            if (idx === -1) {
-                idx = columnsLower.indexOf(sortField);
-            }
             return {
-                idx: idx,
+                idx: this.fieldByLabel(sortField, true).idx,
                 reverse: reverse
             }
         }, this);
-
-        this._data.sort(function (l, r) {
-            for (var i = 0; i < sortFields.length; ++i) {
-                var lVal = l[sortFields[i].idx];
-                var rVal = r[sortFields[i].idx];
-                if (lVal !== rVal) {
-                    return sortFields[i].reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal, rVal);
-                }
-            }
-            return 0;
-        });
-        return this;
-    };
-
-    Grid.prototype.hipieReverse = function () {
-        this._data.reverse();
-        return this;
-    };
-
-    Grid.prototype.hipieFirst = function (first) {
-        if (first && this._data.length > first) {
-            this._data.length = first;
-        }
-        return this;
     };
 
     Grid.prototype.hipieMappings = function (columns) {

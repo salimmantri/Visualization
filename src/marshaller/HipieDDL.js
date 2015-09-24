@@ -1,11 +1,11 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/Database", "../other/Comms", "../common/Widget", "require"], factory);
+        define(["d3", "../common/Database", "../common/Utility", "../other/Comms", "../common/Widget", "require"], factory);
     } else {
-        root.marshaller_HipieDDL = factory(root.d3, root.common_Database, root.other_Comms, root.common_Widget, root.require);
+        root.marshaller_HipieDDL = factory(root.d3, root.common_Database, root.common_Utility, root.other_Comms, root.common_Widget, root.require);
     }
-}(this, function (d3, Database, Comms, Widget, require) {
+}(this, function (d3, Database, Utility, Comms, Widget, require) {
     var Vertex = null;
     var Edge = null;
     var exists = function (prop, scope) {
@@ -331,7 +331,7 @@
     };
 
     Source.prototype.hasData = function () {
-        return this.getOutput().data ? true : false;
+        return this.getOutput().db ? true : false;
     };
 
     Source.prototype.getColumns = function () {
@@ -339,20 +339,18 @@
     };
 
     Source.prototype.getData = function () {
-        var context = this;
-        var data = new Database.Grid().jsonObj(this.getOutput().data, this.mappings.columnsRHS);
-        ;
+        var db = this.getOutput().db;
+        var retVal = this.mappings.doMapAll(db);
         if (this.sort) {
-            data.hipieSort(this.sort);
+            Utility.multiSort(retVal, db.hipieMapSortArray(this.sort));
         }
         if (this.reverse) {
-            data.hipieReverse();
+            retVal.reverse();
         }
-        if (this.first) {
-            data.hipieFirst(first);
+        if (this.first && retVal.length > this.first) {
+            retVal.length = this.first;
         }
-        return this.mappings.doMapAll(data);
-
+        return retVal;
     };
 
     //  Viz Events ---
@@ -644,7 +642,6 @@
                 var columns = this.source.getColumns();
                 this.widget.columns(columns);
                 var data = this.source.getData();
-                this.dashboard.marshaller.updateViz(this, data);
                 this.widget.data(data);
 
                 var params = this.source.getOutput().getParams();
@@ -753,7 +750,7 @@
     Output.prototype.setData = function (data, request, updates) {
         var context = this;
         this.request = request;
-        this.data = data;
+        this.db = new Database.Grid().jsonObj(data);
         this.notify.forEach(function (item) {
             if (!updates || updates.indexOf(item) >= 0) {
                 var viz = context.dataSource.dashboard.getVisualization(item);
@@ -1067,9 +1064,6 @@
             }
         }
         waitForLoad(callback);
-    };
-
-    Marshaller.prototype.updateViz = function (vizInfo, data) {
     };
 
     return {
