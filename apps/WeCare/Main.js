@@ -131,7 +131,7 @@
             .name("zip1")
             .label("Location 1")
             .type("textarea")
-            .value(91331)
+            .value(33428)
             .on("change", function (w) {
                 context.refreshLocations();
             })
@@ -140,7 +140,7 @@
             .name("zip2")
             .label("Location 2")
             .type("textarea")
-            .value(98225)
+            .value(33473)
             .on("change", function (w) {
                 context.refreshLocations();
             })
@@ -149,7 +149,7 @@
             .name("zip3")
             .label("Location 3")
             .type("textarea")
-            .value("")
+            .value("33445")
             .on("change", function (w) {
                 context.refreshLocations();
             })
@@ -164,7 +164,7 @@
                         .name("zip1Date")
                         .label("Date")
                         .type("date")
-                        .value("2004-01-01")
+                        .value("2009-12-01")
                         .on("change", function (w) {
                             context.formatDate(w);
                         }),
@@ -191,7 +191,7 @@
                         .name("zip2Date")
                         .label("Date")
                         .type("date")
-                        .value("2012-01-01")
+                        .value("2010-12-01")
                         .on("change", function (w) {
                             context.formatDate(w);
                         }),
@@ -218,7 +218,7 @@
                         .name("zip3Date")
                         .label("Date")
                         .type("date")
-                        .value("")
+                        .value("2001-06-01")
                         .on("change", function (w) {
                             context.formatDate(w);
                         }),
@@ -287,7 +287,6 @@
                 newRequest.demomode = demomode;
 
                 context.connWeCare.send(newRequest, function (response) {
-                    localStorage.setItem("connWeCare." + JSON.stringify(request), JSON.stringify(response));
                     loadResponse(response);
                 });
                 function loadResponse(response) {
