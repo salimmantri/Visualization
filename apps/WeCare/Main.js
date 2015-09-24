@@ -27,6 +27,7 @@
         this.addressTable.data([]).render();
         this.syncSelection(null, []);
         this.addressMap.data([]).zoomToFit();
+        this.loadDebugTable([]);
         return this;
     };
 
@@ -245,7 +246,7 @@
                     .low(1)
                     .high(20)
                     .step(1)
-                    .value(5),
+                    .value(3),
                 new Slider()
                     .name("age")
                     .label("Age (18-100)")
@@ -253,7 +254,7 @@
                     .high(100)
                     .step(1)
                     .allowRange(true)
-                    .value([30, 44])
+                    .value([35, 50])
             ])
             .showSubmit(true)
             .omitBlank(true)
@@ -290,6 +291,7 @@
                     loadResponse(response);
                 });
                 function loadResponse(response) {
+                    context.loadDebugTable(response.IndividualList);
                     var individualIdx = {};
                     context.connPersonToLocations.send({
                         lexids: response.IndividualList.map(function (row, idx) {
@@ -392,8 +394,8 @@
             .interpolate("cardinal")
             .xAxisType("time")
             .xAxisTypeTimePattern("%Y%m%d")
-            .xAxisDomainLow("19840101")
-            .xAxisDomainHigh("20160101")
+            //.xAxisDomainLow("19840101")
+            //.xAxisDomainHigh("20160101")
             .yAxisTitle("Miles")
             .yAxisTickCount(4)
             .yAxisType("pow")
@@ -490,13 +492,18 @@
         this.debugTable = new Table()
             .target(id)
             .columns([])
+            .data([])
+            .pagination(true)
             .on("click", function (row) {
             })
-            .render()
+            //.render()
         ;
     }
 
     Main.prototype.loadDebugTable = function (details) {
+        if (details.length === 0) {
+            details = [{ "": "" }];
+        }
         var columns = [];
         var data = details.map(function (row, idx) {
             var retVal = [];
