@@ -6,22 +6,24 @@ require(
     [
         "src/layout/Border", "src/layout/Grid", "src/layout/Tabbed",
         "src/form/Form", "src/form/Input", "src/form/TextArea",
-        "src/common/Database",
+        "src/common/Database", "src/common/Utility",
         "src/chart/Summary", "src/chart/Column", "src/chart/Line", "src/chart/Pie",
         "src/other/Table", "src/other/Comms",
         "src/map/ChoroplethStates",
-        "src/c3chart/Gauge"
+        "src/c3chart/Gauge",
+        "./DataAnalyst/sample_breach"
     ],
     function (Border, Grid, Tabbed,
         Form, Input, TextArea,
-        Database,
+        Database, Utility,
         Summary, Column, Line, Pie,
         Table, Comms,
         ChoroplethStates,
-        Gauge) {
+        Gauge, 
+        sample_breach) {
     var loading = "...loading...";
 
-    function Dashboard(db, filters) {
+    function Dashboard(db, filters, series, aggregates) {
         Grid.call(this);
         this._db = db.clone();
         this._filter = {};
@@ -46,13 +48,13 @@ require(
             var widget = null;
 
             if (field.isUSState) {
-                widget = new ChoroplethStates().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                widget = new ChoroplethStates().columns([filter, "Records"]);
             } else if (field.isDateTime || field.isDate) {
-                widget = new Line().columns([filter, "Records"]).xAxisTypeTimePattern(field.isDateTime || field.isDate).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                widget = new Line().columns([filter, "Records"]).xAxisTypeTimePattern(field.isDateTime || field.isDate);
             } else if (dedupInfo.length < 10) {
-                widget = new Pie().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                widget = new Pie().columns([filter, "Records"]);
             } else if (dedupInfo.length < 50) {
-                widget = new Column().columns([filter, "Records"]).data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                widget = new Column().columns([filter, "Records"]);
             }
             if (widget) {
                 widget
@@ -69,11 +71,40 @@ require(
                     })
                 ;
                 widget.__hpcc_field = filter;
+                widget.__hpcc_aggregate = null;
                 this.setContent(row, col++, widget, filter);
             }
 
             inputArray.push(new Input().label(filter).name(filter))
         }, this);
+
+        if (series.length && aggregates.length) {
+            var field = this._db.fieldByLabel(series[0]);
+            var sumBy = this._db.fieldByLabel(aggregates[0]);
+            //var dedupInfo = this._db.rollup([field.idx], function (leaves) {
+            //    return d3.sum(leaves, function (d) { return d[sumBy.idx]; });
+            //});
+            this._seriesChart = new Line()
+                .columns([series[0], "Records"])
+                .xAxisOverlapMode("none")
+                .xAxisType("time")
+                .xAxisTypeTimePattern(field.isDateTimeFormat)
+                .yAxisType("pow")
+                .yAxisTypePowExponent(0.3)
+                .interpolate("monotone")
+                //.data(Utility.multiSort(dedupInfo.map(function (row) { return [row.key, row.values]; }), [{ idx: 0 }]))
+            ;
+            this._seriesChart.__hpcc_field = series[0];
+            this._seriesChart.__hpcc_aggregate = function (db) {
+                var dedupInfo = db.rollup([field.idx], function (leaves) {
+                    return d3.sum(leaves, function (d) { return d[sumBy.idx]; });
+                });
+                return Utility.multiSort(dedupInfo.map(function (row) {
+                    return [row.key, row.values];
+                }), [{ idx: 0 }]);
+            };
+            this.setContent(row + 1, 0, this._seriesChart, series[0] + " / " + aggregates[0], 1, cols + 1);
+        }
 
         this._form = new Form()
             .omitBlank(true)
@@ -88,6 +119,7 @@ require(
             })
         ;
         this.setContent(0, cols, this._form, "Filter", row + 1);
+        this.refresh();
     };
     Dashboard.prototype = Object.create(Grid.prototype);
     Dashboard.prototype.constructor = Dashboard;
@@ -103,9 +135,13 @@ require(
                     }
                 }
                 var db = this._db.filter(filter);
-                var field = db.fieldByLabel(widget.__hpcc_field);
-                var dedupInfo = db.analyse([field.idx])[0];
-                widget.data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                if (widget.__hpcc_aggregate) {
+                    widget.data(widget.__hpcc_aggregate(db));
+                } else {
+                    var field = db.fieldByLabel(widget.__hpcc_field);
+                    var dedupInfo = db.analyse([field.idx])[0];
+                    widget.data(dedupInfo.map(function (row) { return [row.key, row.values]; }));
+                }
             }
         }, this);
         this._form.values(this._filter);
@@ -116,9 +152,10 @@ require(
         Tabbed.call(this);
 
         this._db = new Database.Grid();
+        this._db.jsonObj(sample_breach);
         this._dashID = 0;
         var context = this;
-
+        var testData = loading;
         //  Input  ---
         this._inputTSV = new TextArea()
             .value(testData)
@@ -186,23 +223,7 @@ require(
             .addTab(this._inputWU, "Input (WU)")
             .addTab(this._inputTable, "Input (parsed)")
             .on("click", function (widget, column, idx) {
-                    switch (widget) {
-                        case context._inputTSV:
-                            if (widget.value() === loading) {
-                                widget.value(context._db.tsv());
-                            }
-                            break;
-                        case context._inputCSV:
-                            if (widget.value() === loading) {
-                                widget.value(context._db.csv());
-                            }
-                            break;
-                        case context._inputJSON:
-                            if (widget.value() === loading) {
-                                widget.value(context._db.json());
-                            }
-                            break;
-                    }
+                context.doDataTabChanged(widget);
             })
         ;
 
@@ -232,7 +253,7 @@ require(
             .type("button")
             .value("Generate Dashboard")
             .on("click", function (d) {
-                var grid = new Dashboard(context._db, JSON.parse(context._inputFilters.value()));
+                var grid = new Dashboard(context._db, JSON.parse(context._inputFilters.value()), JSON.parse(context._inputSeries.value()), JSON.parse(context._inputAggregates.value()));
                 context.addTab(grid, "Dash-" + ++context._dashID, true).render();
             })
         ;
@@ -345,6 +366,26 @@ require(
         this._inputAggregates.value("").render();
     }
 
+    DataAnalyst.prototype.doDataTabChanged = function (srcWidget) {
+        switch (srcWidget) {
+            case this._inputTSV:
+                if (srcWidget.value() === loading) {
+                    srcWidget.value(this._db.tsv());
+                }
+                break;
+            case this._inputCSV:
+                if (srcWidget.value() === loading) {
+                    srcWidget.value(this._db.csv());
+                }
+                break;
+            case this._inputJSON:
+                if (srcWidget.value() === loading) {
+                    srcWidget.value(this._db.json());
+                }
+                break;
+        }
+    };
+
     DataAnalyst.prototype.doDataChanged = function (srcWidget, response) {
         srcWidget = srcWidget || this._inputTSV;
         this.doClear();
@@ -375,7 +416,7 @@ require(
             .columns(this._db.legacyColumns())
             .data(this._db.legacyData())
         ;
-        this._rowSummary.data(d3.format(".2s")(this._db.length())).render();
+        this._rowSummary.data(d3.format(".2s")(this._db.length() - 1)).render();
         this._colSummary.data(this._db.width()).render();
 
         this.resetProgress(this._db.width());
@@ -429,6 +470,7 @@ require(
     }, 250)
     dataAnalyst = new DataAnalyst();
     dataAnalyst.doResize();
+    dataAnalyst.doDataTabChanged(dataAnalyst._inputTSV);
     dataAnalyst.doDataChanged();
 });
 function doResize() {

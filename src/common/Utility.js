@@ -159,7 +159,7 @@
                 }
                 return 0;
             });
-            return this;
+            return data;
         },
 
         Selection: SelectionBag,

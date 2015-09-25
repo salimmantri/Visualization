@@ -329,8 +329,11 @@
             this._fields[col].isString = !this._fields[col].isNumber && typeTest(keys, isString);
             this._fields[col].isUSState = this._fields[col].isString && typeTest(keys, isUSState);
             this._fields[col].isDateTime = this._fields[col].isString && typeTest(keys, isDateTime);
+            this._fields[col].isDateTimeFormat = lastFoundFormat;
             this._fields[col].isDate = !this._fields[col].isDateTime && typeTest(keys, isDate);
+            this._fields[col].isDateFormat = lastFoundFormat;
             this._fields[col].isTime = this._fields[col].isString && !this._fields[col].isDateTime && !this._fields[col].isDate && typeTest(keys, isTime);
+            this._fields[col].isTimeFormat = lastFoundFormat;
         }, this);
         return retVal;
     };
@@ -416,10 +419,12 @@
             dateTimeFormats.push(d + "T" + t);
         });
     });
+    var lastFoundFormat = null;
     function formatPicker(formats, cell) {
         for (var i = 0; i < formats.length; ++i) {
             var date = d3.time.format(formats[i]).parse(cell);
             if (date) {
+                lastFoundFormat = formats[i];
                 return formats[i];
             }
         }
