@@ -735,10 +735,12 @@
     Output.prototype.getParams = function () {
         var retVal = "";
         for (var key in this.request) {
-            if (retVal.length) {
-                retVal += ", ";
+            if (!Utility.endsWith(key, "_changed")) {
+                if (retVal.length) {
+                    retVal += ", ";
+                }
+                retVal += this.request[key];
             }
-            retVal += this.request[key];
         }
         return retVal;
     };

@@ -48,13 +48,21 @@ require(
             var widget = null;
 
             if (field.isUSState) {
-                widget = new ChoroplethStates().columns([filter, "Records"]);
+                widget = new ChoroplethStates().columns([filter, "Rows"]);
             } else if (field.isDateTime || field.isDate) {
-                widget = new Line().columns([filter, "Records"]).xAxisTypeTimePattern(field.isDateTime || field.isDate);
+                widget = new Line().columns([filter, "Rows"]).xAxisTypeTimePattern(field.isDateTime || field.isDate);
             } else if (dedupInfo.length < 10) {
-                widget = new Pie().columns([filter, "Records"]);
+                var max = d3.max(dedupInfo, function (d) { return d.key.length; });
+                if (max > 10) {
+                    widget = new Column()
+                        .columns([filter, "Rows"])
+                        .orientation("vertical")
+                    ;
+                } else {
+                    widget = new Pie().columns([filter, "Rows"]);
+                }
             } else if (dedupInfo.length < 50) {
-                widget = new Column().columns([filter, "Records"]);
+                widget = new Column().columns([filter, "Rows"]);
             }
             if (widget) {
                 widget
@@ -85,14 +93,25 @@ require(
             //    return d3.sum(leaves, function (d) { return d[sumBy.idx]; });
             //});
             this._seriesChart = new Line()
-                .columns([series[0], "Records"])
+                .columns([series[0], aggregates[0]])
                 .xAxisOverlapMode("none")
                 .xAxisType("time")
                 .xAxisTypeTimePattern(field.isDateTimeFormat)
                 .yAxisType("pow")
                 .yAxisTypePowExponent(0.3)
-                .interpolate("monotone")
-                //.data(Utility.multiSort(dedupInfo.map(function (row) { return [row.key, row.values]; }), [{ idx: 0 }]))
+                .interpolate("cardinal")
+                    .on("click", function (row, col, selected) {
+                        for (var key in row) {
+                            if (selected) {
+                                context._filter[key] = row[key];
+                            } else {
+                                delete context._filter[key];
+                            }
+                            break;
+                        }
+                        context.refresh(this);
+                    })
+            //.data(Utility.multiSort(dedupInfo.map(function (row) { return [row.key, row.values]; }), [{ idx: 0 }]))
             ;
             this._seriesChart.__hpcc_field = series[0];
             this._seriesChart.__hpcc_aggregate = function (db) {
@@ -103,7 +122,7 @@ require(
                     return [row.key, row.values];
                 }), [{ idx: 0 }]);
             };
-            this.setContent(row + 1, 0, this._seriesChart, series[0] + " / " + aggregates[0], 1, cols + 1);
+            this.setContent(row + 1, 0, this._seriesChart, series[0] + " / " + aggregates[0], 1, cols);
         }
 
         this._form = new Form()
@@ -118,7 +137,7 @@ require(
                 context.refresh();
             })
         ;
-        this.setContent(0, cols, this._form, "Filter", row + 1);
+        //this.setContent(0, cols, this._form, "Filter", row + 1);
         this.refresh();
     };
     Dashboard.prototype = Object.create(Grid.prototype);
@@ -152,7 +171,7 @@ require(
         Tabbed.call(this);
 
         this._db = new Database.Grid();
-        this._db.jsonObj(sample_breach);
+        //this._db.jsonObj(sample_breach);
         this._dashID = 0;
         var context = this;
         var testData = loading;
@@ -263,10 +282,10 @@ require(
             .setContent(0, 0, this._analysis, "", 2, 3)
             .setContent(2, 0, this._colSummary, "", 2, 3)
             .setContent(4, 0, this._rowSummary, "", 2, 3)
-            .setContent(6, 0, this._inputFilters, "Filters", 1, 3)
-            .setContent(7, 0, this._inputSeries, "Series", 1, 3)
-            .setContent(8, 0, this._inputAggregates, "Aggregates", 1, 3)
-            .setContent(9, 0, this._inputGenerate, "", 1, 3)
+            .setContent(6, 0, this._inputGenerate, "", 1, 3)
+            .setContent(7, 0, this._inputFilters, "Filters", 1, 3)
+            .setContent(8, 0, this._inputSeries, "Series", 1, 3)
+            .setContent(9, 0, this._inputAggregates, "Aggregates", 1, 3)
         ;
 
         //  Analysis  ---

@@ -225,3 +225,7 @@ header nav span {
 .graph_Graph .graphVertex .graph_Vertex.selected .common_Shape {
     stroke: red;
 }
+
+.chart_XYAxis .axis > text {
+    visibility:hidden;
+}
