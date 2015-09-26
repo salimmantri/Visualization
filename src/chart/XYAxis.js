@@ -461,7 +461,6 @@
         var context = this;
 
         var isHorizontal = this.orientation() === "horizontal";
-        this.updateRegions(domNode, element, isHorizontal);
 
         switch (this.xAxisType()) {
             case "linear":
@@ -534,10 +533,18 @@
                 var domainMin = this.xAxisDomainLow() ? this.formatData(this.xAxisDomainLow()) : d3.min(this.formattedData(), function (data) {
                     return data[0];
                 });
+                var regionMin = d3.min(this.regions(), function (d) { return context.formatData(d.x0); });
+                regionMin = regionMin === undefined ? domainMin : regionMin;
+                domainMin = domainMin === undefined ? regionMin : domainMin;
+
                 var domainMax = this.xAxisDomainHigh() ? this.formatData(this.xAxisDomainHigh()) : d3.max(this.formattedData(), function (data) {
                     return data[0];
                 });
-                this.dataScale.domain([domainMin, domainMax]);
+                var regionMax = d3.max(this.regions(), function (d) { return context.formatData(d.x1); });
+                regionMax = regionMax === undefined ? domainMax : regionMax;
+                domainMax = domainMax === undefined ? regionMax : domainMax;
+
+                this.dataScale.domain([domainMin < regionMin ? domainMin : regionMin, domainMax > regionMax ? domainMax : regionMax]);
                 break;
         }
 
@@ -573,6 +580,7 @@
             maxOtherExtent = isHorizontal ? height : width;
 
         //  Render  ---
+        this.updateRegions(domNode, element, isHorizontal);
         this.svg.transition()
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
         ;
