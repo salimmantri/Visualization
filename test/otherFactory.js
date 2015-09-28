@@ -7,6 +7,15 @@
     }
 }(this, function (DataFactory, HeatMap, WordCloud, Table) {
     return {
+        HTML: {
+            simple: function (callback) {
+                require(["test/DataFactory", "src/other/HTML"], function (DataFactory, HTML) {
+                    callback(new HTML()
+                        .data([["<b>Hello and Welcome!</b>"]])
+                    );
+                });
+            }
+        },
         HeatMap: {
             simple: function (callback) {
                 require(["test/DataFactory", "src/other/HeatMap"], function (DataFactory, HeatMap) {
@@ -31,20 +40,20 @@
             }
         },
         Table: {
-            simple: function (callback) {
-                require(["test/DataFactory", "src/other/Table"], function (DataFactory, Table) {
-                    callback(new Table()
-                        .columns(DataFactory.Table.simple.columns)
-                        .data(DataFactory.Table.simple.data)
-                    );
-                });
-            },
             large: function (callback) {
                 require(["test/DataFactory", "src/other/Table"], function (DataFactory, Table) {
                     callback(new Table()
                     .columns(DataFactory.Table.large.columns)
                     .data(DataFactory.Table.large.data)
                     .fixedHeader(true)
+                    );
+                });
+            },
+            simple: function (callback) {
+                require(["test/DataFactory", "src/other/Table"], function (DataFactory, Table) {
+                    callback(new Table()
+                        .columns(DataFactory.Table.simple.columns)
+                        .data(DataFactory.Table.simple.data)
                     );
                 });
             }

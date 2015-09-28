@@ -217,15 +217,23 @@
         return this;
     };
 
-    Border.prototype.getContent = function (id) {
+    Border.prototype.getCell = function (id) {
         var idx = this.sectionTypes().indexOf(id);
         if (idx >= 0) {
-            return this.content()[idx].widget();
+            return this.content()[idx];
         }
         return null;
     };
 
-    Border.prototype.getSize = function(i){
+    Border.prototype.getContent = function (id) {
+        var cell = this.getCell();
+        if (cell) {
+            return cell.widget();
+        }
+        return null;
+    };
+
+    Border.prototype.getSize = function (i) {
         switch(this.sectionTypes()[i]){
             case "top":return this.topSize();
             case "right":return this.rightSize();
@@ -373,7 +381,7 @@
                 var sectionType = context.sectionTypes()[idx];
                 if(typeof (context[sectionType + "ShrinkWrap"]) !== "undefined" && context[sectionType + "ShrinkWrap"]()){
                     d.render();
-                    context._shrinkWrapBoxes[sectionType] = d.widget().getBBox();
+                    context._shrinkWrapBoxes[sectionType] = d.widget().getBBox(true);
                 } else {
                     delete context._shrinkWrapBoxes[sectionType];
                 }

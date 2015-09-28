@@ -8,11 +8,8 @@
     border-collapse: collapse;
     border-spacing: 0;
 }
-.other_Table .tableDiv {
-    position: absolute;
-}
 
-.other_Table th, .labels-wrapper th {
+.other_Table th {
     padding:5px 10px;
     border-width: 1px;
     border-style: solid;
@@ -21,55 +18,18 @@
     white-space: nowrap;
     cursor : pointer;
 }
-.other_Table thead > tr, .cols-wrapper tr {
+
+.other_Table thead > tr {
     background-color:#1f77b4;
 }
 
-.other_Table .thIcon, .labels-wrapper .thIcon {
-    font-family: FontAwesome;
-    padding-left: 8px;
-}
-
-.other_Table .tableDiv tbody > tr:nth-child(odd) {
-    background-color: #f3faff;
-    color:black;
-}
-
-.other_Table .tableDiv tbody > tr:nth-child(even)  {
-    background-color: white;
-    color:black;
-}
-
-.other_Table .tableDiv tbody > tr:hover  {
-    background-color:#bfd7e7;
-    color: white;
-}
-
-.other_Table .tableDiv tbody > tr.selected  {
-    background-color:#f48a00;
-    color: white;
-}
-
-.other_Table .rows-wrapper tbody > tr {
-    background-color:#BCE1FB;
-    color:black;
-}
-
-.other_Table .rows-wrapper .labels-wrapper {
-    width: 100%;
-}
 .other_Table tbody > tr.selected {
     background-color:#f48a00;
     color: white;
 }
 
-.other_Table tbody > tr:hover, .other_Table tbody > tr.hover, .rows-wrapper tbody tr.hover {
+.other_Table tbody > tr:hover, .other_Table tbody > tr.hover {
     background-color: #bfd7e7;
-}
-
-.other_Table .rows-wrapper tbody tr.hover.selected {
-    background-color:#5ea8db;
-    color: white;
 }
 
 .other_Table tr.selected:hover, .other_Table tr.selected.hover {
@@ -77,7 +37,7 @@
     color: white;
 }
 
-.other_Table td, .rows-wrapper td{
+.other_Table td{
     border-width: 1px;
     padding:2px 5px;
     border-style: solid;
