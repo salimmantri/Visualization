@@ -262,6 +262,7 @@
                 context.clear();
             }).on("click", function (request) {
                 context.clear();
+                context.refreshLocations();
                 var data = JSON.stringify(context.form.data());
                 localStorage.setItem("formData", data);
 
