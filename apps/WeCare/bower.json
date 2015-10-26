@@ -13,7 +13,7 @@
     "bower_components"
   ],
   "dependencies": {
-    "impress.js": "^0.5.3"
+    "impress.js": "git://github.com/GordonSmith/impress.js.git#MILEHIGH_UI"
   }
 }
 

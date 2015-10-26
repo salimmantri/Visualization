@@ -19,7 +19,7 @@
 /*jshint bitwise:true, curly:true, eqeqeq:true, forin:true, latedef:true, newcap:true,
          noarg:true, noempty:true, undef:true, strict:true, browser:true */
 
-// You are one of those who like to know how thing work inside?
+// You are one of those who like to know how things work inside?
 // Let me show you the cogs that make impress.js run...
 (function ( document, window ) {
     'use strict';
@@ -191,7 +191,7 @@
     
     // GLOBALS AND DEFAULTS
     
-    // This is were the root elements of all impress.js instances will be kept.
+    // This is where the root elements of all impress.js instances will be kept.
     // Yes, this means you can have more than one instance on a page, but I'm not
     // sure if it makes any sense in practice ;)
     var roots = {};
@@ -680,15 +680,14 @@
         // KEYBOARD NAVIGATION HANDLERS
         
         // Prevent default keydown action when one of supported key is pressed.
-
-        /*
+        /*GJS
         document.addEventListener("keydown", function ( event ) {
             if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
                 event.preventDefault();
             }
         }, false);
         */
-
+        
         // Trigger impress action (next or prev) on keyup.
         
         // Supported keys are:
@@ -704,8 +703,7 @@
         //   positioning. I didn't want to just prevent this default action, so I used [tab]
         //   as another way to moving to next step... And yes, I know that for the sake of
         //   consistency I should add [shift+tab] as opposite action...
-
-        /*
+        /*GJS
         document.addEventListener("keyup", function ( event ) {
             if ( event.keyCode === 9 || ( event.keyCode >= 32 && event.keyCode <= 34 ) || (event.keyCode >= 37 && event.keyCode <= 40) ) {
                 switch( event.keyCode ) {
@@ -727,7 +725,7 @@
             }
         }, false);
         */
-
+        
         // delegated handler for clicking on the links to presentation steps
         document.addEventListener("click", function ( event ) {
             // event delegation with "bubbling"
@@ -790,7 +788,7 @@
         // rescale presentation when window is resized
         window.addEventListener("resize", throttle(function () {
             // force going to active step again, to trigger rescaling
-            api.goto( document.querySelector(".active"), 500 );
+            api.goto( document.querySelector(".step.active"), 500 );
         }, 250), false);
         
     }, false);

@@ -1,0 +1,3 @@
+[submodule "apps/WeCare/impress.js"]
+	path = apps/WeCare/impress.js
+	url = git@github.com:GordonSmith/impress.js.git
