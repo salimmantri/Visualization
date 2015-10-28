@@ -171,7 +171,7 @@ require(
         Tabbed.call(this);
 
         this._db = new Database.Grid();
-        //this._db.jsonObj(sample_breach);
+        this._db.jsonObj(sample_breach);
         this._dashID = 0;
         var context = this;
         var testData = loading;
