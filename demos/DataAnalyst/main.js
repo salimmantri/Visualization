@@ -278,7 +278,7 @@ require(
         ;
         this._summary = new Grid()
             .fitTo("width")
-            .cellPadding(0)
+            //.cellPadding(0)
             .setContent(0, 0, this._analysis, "", 2, 3)
             .setContent(2, 0, this._colSummary, "", 2, 3)
             .setContent(4, 0, this._rowSummary, "", 2, 3)

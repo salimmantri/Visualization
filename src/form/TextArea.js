@@ -26,7 +26,7 @@
 
     TextArea.prototype.update = function (domNode, element) {
         Input.prototype.update.apply(this, arguments);
-        this._inputElement
+        this._inputElement[0]
             .attr("rows", this.rows())
             .attr("cols", this.cols())
             .attr("wrap", this.wrap())
