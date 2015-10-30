@@ -67,6 +67,22 @@
     }
     Widget.prototype._class = "common_Widget";
 
+    var destructObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            for (var i = 0; i < mutation.removedNodes.length; ++i) {
+                var node = mutation.removedNodes.item(i);
+                var widget = d3.select(node).datum();
+                if (widget instanceof Widget && widget._target) {
+                    console.log("Leak:  " + widget.id() + "(" + widget.classID() + ")");
+                }
+            }
+        });
+    });
+    destructObserver.observe(document, { childList: true, subtree: true });
+
+    Widget.prototype.dispose = function () {
+    };
+
     Widget.prototype.applyTheme = function (theme) {
         if (!theme) {
             return;
@@ -768,7 +784,7 @@
         return this;
     };
 
-    Widget.prototype.enter = function (domeNode, element) { };
+    Widget.prototype.enter = function (domNode, element) { };
     Widget.prototype.preUpdate = function (domeNode, element) { };
     Widget.prototype.update = function (domeNode, element) { };
     Widget.prototype.postUpdate = function (domeNode, element) { };
