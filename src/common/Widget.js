@@ -22,6 +22,20 @@
     }
 }(this, function (d3) {
     var widgetID = 0;
+
+    var globalObserver = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+            for (var i = 0; i < mutation.removedNodes.length; ++i) {
+                var node = mutation.removedNodes.item(i);
+                var widget = d3.select(node).datum();
+                if (widget instanceof Widget && widget.id() === node.id) {
+                    widget.destruct();
+                }
+            }
+        });
+    });
+    globalObserver.observe(document, { childList: true, subtree: true });
+
     function Widget() {
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
@@ -67,21 +81,26 @@
     }
     Widget.prototype._class = "common_Widget";
 
-    var destructObserver = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            for (var i = 0; i < mutation.removedNodes.length; ++i) {
-                var node = mutation.removedNodes.item(i);
-                var widget = d3.select(node).datum();
-                if (widget instanceof Widget && widget._target) {
-                    console.log("Leak:  " + widget.id() + "(" + widget.classID() + ")");
+    Widget.prototype.construct = function (parentNode, newNode) {
+        //console.log("construct:  " + this.id() + "(" + this.classID() + ")");
+        var context = this;
+        var destructObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                for (var i = 0; i < mutation.removedNodes.length; ++i) {
+                    var node = mutation.removedNodes.item(i);
+                    if (node === newNode) {
+                        context.destruct();
+                        destructObserver.disconnect();
+                    }
                 }
-            }
+            });
         });
-    });
-    destructObserver.observe(document, { childList: true, subtree: true });
-
-    Widget.prototype.dispose = function () {
+        destructObserver.observe(parentNode, { childList: true });
     };
+
+    Widget.prototype.destruct = function () {
+        console.log("destruct:  " + this.id() + "(" + this.classID() + ")");
+    }
 
     Widget.prototype.applyTheme = function (theme) {
         if (!theme) {

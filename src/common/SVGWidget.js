@@ -92,6 +92,7 @@
                 this._parentWidget = this.locateParentWidget(this._target.parentNode);
             }
             this._parentOverlay = this.locateOverlayNode();
+            this.construct(this._target, this._parentElement.node());
         } else if (this._target) {
             //  Target is a DOM Node, so create a SVG Element  ---
             this._parentRelativeDiv = d3.select(this._target).append("div")
@@ -113,6 +114,7 @@
                     left: 0
                 })
             ;
+            this.construct(this._target, this._parentElement.node());
             this.resize(this._size);
         } else {
             this.exit();
