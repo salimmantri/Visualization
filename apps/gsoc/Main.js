@@ -1,7 +1,7 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["src/layout/Grid", "src/chart/Summary", "src/form/Slider", "src/chart/Column", "src/other/Comms", "gsoc/Data"], factory);
+        define(["src/layout/Grid", "src/chart/Summary", "src/form/Slider", "src/chart/Column", "src/other/Comms", "gsoc/data"], factory);
     }
     //http://cmsapi.pulselive.com/rugby/rankings/mru?date=2015-10-01&client=pulse
 }(this, function (Grid, Summary, Slider, Column, Comms, data) {
