@@ -1,51 +1,218 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>HPCC Systems - Dermatology Test</title>
-    <link rel="stylesheet" href="index.css">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>HPCC Systems - GSoC</title>
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic" rel="stylesheet" />
+    <link href="./bower_components/impress.js/css/impress-demo.css" rel="stylesheet" />
+
+    <link rel="shortcut icon" href="./bower_components/impress.js/favicon.png" />
+    <link rel="apple-touch-icon" href="./bower_components/impress.js/apple-touch-icon.png" />
+    <style>
+        small {
+            font-size:32px;
+        }
+        .form_Slider text {
+            font-size:12px;
+        }
+    </style>
+
     <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
     <script src="../../src/config.js"></script>
     <script>
-        requirejs.config({
+        require.config({
+            paths: {
+                gsoc: "./GSoC"
+            },
             baseUrl: ".."
         });
+        events = {};
     </script>
+    <!--  Uncomment for rawgit
+    <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
+    <script src="../src/config.js"></script>
+    -->
+    <!--  Uncomment to develop
+    <script src="../../bower_components/requirejs/require.js"></script>
+    <script src="../src/config.js"></script>
+    -->
+    <!--  Uncomment to test build
+    <script src="../dist-amd/hpcc-viz.js"></script>
+    <script src="../dist-amd/hpcc-bundles.js"></script>
+    <script>
+        require.config({
+            paths: {
+                "src": "../dist-amd",
+                "font-awesome": "../dist-amd/font-awesome/css/font-awesome.min"
+            }
+        });
+    </script>
+    -->
 </head>
-<body onresize="doResize();">
-    <div id="main">
+<body id="body" class="impress-not-supported">
+
+    <div class="fallback-message">
+        <p>Your browser <b>doesn't support the features required</b> by this demo, so you are presented with this simplified version.</p>
+        <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+    </div>
+
+    <div id="impress">
+
+        <div id="welcome" class="step slide" data-x="-500" data-y="-500" style="position:relative">
+            <div id="badge" style="position:absolute;width:100px; height:100px;text-align:center;overflow:hidden"></div>
+            <q style="text-align:center"><strong>HPCC</strong> Visualization Framework</q>
+            <br />
+            <br />
+            <p style="text-align:center">
+                <strong>Anmol Jagetia</strong> - Student
+            </p>
+            <p style="text-align:center">
+                <strong>Gordon Smith</strong> - Mentor
+            </p>
+            <br />
+            <br />
+            <p style="text-align:right">
+                6-8 November, 2015
+                <br />
+                Google Inc., CA
+            </p>
+            <br />
+            <br />
+            <p style="text-align:center">
+                <i>Google Summer of Code - Mentor Summit</i>
+            </p>
+            <script>
+                events["welcome"] = {
+                    enter: function () {
+                        var context = this;
+                        require(["gsoc/HPCCBadge"], function (HPCCBadge) {
+                            context.badge = new HPCCBadge()
+                                .target("badge")
+                                .animation("none")
+                                .render()
+                            ;
+                            //context.timoutHandle = setInterval(function () { context.badge.render(); }, 13000);
+                        });
+                    },
+                    exit: function () {
+                        //clearTimeout(this.timoutHandle);
+                        if (this.badge) {
+                            this.badge.target(null);
+                            this.badge = null;
+                        }
+                    }
+                }
+            </script>
+        </div>
+
+        <div class="step slide" data-x="500" data-y="-500">
+            <q style="text-align:center;margin-top:50px"><strong>Overview:</strong>  HPCC Systems <small>(est. 2001)</small></q>
+            <q style="margin-left:100px;margin-top:50px">
+                <ul style="list-style-type:disc">
+                    <li>Big Data Processing Platform</li>
+                    <i><small>...not hadoop based...</small></i>
+                    <li>Visualization Framework</li>
+                    <i><small>Anmol:  ...Linting, Unit Testing...</small></i>
+                </ul>
+            </q>
+        </div>
+
+        <div id="demo" class="step slide" data-x="0" data-y="333" data-z="500" style="position:relative">
+            <script>
+                var frame;
+                events["demo"] = {
+                    enter: function () {
+                        var context = this;
+                        require(["d3", "src/layout/Surface", "gsoc/Main"], function (d3, Surface, Main) {
+                            var main = new Main()
+                            ;
+                            frame = new Surface()
+                                .widget(main)
+                                .target("demo")
+                                .title("HPCC Visualization Framework - Anmol Jagetia")
+                                .surfacePadding(0)
+                            ;
+                            frame.doResize = Surface.prototype.debounce(function () {
+                                const border = 8;
+                                var bbox = d3.select("#demo").style({
+                                    "margin": "0px",
+                                    "padding": border + "px"
+                                }).node().getBoundingClientRect();
+                                this
+                                    .resize({ width: bbox.width - border * 2, height: bbox.height - border * 2 })
+                                    .render()
+                                ;
+                            }, 250);
+                            frame.doResize();
+                        });
+                    },
+                    exit: function () {
+                        if (frame) {
+                            frame.target(null).render();
+                            delete frame;
+                        }
+                    }
+                }
+            </script>
+        </div>
+        <div id="overview" class="overview step" data-x="0" data-y="0" data-scale="2.5">
+        </div>
+
+    <div class="hint">
+        <p>Use a spacebar or arrow keys to navigate</p>
     </div>
     <script>
-        var frame;
-        require(["d3", "src/layout/Surface", "gsoc/Main"], function (d3, Surface, Main) {
-            var main = new Main()
-            ;
-            frame = new Surface()
-                .widget(main)
-                .target("main")
-                .title("HPCC Systems - Anmol Jagetia")
-                .surfacePadding(0)
-            ;
-            frame.doResize = Surface.prototype.debounce(function () {
-                const border = 4;
-                d3.select("#main").style({
-                    "margin-left": border + "px",
-                    "margin-top": border + "px",
-                    width: window.innerWidth - 2 * border + "px",
-                    height: window.innerHeight - 2 * border + "px"
-                });
-                this
-                    .resize()
-                    .render()
-                ;
-            }, 250);
-            frame.doResize();
-        });
-        function doResize() {
-            if (frame) {
-                frame.doResize();
-            }
+        if ("ontouchstart" in document.documentElement) {
+            document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
         }
     </script>
+    <script src="./impress.js/js/impress.js"></script>
+    <script>
+        impress().init();
+        var timing = null;
+        window.addEventListener('impress:stepenter', function (evt) {
+            console.log("Enter:  " + evt.target.id);
+            if (events[evt.target.id] && events[evt.target.id].enter && !events[evt.target.id].loaded) {
+                events[evt.target.id].enter();
+                events[evt.target.id].loaded = true;
+            }
+            if (evt.target.id === "finale") {
+                var tour = ["finale2", "finale3", "finale3a", "finale4", "finale5"]
+                var tourIdx = 0;
+                timing = setInterval(function () {
+                    if (!timing) {
+                        return;
+                    }
+                    impress().goto(tour[tourIdx++]);
+                    if (tourIdx >= tour.length) {
+                        tourIdx = 0;
+                    }
+                }, 3000);
+            } else {
+                var d = 0;
+            }
+            if (timing && evt.target.id.indexOf("finale") !== 0) {
+                clearInterval(timing);
+                timing = null;
+            }
+        });
+        window.addEventListener('impress:stepleave', function (evt) {
+            if (events[evt.target.id] && events[evt.target.id].exit) {
+                events[evt.target.id].exit();
+                events[evt.target.id].loaded = false;
+            }
+            console.log("Exit:  " + evt.target.id);
+        });
+    </script>
+    <div class="menu">
+        <ul>
+            <li>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
