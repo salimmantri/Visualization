@@ -52,6 +52,28 @@
         ++i;
     }, 500);
     */
+
+    var colors = {
+        NZL: "black",
+        AUS: "#CFA14B",
+        RSA: "#183A43",
+        ARG: "#5282CE",
+        ENG: "#D5D7E4",
+        WAL: "#B20229",
+        FRA: "#2559BC",
+        IRE: "#448D7C",
+        TGA: "#AC1735",
+        SAM: "#1C44A3",
+        ITA: "#3581CD",
+        SCO: "#232744",
+        CAN: "#B40E32",
+        JPN: "#282530",
+        GEO: "#CE0227",
+        FJI: "#DAD9EB",
+        USA: "#272F53",
+        ROM: "#F5B404",
+        NAM: "#023E9E"
+    };
     function Main(target) {
         Grid.call(this);
     }
@@ -62,23 +84,35 @@
         Grid.prototype.enter.apply(this, arguments);
         this.slider = new Slider()
             .showPlay(true)
-            .low(0)
+            .low(102)
             .high(data.length - 1)
             .step(1)
-            .playInterval(250)
+            .playInterval(500)
         ;
-        this.setContent(0, 0, this.slider, null, 2, 6);
+        this.setContent(0, 0, this.slider, "HPCC Viz. Framework - Anmol Jagetia", 2, 6);
         this.summary = new Summary()
             .fixedSize(false)
+            .valueIcon("fa-calendar")
+            .moreText("http://www.worldrugby.org/rankings")
             .columns(["Test"])
             .data([["Calue"]])
         ;
         this.setContent(0, 6, this.summary, null, 2, 3);
         this.column = new Column();
+        var palette = this.column._palette;
+
+        this.column._palette = function (id) {
+            var retVal = colors[id];
+            if (retVal)
+                return retVal;
+            return palette(id);
+        };
+        var context = this;
+        this.column._palette.switch = function () { return context.column._palette; };
+
         this.setContent(2, 0, this.column, null, 6, 9);
         this.doUpdate(data[0]);
 
-        var context = this;
         this.slider.click = function (row, col, sel) {
             context.doUpdate(data[row]);
         }
@@ -90,14 +124,22 @@
         Grid.prototype.exit.apply(this, arguments);
     }
     Main.prototype.doUpdate = function (data) {
+        var format = d3.time.format("%Y-%m-%d");
+        var format1 = d3.time.format("%d %b");
+        var format2 = d3.time.format("%Y");
+
+        var date = format.parse(data.date);
         this.summary
-            .columns([data.date])
-            .data([[data.date]])
+            .columns([format2(date)])
+            .data([[format1(date)]])
             .render()
         ;
         this.column
             .columns(["Team", "Ranking"])
-            .data(data.entries.map(function (row) { return [row.team, row.pts]; }))
+            .data(data.entries.map(function (row, idx) {
+                var nextPts = idx + 1 < data.entries.length ? data.entries[idx + 1].pts - 0.5 : row.pts - 2;
+                return [row.team, [nextPts, row.pts]];
+            }))
             .render()
         ;
     };

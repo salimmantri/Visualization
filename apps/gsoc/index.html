@@ -30,7 +30,8 @@
             },
             baseUrl: ".."
         });
-        events = {};
+        var events = {};
+        var frame;
     </script>
     <!--  Uncomment for rawgit
     <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
@@ -123,38 +124,39 @@
         
         <div id="demo" class="step slide" data-x="0" data-y="333" data-z="500" style="position:relative">
             <script>
-                var frame;
                 events["demo"] = {
                     enter: function () {
-                        var context = this;
-                        require(["d3", "src/layout/Surface", "gsoc/Main"], function (d3, Surface, Main) {
-                            var main = new Main()
-                            ;
-                            frame = new Surface()
-                                .widget(main)
-                                .target("demo")
-                                .title("HPCC Visualization Framework - Anmol Jagetia")
-                                .surfacePadding(0)
-                            ;
-                            frame.doResize = Surface.prototype.debounce(function () {
-                                const border = 8;
-                                var bbox = d3.select("#demo").style({
-                                    "margin": "0px",
-                                    "padding": border + "px"
-                                }).node().getBoundingClientRect();
-                                this
-                                    .resize({ width: bbox.width - border * 2, height: bbox.height - border * 2 })
-                                    .render()
-                                ;
-                            }, 250);
+                        if (frame) {
                             frame.doResize();
-                        });
+                            main.slider.play();
+                        } else {
+                            var context = this;
+                            require(["d3", "src/layout/Surface", "gsoc/Main"], function (d3, Surface, Main) {
+                                var main = new Main()
+                                ;
+                                frame = new Surface()
+                                    .widget(main)
+                                    .target("demo")
+                                    .surfacePadding(0)
+                                ;
+                                frame.doResize = Surface.prototype.debounce(function () {
+                                    const border = 8;
+                                    var bbox = d3.select("#demo").style({
+                                        "margin": "0px",
+                                        "padding": border + "px"
+                                    }).node().getBoundingClientRect();
+                                    this
+                                        .resize({ width: bbox.width - border * 2, height: bbox.height - border * 2 })
+                                        .render(function () {
+                                            main.slider.play();
+                                        })
+                                    ;
+                                }, 250);
+                                frame.doResize();
+                            });
+                        }
                     },
                     exit: function () {
-                        if (frame) {
-                            frame.target(null).render();
-                            delete frame;
-                        }
                     }
                 }
             </script>
@@ -173,6 +175,8 @@
     <script src="./impress/js/impress.js"></script>
     <script>
         impress().init();
+        require(["gsoc/Main"], function (d3, Surface, Main) {
+        });
         var timing = null;
         window.addEventListener('impress:stepenter', function (evt) {
             console.log("Enter:  " + evt.target.id);

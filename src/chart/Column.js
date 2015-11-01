@@ -97,7 +97,7 @@
                         .attr("y", function (d) { return d.value instanceof Array ? context.valueScale(d.value[1]) : context.valueScale(d.value); })
                         .attr("height", function (d) { return d.value instanceof Array ? context.valueScale(d.value[0]) - context.valueScale(d.value[1]) : height - context.valueScale(d.value); })
                         .style("opacity", context.stacked() ? context.stackedOpacity() : 1)
-                        .style("fill", function (d) { return context._palette(d.column); })
+                        .style("fill", function (d) { return context._palette(d.row[0]); })
                     ;
                 } else {
                     columnRect.transition()

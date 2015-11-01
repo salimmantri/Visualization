@@ -70,7 +70,7 @@
             }
             colors = scale.range();
         }
-        function ordinal(_) {
+        function ordinal(_, newVal) {
             return scale(_);
         }
         ordinal.id = function (_) {
