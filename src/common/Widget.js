@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "./Database"], factory);
+        define(["d3", "./Class", "./PropertyExt", "./Database"], factory);
     } else {
         root.require = root.require || function (paths, cb) {
             if (typeof paths === "function") {
@@ -18,11 +18,13 @@
             cb.apply(null, objs);
         };
 
-        root.common_Widget = factory(root.d3, root.common_Database);
+        root.common_Widget = factory(root.d3, root.common_Class, root.common_PropertyExt, root.common_Database);
     }
-}(this, function (d3, Database) {
+}(this, function (d3, Class, PropertyExt, Database) {
     var widgetID = 0;
     function Widget() {
+        Class.call(this);
+        PropertyExt.call(this);
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
 
@@ -31,17 +33,6 @@
         this._size = { width: 0, height: 0 };
         this._scale = 1;
         this._visible = true;
-
-        for (var key in this) {
-            if (key.indexOf("__meta_") === 0) {
-                switch (this[key].type) {
-                    case "array":
-                    case "widgetArray":
-                        this["__prop_" + this[key].id] = [];
-                        break;
-                }
-            }
-        }
 
         this._target = null;
         this._parentElement = null;
@@ -64,7 +55,10 @@
             this.applyTheme(window.__hpcc_theme);
         }
     }
+    Widget.prototype = Object.create(Class.prototype);
+    Widget.prototype.constructor = Widget;
     Widget.prototype._class = "common_Widget";
+    Widget.prototype.mixin(PropertyExt);
 
     Widget.prototype.leakCheck = function (newNode) {
         var context = this;
@@ -100,8 +94,8 @@
         for (var i in clsArr) {
             if (theme[clsArr[i]]) {
                 for (var paramName in theme[clsArr[i]]) {
-                    if (this["__meta_" + paramName]) {
-                        this["__meta_" + paramName].defaultValue = theme[clsArr[i]][paramName];
+                    if (this.publishedProperty(paramName)) {
+                        this.publishedProperty(paramName).defaultValue = theme[clsArr[i]][paramName];
                     }
                 }
             }
@@ -192,193 +186,6 @@
     if (!window.MutationObserver) {
         window.MutationObserver = Widget.prototype.MutationObserver;
     }
-
-    Widget.prototype.implements = function (source) {
-        for (var prop in source) {
-            if (this[prop] === undefined && source.hasOwnProperty(prop)) {
-                this[prop] = source[prop];
-            }
-        }
-    };
-
-    // Serialization  ---
-    Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
-        if (this["__meta_" + id] !== undefined && !ext.override) {
-            throw id + " is already published.";
-        }
-        this["__meta_" + id] = {
-            id: id,
-            type: type,
-            origDefaultValue: defaultValue,
-            defaultValue: defaultValue,
-            description: description,
-            set: set,
-            ext: ext || {}
-        };
-        this[id] = function (_) {
-            var isPrototype = this._id === undefined;
-            if (!arguments.length) {
-                return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
-            }
-            if (_ === "" && this["__meta_" + id].ext.optional) {
-                _ = null;
-            } else if (_ !== null) {
-                switch (type) {
-                    case "set":
-                        if (!set || set.indexOf(_) < 0) {
-                            console.log("Invalid value for '" + id + "':  " + _);
-                        }
-                        break;
-                    case "html-color":
-                        if (window.__hpcc_debug && _ && _ !== "red") {
-                            var litmus = "red";
-                            var d = document.createElement("div");
-                            d.style.color = litmus;
-                            d.style.color = _;
-                            //Element's style.color will be reverted to litmus or set to "" if an invalid color is given
-                            if (d.style.color === litmus || d.style.color === "") {
-                                console.log("Invalid value for '" + id + "':  " + _);
-                            }
-                        }
-                        break;
-                    case "boolean":
-                        _ = typeof (_) === "string" && ["false", "off", "0"].indexOf(_.toLowerCase()) >= 0 ? false : Boolean(_);
-                        break;
-                    case "number":
-                        _ = Number(_);
-                        break;
-                    case "string":
-                        _ = String(_);
-                        break;
-                    case "array":
-                        if (!(_ instanceof Array)) {
-                            console.log("Invalid value for '" + id);
-                        }
-                        break;
-                    case "object":
-                        if (!(_ instanceof Object)) {
-                            console.log("Invalid value for '" + id);
-                        }
-                        break;
-                }
-            }
-            if (isPrototype) {
-                this["__meta_" + id].defaultValue = _;
-            } else {
-                this.broadcast(id, _, this["__prop_" + id]);
-                if (_ === null) {
-                    delete this["__prop_" + id];
-                } else {
-                    this["__prop_" + id] = _;
-                }
-            }
-            return this;
-        };
-        this[id + "_modified"] = function () {
-            var isPrototype = this._id === undefined;
-            if (isPrototype) {
-                return this["__meta_" + id].defaultValue !== defaultValue;
-            }
-            return this["__prop_" + id] !== undefined;
-        };
-        this[id + "_exists"] = function () {
-            var isPrototype = this._id === undefined;
-            if (isPrototype) {
-                return this["__meta_" + id].defaultValue !== undefined;
-            }
-            return this["__prop_" + id] !== undefined || this["__meta_" + id].defaultValue !== undefined;
-        };
-        this[id + "_reset"] = function () {
-            switch (type) {
-                case "widget":
-                    if (this["__prop_" + id]) {
-                        this["__prop_" + id].target(null);
-                    }
-                    break;
-                case "widgetArray":
-                    if (this["__prop_" + id]) {
-                        this["__prop_" + id].forEach(function (widget) {
-                            widget.target(null);
-                        });
-                    }
-                    break;
-            }
-            this["__prop_" + id] = undefined;
-        };
-        this["__prop_" + id] = undefined;
-    };
-
-    Widget.prototype.publishWidget = function (prefix, WidgetType, id) {
-        for (var key in WidgetType.prototype) {
-            if (key.indexOf("__meta") === 0) {
-                var publishItem = WidgetType.prototype[key];
-                this.publishProxy(prefix + "__prop_" + publishItem.id, id, publishItem.method || publishItem.id);
-            }
-        }
-    };
-
-    Widget.prototype.publishProxy = function (id, proxy, method, defaultValue) {
-        method = method || id;
-        if (this["__meta_" + id] !== undefined) {
-            throw id + " is already published.";
-        }
-        this["__meta_" + id] = {
-            id: id,
-            type: "proxy",
-            proxy: proxy,
-            method: method,
-            defaultValue: defaultValue
-        };
-        this[id] = function (_) {
-            var isPrototype = this._id === undefined;
-            if (isPrototype) {
-                throw "Setting default value of proxied properties is not supported.";
-            }
-            if (!arguments.length) return !defaultValue || this[id + "_modified"]() ? this[proxy][method]() : defaultValue;
-            if (defaultValue && _ === defaultValue) {
-                this[proxy][method + "_reset"]();
-            } else {
-                this[proxy][method](_);
-            }
-            return this;
-        };
-        this[id + "_modified"] = function () {
-            var isPrototype = this._id === undefined;
-            if (isPrototype) {
-                throw "Setting default values of proxied properties is not supported.";
-            }
-            return this[proxy][method + "_modified"]() && (!defaultValue || this[proxy][method]() !== defaultValue);
-        };
-        this[id + "_reset"] = function () {
-            var isPrototype = this._id === undefined;
-            if (isPrototype) {
-                throw "Setting default values of proxied properties is not supported.";
-            }
-            this[proxy][method + "_reset"]();
-        };
-    };
-
-    Widget.prototype.watch = function (func) {
-        var context = this;
-        var idx = this._watchArr.push(func) - 1;
-        return {
-            remove: function () {
-                delete context._watchArr[idx];
-            }
-        };
-    };
-
-    Widget.prototype.broadcast = function (key, newVal, oldVal) {
-        if (this._watchArr && newVal !== oldVal) {
-            this._watchArr.forEach(function (func) {
-                if (func) {
-                    setTimeout(function () {
-                        func(key, newVal, oldVal);
-                    }, 0);
-                }
-            });
-        }
-    };
 
     //  Events  ---
     Widget.prototype.on = function (eventID, func, stopPropagation) {
@@ -755,22 +562,20 @@
 
         //  ASync Render Contained Widgets  ---
         var widgets = [];
-        for (var key in this) {
-            if (key.indexOf("__meta_") === 0) {
-                var meta = this[key];
-                switch (meta.type) {
-                    case "widget":
-                        var widget = this[meta.id]();
-                        if (widget) {
-                            widgets.push(this[meta.id]());
-                        }
-                        break;
-                    case "widgetArray":
-                        widgets = widgets.concat(this[meta.id]());
-                        break;
-                }
+        this.publishedProperties().forEach(function (meta) {
+            switch (meta.type) {
+                case "widget":
+                    var widget = this[meta.id]();
+                    if (widget) {
+                        widgets.push(this[meta.id]());
+                    }
+                    break;
+                case "widgetArray":
+                    widgets = widgets.concat(this[meta.id]());
+                    break;
             }
-        }
+        }, this);
+
         var context = this;
         switch (widgets.length) {
             case 0:
