@@ -93,7 +93,7 @@
         this.summary = new Summary()
             .fixedSize(false)
             .valueIcon("fa-calendar")
-            .moreText("http://www.worldrugby.org/rankings")
+            .moreText("www.worldrugby.org/rankings")
             .columns(["Test"])
             .data([["Calue"]])
         ;

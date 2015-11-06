@@ -16,6 +16,12 @@
         small {
             font-size:32px;
         }
+        sup {
+            font-size:0.5em;
+        }
+        ul {
+            margin-left: 100px;
+        }
         .form_Slider text {
             font-size:12px;
         }
@@ -31,7 +37,7 @@
             baseUrl: ".."
         });
         var events = {};
-        var frame;
+        var frame, main;
     </script>
     <!--  Uncomment for rawgit
     <script src="http://rawgit.com/jrburke/requirejs/2.1.17/require.js"></script>
@@ -65,15 +71,16 @@
 
         <div id="welcome" class="step slide" data-x="-500" data-y="-500">
             <div id="badge" style="float:left;width:96px; height:96px;overflow:hidden"></div>
-            <q style="text-align:center"><strong>HPCC</strong> Systems GSoC</q>
+            <q style="text-align:center"><strong>HPCC</strong> Systems<sup>®</sup> GSoC</q>
             <br />
             <br />
             <p style="text-align:center">
-                <strong>Anmol Jagetia</strong> - Student
+                <strong>Sarthak Jain</strong> - Machine Learning Library
             </p>
             <p style="text-align:center">
-                <strong>Gordon Smith</strong> - Mentor
+                <strong>Anmol Jagetia</strong> - Visualization Framework
             </p>
+            <br />
             <br />
             <br />
             <p style="text-align:right">
@@ -82,9 +89,6 @@
                 Google Inc., CA
             </p>
             <br />
-            <p style="text-align:center;">
-                <i>Google Summer of Code - Mentor Summit</i>
-            </p>
             <br />
             <img src="./lnrs.png" height="48" style="float: left">
             <img src="./relx.png" height="48" style="float: right">
@@ -100,32 +104,46 @@
                             ;
                             //context.timoutHandle = setInterval(function () { context.badge.render(); }, 13000);
                         });
-                    },
-                    exit: function () {
-                        //clearTimeout(this.timoutHandle);
-                        if (this.badge) {
-                            this.badge.target(null);
-                            this.badge = null;
-                        }
                     }
                 }
             </script>
         </div>
 
-        <div class="step slide" data-x="500" data-y="-500">
-            <q style="text-align:center;margin-top:50px"><strong>Overview:</strong>  HPCC Systems <small>(est. 2001)</small></q>
-            <q style="margin-left:100px;margin-top:50px">
-                <ul style="list-style-type:disc">
-                    <li>Big Data Processing Platform</li>
-                    <i><small>...not hadoop based...</small></i>
-                    <li>Visualization Framework</li>
-                    <i><small>Anmol:  ...Linting, Unit Testing...</small></i>
-                </ul>
-            </q>
+        <div id="summary" class="step slide" data-x="500" data-y="-500">
+            <div id="badge2" style="float:left;width:96px; height:96px;overflow:hidden"></div>
+            <q style="text-align:center"><strong>HPCC</strong> Platform</q>
+            <br />
+            <ul style="list-style-type:disc">
+                <li>Distributed Big Data and Analytics Platform</li>
+                <li>Established circa 2001</li>
+                <li>Open Sourced in 2011</li>
+                <li>Written in C++</li>
+                <li>Declarative Parallel Language ECL</li>
+            </ul>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
             <div style="vertical-align: bottom;border:0;">
                 <img src="./lnrs.png" height="48" style="float: left">
                 <img src="./relx.png" height="48" style="float: right">
             </div>
+            <script>
+                events["summary"] = {
+                    enter: function () {
+                        var context = this;
+                        require(["gsoc/HPCCBadge"], function (HPCCBadge) {
+                            context.badge = new HPCCBadge()
+                                .target("badge2")
+                                .animation("none")
+                                .render()
+                            ;
+                            //context.timoutHandle = setInterval(function () { context.badge.render(); }, 13000);
+                        });
+                    }
+                }
+            </script>
         </div>
         
         <div id="demo" class="step slide" data-x="0" data-y="333" data-z="500" style="position:relative">
@@ -138,7 +156,7 @@
                         } else {
                             var context = this;
                             require(["d3", "src/layout/Surface", "gsoc/Main"], function (d3, Surface, Main) {
-                                var main = new Main()
+                                main = new Main()
                                 ;
                                 frame = new Surface()
                                     .widget(main)
@@ -151,8 +169,11 @@
                                         "margin": "0px",
                                         "padding": border + "px"
                                     }).node().getBoundingClientRect();
+                                    var width = d3.select("#demo").style("width");
+                                    var height = d3.select("#demo").style("height");
+                                    var scale = parseFloat(width) / bbox.width;
                                     this
-                                        .resize({ width: bbox.width - border * 2, height: bbox.height - border * 2 })
+                                        .resize({ width: parseFloat(width) - border * 2, height: parseFloat(height) - border * 2 })
                                         .render(function () {
                                             main.slider.play();
                                         })
