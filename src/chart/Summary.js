@@ -10,7 +10,7 @@
         HTMLWidget.call(this);
         this._tag = "div";
 
-        this._drawStartPos = "center";
+        //this._drawStartPos = "center";
 
     }
     Summary.prototype = Object.create(HTMLWidget.prototype);
