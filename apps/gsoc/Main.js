@@ -84,12 +84,12 @@
         Grid.prototype.enter.apply(this, arguments);
         this.slider = new Slider()
             .showPlay(true)
-            .low(102)
-            .high(data.length - 1)
+            .low(-102)
+            .high(0)
             .step(1)
             .playInterval(500)
         ;
-        this.setContent(0, 0, this.slider, "HPCC Viz. Framework - Anmol Jagetia", 2, 6);
+        this.setContent(0, 0, this.slider, "Rugby World Rankings", 2, 6);
         this.summary = new Summary()
             .fixedSize(false)
             .valueIcon("fa-calendar")
@@ -113,7 +113,8 @@
         this.setContent(2, 0, this.column, null, 6, 9);
         this.doUpdate(data[0]);
 
-        this.slider.click = function (row, col, sel) {
+        this.slider.click = function (_row, col, sel) {
+            var row = data.length - 1 + _row;
             context.doUpdate(data[row]);
         }
     }
