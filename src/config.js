@@ -27,6 +27,7 @@ require.config({
         "amcharts.plugins.responsive": "../bower_components/amcharts3/amcharts/plugins/responsive/responsive",
         "amchartsImg": "../bower_components/amcharts3/amcharts/images/",
         "simpleheat": "../bower_components/simpleheat/index",
+        "es6-promise": "../bower_components/es6-promise/promise",
 
         "src": "../src"
     },

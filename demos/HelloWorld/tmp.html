@@ -1,0 +1,95 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../../node_modules/requirejs/require.js"></script>
+    <script src="../../src/config.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: ".."
+        });
+    </script>
+</head>
+<body>
+    <div id="div" style="float:left; width:50%; height:100vh;background-color:antiquewhite">
+    </div>
+    <div id="div2" style="float:right; width:50%; height:100vh;background-color:white">
+    </div>
+    <script>
+        require(["d3", "es6-promise"], function (d3, es6Promise) {
+            function Widget() {
+                this.tag = "div";
+
+                this._targetElement = d3.select(null);
+                this._element = d3.select(null);
+            }
+
+            Widget.prototype.target = function (target) {
+                //  Select new target  ---
+                var newTarget;
+                if (typeof (target) === "string" || target instanceof String) {
+                    newTarget = d3.select(target);
+                } else if (target) {    //  instanceof d3 selection  ---
+                    newTarget = target;
+                } else {                //  null ---
+                    newTarget = d3.select(null);
+                }
+
+                if (newTarget.node() !== this._targetElement.node()) {
+                    if (this._targetElement.node()) {
+                        this.render(true);
+                    }
+                    this._targetElement = newTarget;
+                }
+
+                return this;
+            };
+
+            Widget.prototype.render = function (remove) {
+                var context = this;
+                return new es6Promise.Promise(function (resolve, reject) {
+                    var widgetSelection = context._targetElement.selectAll(".widget").data(remove ? [] : [context]);
+                    widgetSelection.enter().append("div")
+                        .attr("class", "widget")
+                        .each(function (widget) {
+                            context._element = d3.select(this);
+                            widget.enter(context._element);
+                        })
+                    ;
+                    widgetSelection
+                        .each(function (widget) {
+                            widget.update(context._element);
+                        })
+                    ;
+                    widgetSelection.exit()
+                        .each(function (widget) {
+                            widget.exit(context._element);
+                            context._element = d3.select(null);
+                        })
+                        .remove()
+                    ;
+                    resolve(context);
+                });
+            };
+
+            Widget.prototype.enter = function (element) {
+            };
+            Widget.prototype.update = function (element) {
+                element.text("Hello and Welcome!");
+            };
+            Widget.prototype.exit = function (element) {
+            };
+
+            var widget = new Widget()
+                .target("#div")
+            ;
+            widget.render().then(function (w) {
+                w
+                    .target("#div2")
+                    .render()
+                ;
+            });
+        });
+    </script>
+</body>
+</html>
