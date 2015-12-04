@@ -8,9 +8,10 @@
     var demomode = params.demomode !== undefined ? params.demomode : true;
 
     function Main() {
-        this.connWeCare = Comms.createESPConnection("http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/wecare");
-        this.connPersonAddresses = Comms.createESPConnection("http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/personaddresses");
-        this.connPersonToLocations = Comms.createESPConnection("http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/personstolocations")
+        var baseUrl = "http://10.239.190.101:8002/WsEcl/forms/default/query/myroxie_dataland";
+        this.connWeCare = Comms.createESPConnection(baseUrl + "/wecare");
+        this.connPersonAddresses = Comms.createESPConnection(baseUrl + "/personaddresses");
+        this.connPersonToLocations = Comms.createESPConnection(baseUrl + "/personstolocations")
         this.geoDecode = new Comms.Basic().url("http://maps.googleapis.com/maps/api/geocode/json");
         this.dateFormatter = d3.time.format("%Y%m");
         this.dateFormatter2 = d3.time.format("%Y%m%d");
