@@ -71,43 +71,20 @@
     };
 
     Layered.prototype.zoomed = function () {
-        var zoom = this.gmap._googleMap.getZoom();
-        var minLatLong = new google.maps.LatLng(0, -179);
-        var maxLatLong = new google.maps.LatLng(0, 179);
-        var centerLatLong = new google.maps.LatLng(0, 0);
         var projection = this.gmap._overlay.getProjection();
         if (projection) {
-            var minn = projection.fromLatLngToDivPixel(minLatLong);
-            var maxx = projection.fromLatLngToDivPixel(maxLatLong);
-            var center = projection.fromLatLngToDivPixel(centerLatLong);
-            var pos = projection.fromLatLngToDivPixel(centerLatLong);
+            var center = new google.maps.LatLng(0, 0);
+            var pos = projection.fromLatLngToDivPixel(center);
             var widgetX = parseFloat(this.surface.widgetX());
-
-            var bounds = this.gmap._googleMap.getBounds();
-            var sw = projection.fromLatLngToDivPixel(bounds.getSouthWest());
-            var ne = projection.fromLatLngToDivPixel(bounds.getNorthEast());
-
-            var min = {
-                x: sw.x,
-                y: ne.y
-            };
-
-            var worldWidth = projection.getWorldWidth();
-
-
             var widgetY = parseFloat(this.surface.widgetY());
-            var widgetWidth = parseFloat(this.surface.widgetWidth());
+            var translate = [(pos.x - widgetX), (pos.y - widgetY)];
 
-
-            console.log("trans:  (" + minn.x + "," + maxx.x + "):" + widgetX + "->" + (pos.x - min.x) + " = " + pos.x + "-" + min.x);
-            while (min.x > pos.x) {
-                pos.x += worldWidth;
-            }
-            var translate = [(pos.x - min.x), (pos.y - min.y)];
+            var zoom = this.gmap._googleMap.getZoom();
             this._zoom
                 .scale(zoomFactor * (1 << zoom))
                 .translate(translate)
             ;
+
             var layers = this._element.selectAll(".layerContainer");
             var context = this;
             layers
