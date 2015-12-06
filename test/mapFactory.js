@@ -196,16 +196,14 @@
                         .data(DataFactory.GMap.heat.data)
                     );
                 });
+            },
+            layered: function (callback) {
+                createMap(true, callback);
             }
         },
         Layered: {
             simple: function (callback) {
                 createMap(false, callback);
-            }
-        },
-        GMapLayered: {
-            simple: function (callback) {
-                createMap(true, callback);
             }
         },
         OpenStreet: {

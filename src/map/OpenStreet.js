@@ -46,7 +46,10 @@
         var tiles = [];
         if (this.visible()) {
             var maxSize = base.project(-85, 180);
-            if (!maxSize) {
+            maxSize[0] = Math.floor(maxSize[0]);
+            maxSize[1] = Math.floor(maxSize[1]);
+            console.log(Math.min(base.width(), maxSize[0]) + ", " + base.width() + ", " + maxSize[0]);
+            if (!maxSize || maxSize[0] <= 0) {
                 maxSize = [base.width(), base.height()];
             }
             this._tile
