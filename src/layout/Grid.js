@@ -24,23 +24,19 @@
     Grid.prototype._class += " layout_Grid";
 
     Grid.prototype.publish("designMode", false, "boolean", "Design Mode",null,{tags:["Basic"]});
-    Grid.prototype.publish("designModeOpacity", 1, "number", "Opacity of Cells and drag handles in Design Mode",null,{tags:["Basic"]});
-    Grid.prototype.publish("hideDragHandles", false, "boolean", "Hide Drag Handles in Design Mode",null,{tags:["Basic"]});
-    Grid.prototype.publish("hideDesignGrid", false, "boolean", "Hide Design Mode Grid",null,{tags:["Basic"]});
-    Grid.prototype.publish("disableCellSelection", false, "boolean", "Disable the ability to 'select' cells while in designMode",null,{tags:["Basic"]});
-    Grid.prototype.publish("restrictDraggingOut", false, "boolean", "Restrict Cell dragging to the bounds of the Grid",null,{tags:["Basic"]});
+    Grid.prototype.publish("hideDragCellContent", false, "boolean", "Hide Cell content while in Design Mode",null,{tags:["Basic"]});
     Grid.prototype.publish("gutter", 4, "number", "Gap Between Widgets",null,{tags:["Basic"]});
     Grid.prototype.publish("fitTo", "all", "set", "Sizing Strategy", ["all", "width"], { tags: ["Basic"] });
     
-    Grid.prototype.publish("designGridColor", "#dddddd", "html-color", "Color of grid lines in Design Mode",null,{tags:["Private"]});
+    Grid.prototype.publish("designGridColor", "#ddd", "html-color", "Color of grid lines in Design Mode",null,{tags:["Private"]});
     Grid.prototype.publish("designGridColorExtra", "#333333", "html-color", "Color of excess grid lines in Design Mode",null,{tags:["Private"]});
 
     Grid.prototype.publish("surfacePadding", null, "string", "Cell Padding (px)", null, { tags: ["Intermediate"] });
     
     Grid.prototype.publish("surfaceBorderWidth", 1, "number", "Width (px) of Cell Border", null, { tags: ["Intermediate"] });
     
-    Grid.prototype.publish("extraDesignModeWidth", 0, "number", "Number of additional columns added when in Design Mode.",null,{tags:["Private"]});
-    Grid.prototype.publish("extraDesignModeHeight", 0, "number", "Number of additional rows added when in Design Mode.",null,{tags:["Private"]});
+    Grid.prototype.publish("extraDesignModeWidth", 2, "number", "Number of additional columns added when in Design Mode.",null,{tags:["Private"]});
+    Grid.prototype.publish("extraDesignModeHeight", 2, "number", "Number of additional rows added when in Design Mode.",null,{tags:["Private"]});
     Grid.prototype.publish("cellDensity", 3, "string", "Increase the cell density with this multiplier (Ex: 3 results in 3 cols per col and 3 rows per row)", null, { tags: ["Intermediate"] });
 
     Grid.prototype.publish("content", [], "widgetArray", "widgets",null,{tags:["Basic"]});
@@ -146,9 +142,9 @@
         }
     };
     
-    Grid.prototype.childMoved = Grid.prototype.debounce(function (domNode, element) {
+    Grid.prototype.childMoved = function (domNode, element) {
         this.render();
-    }, 250);
+    };
 
     Grid.prototype.enter = function (domNode, element) {
         HTMLWidget.prototype.enter.apply(this, arguments);
@@ -196,7 +192,7 @@
         return handle;
     };
     
-    Grid.prototype.createDropTarget = function (loc,handle) {
+    Grid.prototype.createDropTarget = function (loc) {
         var col = loc[0] - this._dragCellOffsetX;
         var row = loc[1] - this._dragCellOffsetY;
         var colSpan = this._dragCell.gridColSpan();
@@ -204,7 +200,7 @@
         
         var dropTarget = document.createElement("div");
         dropTarget.id = "grid-drop-target"+this.id();
-        dropTarget.className = "grid-drop-target grid-drag-handle-"+handle;
+        dropTarget.className = "grid-drop-target";
         
         this._element.node().appendChild(dropTarget);
         this.updateDropTarget(col,row,colSpan,rowSpan);
@@ -216,26 +212,6 @@
     };
     
     Grid.prototype.updateDropTarget = function (col,row,colSpan,rowSpan) {
-        if(this.restrictDraggingOut()){
-            var beyondTop = row < 0;
-            var beyondRight = col+colSpan > this._colCount;
-            var beyondBottom = row+rowSpan > this._rowCount;
-            var beyondLeft = col < 0;
-            if(beyondRight){
-                var rDiff = col+colSpan - this._colCount;
-                col -= rDiff;
-            }
-            if(beyondBottom){
-                var bDiff = row+rowSpan - this._rowCount;
-                row -= bDiff;
-            }
-            if(beyondLeft){
-                col = 0;
-            }
-            if(beyondTop){
-                row = 0;
-            }
-        }
         var top,left,width,height;
         top = this._offsetY + (row * this._rowSize);
         left = this._offsetX + (col * this._colSize);
@@ -250,12 +226,6 @@
     };
     
     Grid.prototype.moveDropTarget = function (loc) {
-        if(this.restrictDraggingOut()){
-            loc[0] = loc[0] > this._colCount-1 ? this._colCount-1 : loc[0];
-            loc[0] = loc[0] < 0 ? 0 : loc[0];
-            loc[1] = loc[1] > this._rowCount-1 ? this._rowCount-1 : loc[1];
-            loc[1] = loc[1] < 0 ? 0 : loc[1];
-        }
         if(this._handle){
             var pivotCell = [];
             switch(this._handle){
@@ -362,10 +332,6 @@
                 
                 context._startLoc = [context._currLoc[0],context._currLoc[1]];
                 
-                context._element.selectAll(".dragHandle")
-                    .style("visibility", "hidden")
-                ;
-                
                 context._handle = context.overHandle(d3.event.sourceEvent);
                 if(context._dragCell._dragHandles.indexOf(context._handle) === -1){
                     context._handle = undefined;
@@ -373,7 +339,7 @@
                 
                 context._dragCellOffsetX = context._currLoc[0] - d.gridCol();
                 context._dragCellOffsetY = context._currLoc[1] - d.gridRow();
-                context.createDropTarget(context._currLoc,context._handle);
+                context.createDropTarget(context._currLoc);
                 setTimeout(function () {
                     context.contentDiv.selectAll(".cell_." + context._id)
                         .classed("dragItem", function (d2) {
@@ -398,10 +364,8 @@
             .on("dragend", function () {
                 d3.event.sourceEvent.stopPropagation();
         
-                if(context._initSelection || context._startLoc[0] === context._currLoc[0] || context._startLoc[1] === context._currLoc[1]){
-                    if(!context.disableCellSelection()){
-                        context.selectionBagClick(context.getCell(context._currLoc[1],context._currLoc[0]));
-                    }
+                if(context._initSelection){
+                    context.selectionBagClick(context.getCell(context._currLoc[1],context._currLoc[0]));
                 }
         
                 context._element.selectAll(".dragHandle")
@@ -409,23 +373,10 @@
                 ;
         
                 if (context._handle) {
-                    if(context.restrictDraggingOut()){
-                        //Contain the dragCell (while 'resizing') within the bounds of the Grid
-                        var locY = context._locY > 0 ? context._locY : 0;
-                        var locX = context._locX > 0 ? context._locX : 0;
-                        locY = context._locY+context._sizeY < context._rowCount ? context._locY : context._rowCount-context._sizeY;
-                        locX = context._locX+context._sizeX < context._colCount ? context._locX : context._colCount-context._sizeX;
-                        
-                        context._dragCell.gridRow(locY);
-                        context._dragCell.gridRowSpan(context._sizeY);
-                        context._dragCell.gridCol(locX);
-                        context._dragCell.gridColSpan(context._sizeX);
-                    } else {
-                        context._dragCell.gridRow(context._locY);
-                        context._dragCell.gridRowSpan(context._sizeY);
-                        context._dragCell.gridCol(context._locX);
-                        context._dragCell.gridColSpan(context._sizeX);
-                    }
+                    context._dragCell.gridRow(context._locY);
+                    context._dragCell.gridRowSpan(context._sizeY);
+                    context._dragCell.gridCol(context._locX);
+                    context._dragCell.gridColSpan(context._sizeX);
                 } else {
                     var targetRow = context._currLoc[1];
                     var targetCol = context._currLoc[0];
@@ -440,7 +391,6 @@
                     var newDragCellCol;
                     var newDragCellRow;
                     if (targetCell) {
-                        //If dragCell is dropped onto another Cell... swap Cell sizes and positions
                         targetRow = targetCell.gridRow();
                         targetCol = targetCell.gridCol();
                         targetRowSpan = targetCell.gridRowSpan();
@@ -456,18 +406,6 @@
                     } else {
                         newDragCellCol = targetCol - context._dragCellOffsetX;
                         newDragCellRow = targetRow - context._dragCellOffsetY;
-                        if(context.restrictDraggingOut()){
-                            //Contain the dragCell (while 'moving') within the bounds of the Grid
-                            targetRowSpan = context._dragCell.gridRowSpan();
-                            targetColSpan = context._dragCell.gridColSpan();
-                            var rightExcess = newDragCellCol + targetColSpan - context._colCount;
-                            var bottomExcess = newDragCellRow + targetRowSpan - context._rowCount;
-                            newDragCellCol -= rightExcess > 0 ? rightExcess : 0;
-                            newDragCellRow -= bottomExcess > 0 ? bottomExcess : 0;
-
-                            newDragCellCol = newDragCellCol > 0 ? newDragCellCol : 0;
-                            newDragCellRow = newDragCellRow > 0 ? newDragCellRow : 0;
-                        }
                     }
                     context._dragCell
                         .gridCol(newDragCellCol)
@@ -507,6 +445,7 @@
             .each(function (d) {
                 d._parentElement
                     .attr("draggable", context.designMode())
+                    .classed("hideDragCellContent", context.hideDragCellContent())
                     .selectAll(".dragHandle")
                         .attr("draggable", context.designMode())
                 ;
@@ -532,7 +471,7 @@
     Grid.prototype.updateDropCells = function (dimensions, cellWidth, cellHeight) {
         var context = this;
         if(_needsCanvasRedraw()){
-            if(this.designMode() && !this.hideDesignGrid()){
+            if(this.designMode()){
                 var c_canvas = document.createElement("canvas");
                 c_canvas.width = dimensions.width * cellWidth;
                 c_canvas.height = dimensions.height * cellHeight;
@@ -592,7 +531,7 @@
         
         
         function _roundHalf(n){
-            return parseInt(n) - 0.5;
+            return parseInt(n) + 0.5;
         }
         function _drawLine(x1,x2,y1,y2,color){
             canvasContext.beginPath();
@@ -609,11 +548,7 @@
                 ret = true;
             } else if (context.prevCellWidth !== cellWidth || context.prevCellHeight !== cellHeight) {
                 ret = true;
-            } else if (context._target.style.backgroundImage === "" && context.designMode() && !context.hideDesignGrid()) {
-                ret = true;
-            } else if (context._target.style.backgroundImage !== "" && !context.designMode()) {
-                ret = true;
-            } else if (context._target.style.backgroundImage !== "" && context.hideDesignGrid()) {
+            } else if (context._target.style.backgroundImage === "" && context.designMode()) {
                 ret = true;
             }
             return ret;
@@ -637,17 +572,9 @@
         this._rowCount = dimensions.height;
         this._colSize = cellWidth;
         this._rowSize = cellHeight;
-        
-        element.selectAll("#"+this.id()+" > div > div.cell_ > div[draggable=true]").style({opacity:this.designModeOpacity()});
-        element.selectAll("#"+this.id()+" > div > div.cell_ > div[draggable=true] > div > div.dragHandle").style({opacity:this.designModeOpacity()});
-        element.selectAll("#"+this.id()+" > div > div.cell_ > div[draggable=false]").style({opacity:1});
-        element.selectAll("#"+this.id()+" > div > div.cell_ > div[draggable=false] > div > div.dragHandle").style({opacity:1});
-        
 
         this.updateCells(cellWidth, cellHeight);
         this.updateDropCells(dimensions, cellWidth, cellHeight);
-        
-        element.classed("hideHandles",this.hideDragHandles());
     };
 
     Grid.prototype.exit = function (domNode, element) {
@@ -675,14 +602,12 @@
     Grid.prototype.selectionBagClick = function (d) {
         if(d !== null){
             var selectionObj = this._createSelectionObject(d);
-            if(d3.event.sourceEvent.ctrlKey){
-                if(this._selectionBag.isSelected(selectionObj)){
-                    this._selectionBag.remove(selectionObj);
-                    this.postSelectionChange();
-                } else {
-                    this._selectionBag.append(selectionObj);
-                    this.postSelectionChange();
-                }
+            if(this._selectionBag.isSelected(selectionObj)){
+                this._selectionBag.remove(selectionObj);
+                this.postSelectionChange();
+            } else if (d3.event.sourceEvent.ctrlKey) {
+                this._selectionBag.append(selectionObj);
+                this.postSelectionChange();
             } else {
                 this._selectionBag.set([selectionObj]);
                 this.postSelectionChange();
