@@ -76,7 +76,7 @@ function css(minify) {
 }
 
 function optimize(opts, cb) {
-  //opts.optimize = "none";
+  opts.optimize = "none";
   rjs.optimize(opts,
     function (text) { cb(null, text) },
     cb

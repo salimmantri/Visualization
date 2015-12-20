@@ -1,0 +1,38 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../dist-amd/hpcc-viz.js"></script>
+    <script src="../dist-amd/hpcc-bundles.js"></script>
+    <script>
+        require.config({
+            paths: {
+                "font-awesome": "../dist-amd/font-awesome/css/font-awesome.min",
+                "src": "../dist-amd"
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="hpccViz">
+    </div>
+    <script>
+        window.addEventListener("message", function (evt) {
+            require(["src/other/Persist"], function (Persist) {
+                d3.select("#hpccViz")
+                    .style({
+                        width: window.innerWidth - 16 + "px",
+                        height: window.innerHeight - 16 + "px"
+                    })
+                ;
+                Persist.create(evt.data, function (widget) {
+                    widget
+                        .target("hpccViz")
+                        .render()
+                    ;
+                });
+            });
+        }, false);
+    </script>
+</body>
+</html>
