@@ -1,0 +1,3 @@
+[submodule "gists/GMapLayered"]
+	path = gists/GMapLayered
+	url = git@gist.github.com:cb23cdaebd0d1d5c5957.git
