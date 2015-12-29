@@ -93,39 +93,43 @@ require.config({
     }
 });
 
-switch (window.location.hostname) {
+var hostname = window.location.hostname;
+switch (hostname) {
+case "bl.ocks.org":
+case "blockbuilder.org":
+    hostname = "rawgit.com";
 case "rawgit.com":
 case "cdn.rawgit.com":
     require.config({
         paths: {
-            "css": "//" + window.location.hostname + "/guybedford/require-css/0.1.8/css.min",
-            "css-builder": "//" + window.location.hostname + "/guybedford/require-css/0.1.8/css-builder.min",
-            "normalize": "//" + window.location.hostname + "/guybedford/require-css/0.1.8/normalize.min",
-            "async": "//" + window.location.hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/async",
-            "propertyParser": "//" + window.location.hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/propertyParser",
-            "goog": "//" + window.location.hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/goog",
+            "css": "//" + hostname + "/guybedford/require-css/0.1.8/css.min",
+            "css-builder": "//" + hostname + "/guybedford/require-css/0.1.8/css-builder.min",
+            "normalize": "//" + hostname + "/guybedford/require-css/0.1.8/normalize.min",
+            "async": "//" + hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/async",
+            "propertyParser": "//" + hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/propertyParser",
+            "goog": "//" + hostname + "/millermedeiros/requirejs-plugins/v1.0.3/src/goog",
 
-            "d3": "//" + window.location.hostname + "/mbostock/d3/v3.5.5/d3.min",
-            "c3": "//" + window.location.hostname + "/masayuki0812/c3/0.4.10/c3.min",
-            "dagre": "//" + window.location.hostname + "/cpettitt/dagre/v0.7.3/dist/dagre.min",
-            "topojson": "//" + window.location.hostname + "/mbostock/topojson/v1.6.19/topojson",
-            "colorbrewer": "//" + window.location.hostname + "/jeanlauliac/colorbrewer/v1.0.0/colorbrewer",
-            "d3-cloud": "//" + window.location.hostname + "/jasondavies/d3-cloud/v1.2.0/build/d3.layout.cloud",
-            "font-awesome": "//" + window.location.hostname + "/FortAwesome/Font-Awesome/v4.3.0/css/font-awesome.min",
-            "es6-promise": "//" + window.location.hostname + "/jakearchibald/es6-promise/v3.0.2/dist/es6-promise.min",
+            "d3": "//" + hostname + "/mbostock/d3/v3.5.5/d3.min",
+            "c3": "//" + hostname + "/masayuki0812/c3/0.4.10/c3.min",
+            "dagre": "//" + hostname + "/cpettitt/dagre/v0.7.3/dist/dagre.min",
+            "topojson": "//" + hostname + "/mbostock/topojson/v1.6.19/topojson",
+            "colorbrewer": "//" + hostname + "/jeanlauliac/colorbrewer/v1.0.0/colorbrewer",
+            "d3-cloud": "//" + hostname + "/jasondavies/d3-cloud/v1.2.0/build/d3.layout.cloud",
+            "font-awesome": "//" + hostname + "/FortAwesome/Font-Awesome/v4.3.0/css/font-awesome.min",
+            "es6-promise": "//" + hostname + "/jakearchibald/es6-promise/v3.0.2/dist/es6-promise.min",
 
-            "amcharts": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/amcharts",
-            "amcharts.funnel": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/funnel",
-            "amcharts.gauge": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/gauge",
-            "amcharts.pie": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/pie",
-            "amcharts.radar": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/radar",
-            "amcharts.serial": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/serial",
-            "amcharts.xy": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/xy",
-            "amcharts.gantt": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/gantt",
-            "amcharts.plugins.responsive": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/plugins/responsive/responsive",
-            "amcharts.plugins.dataloader": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/plugins/dataloader",
-            "amchartsImg": "//" + window.location.hostname + "/amcharts/amcharts3/3.18.0/amcharts/images/",
-            "simpleheat": "//" + window.location.hostname + "/mourner/simpleheat/v0.3.0/simpleheat",
+            "amcharts": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/amcharts",
+            "amcharts.funnel": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/funnel",
+            "amcharts.gauge": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/gauge",
+            "amcharts.pie": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/pie",
+            "amcharts.radar": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/radar",
+            "amcharts.serial": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/serial",
+            "amcharts.xy": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/xy",
+            "amcharts.gantt": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/gantt",
+            "amcharts.plugins.responsive": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/plugins/responsive/responsive",
+            "amcharts.plugins.dataloader": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/plugins/dataloader",
+            "amchartsImg": "//" + hostname + "/amcharts/amcharts3/3.18.0/amcharts/images/",
+            "simpleheat": "//" + hostname + "/mourner/simpleheat/v0.3.0/simpleheat",
 
             "src": "../src"
         }
