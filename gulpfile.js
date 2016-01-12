@@ -25,6 +25,7 @@ const cfg = {
   src: 'src',
   dist: 'dist',
   distamd: 'dist-amd',
+  distamdsrc: 'dist-amd-src',
   test: 'test',
   prefix: "hpcc-viz"
 };
@@ -166,19 +167,30 @@ const amd_modules = bundles.map(function (bundle, idx) {
     };
 });
 
+var amd_opts = {
+    baseUrl: ".",
+    appDir: "src",
+    dir: cfg.distamd,
+    mainConfigFile: "src/config.js",
+    modules: [{
+        name: cfg.prefix,
+        include: ["requireLib", "css", "normalize", "async", "goog", "propertyParser"],
+        create: true
+    }].concat(amd_modules)
+};
+
 gulp.task("build-amd-src", function (done) {
-    var opts = {
-        baseUrl: ".",
-        appDir: "src",
-        dir: cfg.distamd,
-        mainConfigFile: "src/config.js",
-        modules: [{
-            name: cfg.prefix,
-            include: ["requireLib", "css", "normalize", "async", "goog", "propertyParser"],
-            create: true
-        }].concat(amd_modules)
+    amd_opts.optimize = "none";
+    amd_opts.dir = cfg.distamdsrc;
+    optimize(amd_opts, done);
+});
+
+gulp.task("build-amd-src-min", function (done) {
+    if (amd_opts.optimize) {
+        delete amd_opts.optimize;
     };
-    optimize(opts, done);
+    amd_opts.dir = cfg.distamd;
+    optimize(amd_opts, done);
 });
 
 gulp.task("copy-amchart-images", function() {
