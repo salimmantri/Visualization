@@ -63,6 +63,16 @@
                     );
                 });
             }
+        },
+        Tabbed: {
+            databomb: function (callback) {
+                require(["test/DataFactory", "src/marshaller/Tabbed"], function (DataFactory, Tabbed) {
+                    callback(new Tabbed()
+                        .ddlUrl(DataFactory.Marshaller.multiDash.ddlUrl)
+                        .databomb(DataFactory.Marshaller.multiDash.databomb)
+                    );
+                });
+            }
         }
     };
 }));

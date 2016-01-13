@@ -76,6 +76,28 @@ function css(minify) {
     .pipe(gulp.dest(cfg.dist))
 }
 
+function amdOptimize(dest, optimizeMode, done) {
+    var opts = {
+        baseUrl: ".",
+        appDir: "src",
+        dir: dest,
+        mainConfigFile: "src/config.js",
+        modules: [{
+            name: cfg.prefix,
+            include: ["requireLib", "css", "normalize", "async", "goog", "propertyParser"],
+            create: true
+        }].concat(amd_modules)
+    };
+    if (optimizeMode) {
+        opts.optimize = optimizeMode;
+    }
+    optimize(opts, function (err) {
+        copyResources(dest);
+        writeBundlesFile(dest);
+        done(err);
+    });
+}
+
 function optimize(opts, cb) {
   //opts.optimize = "none";
   rjs.optimize(opts,
@@ -167,55 +189,36 @@ const amd_modules = bundles.map(function (bundle, idx) {
     };
 });
 
-var amd_opts = {
-    baseUrl: ".",
-    appDir: "src",
-    dir: cfg.distamd,
-    mainConfigFile: "src/config.js",
-    modules: [{
-        name: cfg.prefix,
-        include: ["requireLib", "css", "normalize", "async", "goog", "propertyParser"],
-        create: true
-    }].concat(amd_modules)
-};
+gulp.task("build-amd", function (done) {
+    amdOptimize(cfg.distamd, "", done);
+});
 
 gulp.task("build-amd-src", function (done) {
-    amd_opts.optimize = "none";
-    amd_opts.dir = cfg.distamdsrc;
-    optimize(amd_opts, done);
+    amdOptimize(cfg.distamdsrc, "none", done);
 });
 
-gulp.task("build-amd-src-min", function (done) {
-    if (amd_opts.optimize) {
-        delete amd_opts.optimize;
-    };
-    amd_opts.dir = cfg.distamd;
-    optimize(amd_opts, done);
-});
-
-gulp.task("copy-amchart-images", function() {
-   gulp.src("./bower_components/amcharts3/amcharts/images/**/*.*")
-   .pipe(gulp.dest(cfg.distamd + "/" + "img/amcharts"));
-});
-
-gulp.task("build-amd", ["build-amd-src","copy-amchart-images"], function (done) {
-    var requireConfig = {
-        bundles: amd_bundles
-    };
-    fs.writeFile(cfg.distamd + "/hpcc-bundles.js",
-        "require.config(" + JSON.stringify(requireConfig) + ");",
-        function (error) { if (error) throw error; }
-    );
-
+function copyResources(dest) {
+    gulp.src("./bower_components/amcharts3/amcharts/images/**/*.*")
+      .pipe(gulp.dest(dest + "/img/amcharts"))
+    ;
     return gulp.src([
         'bower_components/font-awesome/css/font-awesome.min.css',
         'bower_components/font-awesome/fonts/fontawesome-webfont.woff',
         'bower_components/font-awesome/fonts/fontawesome-webfont.woff2'
-
     ], { base: 'bower_components/' })
-        .pipe(gulp.dest(cfg.distamd))
+        .pipe(gulp.dest(dest))
     ;
-});
+}
+
+function writeBundlesFile(dest) {
+    var requireConfig = {
+        bundles: amd_bundles
+    };
+    fs.writeFile(dest + "/hpcc-bundles.js",
+        "require.config(" + JSON.stringify(requireConfig) + ");",
+        function (error) { if (error) throw error; }
+    );
+}
 
 gulp.task("build-all", ["build-nonamd", "build-amd"]);
 
