@@ -470,6 +470,7 @@
                 ;
                 break;
             default:
+
                 cell.append("input")
                     .attr("id", this.id() + "_" + param.id)
                     .classed("property-input", true)
