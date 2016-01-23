@@ -194,6 +194,12 @@ require(
                 context.doDataChanged(widget);
             })
         ;
+        this._inputJSON2 = new TextArea()
+            .value(testData)
+            .on("change", function (widget) {
+                context.doDataChanged(widget);
+            })
+        ;
         this._inputWU = new Form()
             .inputs([
                 new Input()
@@ -239,6 +245,7 @@ require(
             .addTab(this._inputTSV, "Input (TSV)")
             .addTab(this._inputCSV, "Input (CSV)")
             .addTab(this._inputJSON, "Input (JSON)")
+            .addTab(this._inputJSON2, "Input (JSON 2)")
             .addTab(this._inputWU, "Input (WU)")
             .addTab(this._inputTable, "Input (parsed)")
             .on("click", function (widget, column, idx) {
@@ -402,6 +409,11 @@ require(
                     srcWidget.value(this._db.json());
                 }
                 break;
+            case this._inputJSON2:
+                if (srcWidget.value() === loading) {
+                    srcWidget.value(JSON.stringify(this._db.rows(), null, 2));
+                }
+                break;
         }
     };
 
@@ -414,22 +426,32 @@ require(
                 this._db.tsv(srcWidget.value());
                 this._inputCSV.value(loading);
                 this._inputJSON.value(loading);
+                this._inputJSON2.value(loading);
                 break;
             case this._inputCSV:
                 this._db.csv(srcWidget.value());
                 this._inputTSV.value(loading);
                 this._inputJSON.value(loading);
+                this._inputJSON2.value(loading);
                 break;
             case this._inputJSON:
                 this._db.json(srcWidget.value());
                 this._inputCSV.value(loading);
                 this._inputTSV.value(loading);
+                this._inputJSON2.value(loading);
+                break;
+            case this._inputJSON2:
+                this._db.json(srcWidget.value());
+                this._inputCSV.value(loading);
+                this._inputTSV.value(loading);
+                this._inputJSON.value(loading);
                 break;
             case this._inputWU:
                 this._db.jsonObj(response.map(function(d) {if (d.__fileposition__) delete d.__fileposition__; return d; }));
                 this._inputTSV.value(loading);
                 this._inputCSV.value(loading);
                 this._inputTSV.value(loading);
+                this._inputJSON2.value(loading);
         }
         this._inputTable
             .columns(this._db.legacyColumns())

@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "es6-promise"], factory);
+        define(["json!./build.json", "d3", "es6-promise"], factory);
     } else {
         root.require = root.require || function (paths, cb) {
             if (typeof paths === "function") {
@@ -19,9 +19,12 @@
         };
         root.common_Platform = factory(root.d3);
     }
-}(this, function (d3) {
-
+}(this, function (build, d3) {
     function Platform() {
+    }
+
+    Platform.prototype.build = function () {
+        return build;
     }
 
     Platform.prototype.ieVersion = (function () {
