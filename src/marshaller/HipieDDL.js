@@ -566,7 +566,6 @@
                         this.loadWidget("src/map/ChoroplethStates", function (widget) {
                             widget
                                 .id(visualization.id)
-                                .columns(context.source.getColumns())
                                 .paletteID(visualization.color)
                             ;
                         });
@@ -574,7 +573,6 @@
                         this.loadWidget("src/map/ChoroplethCounties", function (widget) {
                             widget
                                 .id(visualization.id)
-                                .columns(context.source.getColumns())
                                 .paletteID(visualization.color)
                             ;
                         });
@@ -583,7 +581,6 @@
                         this.loadWidget("src/map/Layered", function (widget) {
                             widget
                                 .id(visualization.id)
-                                .columns(context.source.getColumns())
                             ;
                         });
                     }
@@ -596,7 +593,6 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                             .legendPosition("none")
                             .chartType(context.properties.chartType || context.properties.charttype || context.type)
                         ;
@@ -606,7 +602,6 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                             .legendPosition("none")
                             //.domainAxisTitle(context.source.getXTitle())
                             //.valueAxisTitle(context.source.getYTitle())
@@ -618,7 +613,6 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                             .legendPosition("none")
                             .showChartSelect(false)
                             .chartType("TABLE")
@@ -630,7 +624,6 @@
                     this.loadWidget("src/form/Slider", function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                         ;
                         if (visualization.range) {
                             var selectionLabel = "";
@@ -651,7 +644,6 @@
                     this.loadWidgets(["src/graph/Graph"], function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                             .layout("ForceDirected2")
                             .applyScaleOnLayout(true)
                         ;
@@ -730,7 +722,6 @@
                     this.loadWidgets(["src/other/HeatMap"], function (widget) {
                         widget
                             .id(visualization.id)
-                            .columns(context.source.getColumns())
                             .image(context.properties.imageUrl)
                         ;
                     });
@@ -816,6 +807,10 @@
     Visualization.prototype.notify = function () {
         if (this.source.hasData()) {
             if (this.widget) {
+                if (!this.widget.fields().length) {
+                    var columns = this.source.getColumns();
+                    this.widget.columns(columns);
+                }
                 var data = this.source.getData();
                 this.widget.data(data);
 
