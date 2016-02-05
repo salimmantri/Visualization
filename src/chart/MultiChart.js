@@ -79,7 +79,8 @@
 
     MultiChart.prototype.fields = function (_) {
         var retVal = HTMLWidget.prototype.fields.apply(this, arguments);
-        if (arguments.length && this.chart()) {
+        if (this.chart()) {
+            if (!arguments.length) return this.chart().fields();
             this.chart().fields(_);
         }
         return retVal;
@@ -87,7 +88,8 @@
 
     MultiChart.prototype.columns = function (_) {
         var retVal = HTMLWidget.prototype.columns.apply(this, arguments);
-        if (arguments.length && this.chart()) {
+        if (this.chart()) {
+            if (!arguments.length) return this.chart().columns();
             this.chart().columns(_);
         }
         return retVal;
@@ -95,7 +97,8 @@
 
     MultiChart.prototype.data = function (_) {
         var retVal = HTMLWidget.prototype.data.apply(this, arguments);
-        if (arguments.length && this.chart()) {
+        if (this.chart()) {
+            if (!arguments.length) return this.chart().data();
             this.chart().data(_);
         }
         return retVal;
