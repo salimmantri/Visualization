@@ -6,6 +6,9 @@
         root.marshaller_HipieDDL = factory(root.d3, root.common_Database, root.common_Utility, root.other_Comms, root.common_Widget, root.require);
     }
 }(this, function (d3, Database, Utility, Comms, Widget, require) {
+
+    var __hpcc_guid = "b5529069-28c5-40ea-9bfd-9b8e4b67f460";
+
     function exists(prop, scope) {
         var propParts = prop.split(".");
         var testScope = scope;
@@ -508,6 +511,7 @@
                     context.visualization.onEvent(key, context.events[key], row, col, selected);
                 };
             }
+            this.visualization.calcEventValues(key, this.events[key], null, null, false);
         }
     };
 
@@ -834,19 +838,25 @@
         this.update("...loading...");
     };
 
+    Visualization.prototype.calcEventValues = function (eventID, event, row, col, selected) {
+        selected = selected === undefined ? true : selected;
+        var request = {};
+        for (var key in event.mappings) {
+            var origKey = (this.source.mappings && this.source.mappings.hasMappings) ? this.source.mappings.getReverseMap(key) : key;
+            if (selected) {
+                request[event.mappings[key]] = row[origKey];
+            } else if (!this.dashboard.marshaller.allowNullFilter()) {
+                request[event.mappings[key]] = __hpcc_guid;
+            }
+        }
+        this._eventValues = request;
+    }
+
     Visualization.prototype.onEvent = function (eventID, event, row, col, selected) {
         var context = this;
         setTimeout(function () {
-            selected = selected === undefined ? true : selected;
             if (event.exists()) {
-                var request = {};
-                for (var key in event.mappings) {
-                    var origKey = (context.source.mappings && context.source.mappings.hasMappings) ? context.source.mappings.getReverseMap(key) : key;
-                    request[event.mappings[key]] = selected ? row[origKey] : "";
-                }
-
-                //  New request calculation:
-                context._eventValues = request;
+                context.calcEventValues(eventID, event, row, col, selected);
                 var datasourceRequests = {};
                 var updatedVizs = event.getUpdatesVisualizations();
                 updatedVizs.forEach(function (updatedViz) {
@@ -918,7 +928,9 @@
                 if (retVal.length) {
                     retVal += ", ";
                 }
-                retVal += this.request[key];
+                if (this.request[key] !== __hpcc_guid) {
+                    retVal += this.request[key];
+                }
             }
         }
         return retVal;
@@ -1003,10 +1015,19 @@
                     });
                 }
             }
+
+            if (!this.dashboard.marshaller.allowNullFilter()) {
+                this.filter.forEach(function (item) {
+                    request[item + "_changed"] = true;
+                    request[item] = __hpcc_guid;
+                }, this);
+            }
+        }
+        if (this.dashboard.marshaller.allowNullFilter()) {
+            this.request.refresh = refresh ? true : false;
         }
 
         var context = this;
-        this.request.refresh = refresh ? true : false;
         this.filter.forEach(function (item) {
             this.request[item + "_changed"] = request[item + "_changed"] || false;
             var value = request[item] === undefined ? null : request[item];
@@ -1129,6 +1150,7 @@
     function Marshaller() {
         this._proxyMappings = {};
         this._widgetMappings = d3.map();
+        this._allowNullFilter = true;
     }
 
     Marshaller.prototype.commsDataLoaded = function () {
@@ -1204,6 +1226,12 @@
     Marshaller.prototype.widgetMappings = function (_) {
         if (!arguments.length) return this._widgetMappings;
         this._widgetMappings = _;
+        return this;
+    };
+
+    Marshaller.prototype.allowNullFilter = function (_) {
+        if (!arguments.length) return this._allowNullFilter;
+        this._allowNullFilter = _;
         return this;
     };
 
