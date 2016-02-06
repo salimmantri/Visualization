@@ -1022,9 +1022,13 @@
                 delete this.request[key];
             }
         }
+        var now = Date.now();
         this.comms.call(this.request).then(function (response) {
-            context.processResponse(response, request, updates);
-            ++context._loadedCount;
+            var delay = 750 - (Date.now() - now);  //  750 is to allow for all "clear" transitions to complete...
+            setTimeout(function() {
+                context.processResponse(response, request, updates);
+                ++context._loadedCount;
+            }, delay > 0 ? delay : 0);
         }).catch(function (e) {
             context.dashboard.marshaller.commsError("DataSource.prototype.fetchData", e);
         });

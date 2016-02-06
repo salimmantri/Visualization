@@ -204,12 +204,7 @@
 
         var size = this.size();
         content
-            .each(function (d) {
-                d
-                    .resize(size)
-                    .render()
-                ;
-            })
+            .each(function (d) { d.resize(size); })
         ;
 
         content.exit().transition()
