@@ -795,11 +795,28 @@
     };
 
     Visualization.prototype.update = function (msg) {
-        var params = msg || this.source.getOutput().getParams();
-        if (exists("widgetSurface.title", this)) {
+        var updatedBy = this.getInputVisualizations();
+        var paramsArr = [];
+        updatedBy.forEach(function (viz) {
+            for (var key in viz._eventValues) {
+                paramsArr.push(viz._eventValues[key])
+            }
+        });
+        var params = msg || paramsArr.join(", ");
+        var widget = this.widget;
+        while (widget && !widget.title) {
+            widget = widget.locateParentWidget(widget._target.parentNode);
+        }
+        if (widget) {
+            widget.title(this.title + (params ? " (" + params + ")" : ""));
+            widget.render();
+        } else if (exists("widgetSurface.title", this)) {
             this.widgetSurface.title(this.title + (params ? " (" + params + ")" : ""));
             this.widgetSurface.render();
         } else {
+            if (this.widget.title) {
+                this.widget.title(this.title + (params ? " (" + params + ")" : ""));
+            }
             this.widget.render();
         }
     };
@@ -825,7 +842,7 @@
             this.source.getOutput().request = {};
         }
         if (this._eventValues) {
-            delete this._eventValues;
+            //delete this._eventValues;
             this.events.getUpdatesVisualizations().forEach(function (updatedViz) {
                 updatedViz.clear();
             });
@@ -917,6 +934,18 @@
     };
 
     Output.prototype.getParams = function () {
+        var retVal = {};
+        for (var key in this.request) {
+            if (!Utility.endsWith(key, "_changed")) {
+                if (this.request[key] !== __hpcc_guid) {
+                    retVal[key] = this.request[key];
+                }
+            }
+        }
+        return retVal;
+    };
+
+    Output.prototype.getParamsMsg = function () {
         var retVal = "";
         for (var key in this.request) {
             if (!Utility.endsWith(key, "_changed")) {
