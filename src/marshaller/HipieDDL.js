@@ -830,7 +830,7 @@
     };
 
     Visualization.prototype.clear = function () {
-        if (this.widget) {
+        if (this.widget && this.dashboard.marshaller.clearDataOnUpdate()) {
             this.widget.data([]);
             this.source.getOutput().request = {};
         }
@@ -1136,6 +1136,7 @@
     function Marshaller() {
         this._proxyMappings = {};
         this._widgetMappings = d3.map();
+        this._clearDataOnUpdate = true;
         this._propogateClear = false;
     }
 
@@ -1212,6 +1213,12 @@
     Marshaller.prototype.widgetMappings = function (_) {
         if (!arguments.length) return this._widgetMappings;
         this._widgetMappings = _;
+        return this;
+    };
+
+    Marshaller.prototype.clearDataOnUpdate = function (_) {
+        if (!arguments.length) return this._clearDataOnUpdate;
+        this._clearDataOnUpdate = _;
         return this;
     };
 

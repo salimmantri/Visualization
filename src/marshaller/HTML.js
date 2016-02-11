@@ -18,6 +18,7 @@
     HTML.prototype.publish("ddlUrl", "", "string", "DDL URL",null,{tags:["Private"]});
     HTML.prototype.publish("databomb", "", "string", "Data Bomb",null,{tags:["Private"]});
     HTML.prototype.publish("proxyMappings", {}, "object", "Proxy Mappings",null,{tags:["Private"]});
+    HTML.prototype.publish("clearDataOnUpdate", true, "boolean", "Clear data prior to refresh", null);
     HTML.prototype.publish("propogateClear", false, "boolean", "Propogate clear to dependent visualizations", null);
 
     HTML.prototype.enter = function(domNode, element) {
@@ -65,6 +66,7 @@
             if (this.marshaller) {
                 this.marshaller
                     .proxyMappings(this.proxyMappings())
+                    .clearDataOnUpdate(this.clearDataOnUpdate())
                     .propogateClear(this.propogateClear())
                 ;
             }
@@ -86,6 +88,7 @@
         var context = this;
         this.marshaller = new HipieDDL.Marshaller()
             .proxyMappings(this.proxyMappings())
+            .clearDataOnUpdate(this.clearDataOnUpdate())
             .propogateClear(this.propogateClear())
             .widgetMappings(d3.map(widgetArr, function (d) {
                 return d.id();
