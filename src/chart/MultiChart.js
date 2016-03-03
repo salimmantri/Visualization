@@ -20,7 +20,7 @@
             this._allCharts[item.display] = newItem;
             this._allCharts[item.widgetClass] = newItem;
         }, this);
-        this._chartTypeDefaults = {};
+        this._chartTypeProperties = {};
     }
     MultiChart.prototype = Object.create(HTMLWidget.prototype);
     MultiChart.prototype.constructor = MultiChart;
@@ -129,9 +129,9 @@
         return this;
     };
 
-    MultiChart.prototype.chartTypeDefaults = function (_) {
-        if (!arguments.length) return this._chartTypeDefaults;
-        this._chartTypeDefaults = _;
+    MultiChart.prototype.chartTypeProperties = function (_) {
+        if (!arguments.length) return this._chartTypeProperties;
+        this._chartTypeProperties = _;
         return this;
     };
     
@@ -166,10 +166,10 @@
                     .size(size)
                 ;
 
-                for (var key in context._chartTypeDefaults) {
-                    if (newContent[key + "_default"]) {
+                for (var key in context._chartTypeProperties) {
+                    if (newContent[key]) {
                         try {
-                            newContent[key + "_default"](context._chartTypeDefaults[key]);
+                            newContent[key](context._chartTypeProperties[key]);
                         } catch (e) {
                             console.log("Exception Setting Property:  " + key);
                         }
@@ -177,7 +177,7 @@
                         console.log("Unknown Property:  " + key);
                     }
                 }
-                context._chartTypeDefaults = {};
+                context._chartTypeProperties = {};
 
                 context.chart(newContent);
                 if (oldContent) {
