@@ -51,9 +51,9 @@
         return this;
     };
 
-    MegaChart.prototype.chartTypeDefaults = function (_) {
-        if (!arguments.length) return this._chart.chartTypeDefaults();
-        this._chart.chartTypeDefaults(_);
+    MegaChart.prototype.chartTypeProperties = function (_) {
+        if (!arguments.length) return this._chart.chartTypeProperties();
+        this._chart.chartTypeProperties(_);
         return this;
     };
 
