@@ -555,7 +555,7 @@
         this.events = new Events(this, visualization.events);
 
         if (this.dashboard.marshaller._widgetMappings.has(visualization.id)) {
-            this.setWidget(this.dashboard.marshaller._widgetMappings.get(visualization.id), true);
+            this.setWidget(this.dashboard.marshaller._widgetMappings.get(visualization.id));
         } else {
             var context = this;
             switch (this.type) {
@@ -591,8 +591,8 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .legendPosition("none")
-                            .chartType(context.properties.chartType || context.properties.charttype || context.type)
+                            .legendPosition_default("none")
+                            .chartType_default(context.properties.chartType || context.properties.charttype || context.type)
                         ;
                     });
                     break;
@@ -600,10 +600,10 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .legendPosition("none")
+                            .legendPosition_default("none")
                             //.domainAxisTitle(context.source.getXTitle())
                             //.valueAxisTitle(context.source.getYTitle())
-                            .chartType(context.properties.chartType || context.properties.charttype || context.type)
+                            .chartType_default(context.properties.chartType || context.properties.charttype || context.type)
                         ;
                     });
                     break;
@@ -611,10 +611,10 @@
                     this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .legendPosition("none")
-                            .showChartSelect(false)
-                            .chartType("TABLE")
-                            .chartTypeProperties({ pagination: true })
+                            .legendPosition_default("none")
+                            .showChartSelect_default(false)
+                            .chartType_default("TABLE")
+                            .chartTypeDefaults({ pagination: true })
                         ;
                     });
                     break;
@@ -630,10 +630,10 @@
                                 break;
                             }
                             widget
-                                .low(+visualization.range[0])
-                                .high(+visualization.range[1])
-                                .step(+visualization.range[2])
-                                .selectionLabel(selectionLabel)
+                                .low_default(+visualization.range[0])
+                                .high_default(+visualization.range[1])
+                                .step_default(+visualization.range[2])
+                                .selectionLabel_default(selectionLabel)
                             ;
                         }
                     });
@@ -642,8 +642,8 @@
                     this.loadWidgets(["src/graph/Graph"], function (widget) {
                         widget
                             .id(visualization.id)
-                            .layout("ForceDirected2")
-                            .applyScaleOnLayout(true)
+                            .layout_default("ForceDirected2")
+                            .applyScaleOnLayout_default(true)
                         ;
                     });
                     break;
@@ -665,7 +665,7 @@
                                 switch(field.properties.charttype) {
                                     case "TEXT":
                                         inp = new Input()
-                                            .type("text")
+                                            .type_default("text")
                                         ;
                                         break;
                                     case "TEXTAREA":
@@ -679,7 +679,7 @@
                                         break;
                                     case "HIDDEN":
                                         inp = new Input()
-                                            .type("hidden")
+                                            .type_default("hidden")
                                         ;
                                         break;
                                     default:
@@ -691,24 +691,23 @@
                                             }
                                         } else {
                                             inp = new Input()
-                                                .type("text")
+                                                .type_default("text")
                                             ;
                                         }
                                         break;
                                 }
 
                                 inp
-                                    .name(field.id)
-                                    .label((field.properties ? field.properties.label : null) || field.label)
-                                    
-                                    .value(field.properties.default ? field.properties.default : "") // TODO Hippie support for multiple default values (checkbox only)
+                                    .name_default(field.id)
+                                    .label_default((field.properties ? field.properties.label : null) || field.label)
+                                    .value_default(field.properties.default ? field.properties.default : "") // TODO Hippie support for multiple default values (checkbox only)
                                 ;
 
                                 if (inp instanceof CheckBox || inp instanceof Radio) { // change this to instanceof?
                                     var vals = Object.keys(field.properties.enumvals);
-                                    inp.selectOptions(vals);
+                                    inp.selectOptions_default(vals);
                                 } else if (selectOptions.length) {
-                                    inp.selectOptions(selectOptions);
+                                    inp.selectOptions_default(selectOptions);
                                 }
 
                                 return inp;
@@ -720,7 +719,7 @@
                     this.loadWidgets(["src/other/HeatMap"], function (widget) {
                         widget
                             .id(visualization.id)
-                            .image(context.properties.imageUrl)
+                            .image_default(context.properties.imageUrl)
                         ;
                     });
                     break;
@@ -728,7 +727,7 @@
                     this.loadWidget("src/common/TextBox", function (widget) {
                         widget
                             .id(visualization.id)
-                            .text(context.id + "\n" + "TODO:  " + context.type)
+                            .text_default(context.id + "\n" + "TODO:  " + context.type)
                         ;
                     });
                     break;
@@ -764,25 +763,23 @@
         });
     };
 
-    Visualization.prototype.setWidget = function (widget, skipProperties) {
+    Visualization.prototype.setWidget = function (widget) {
         this.widget = widget;
         this.events.setWidget(widget);
-        if (!skipProperties) {
-            for (var key in this.properties) {
-                switch (widget.classID()) {
-                    case "chart_MultiChart":
-                    case "composite_MegaChart":
-                        widget.chartTypeProperties()[key] = this.properties[key];
-                        break;
-                    default:
-                        if (this.widget[key]) {
-                            try {
-                                this.widget[key](this.properties[key]);
-                            } catch (e) {
-                                console.log("Invalid Property:" + this.id + ".properties." + key);
-                            }
+        for (var key in this.properties) {
+            switch (widget.classID()) {
+                case "chart_MultiChart":
+                case "composite_MegaChart":
+                    widget.chartTypeDefaults()[key] = this.properties[key];
+                    break;
+                default:
+                    if (this.widget[key + "_default"]) {
+                        try {
+                            this.widget[key + "_default"](this.properties[key]);
+                        } catch (e) {
+                            console.log("Invalid Property:" + this.id + ".properties." + key);
                         }
-                }
+                    }
             }
         }
         return this.widget;
