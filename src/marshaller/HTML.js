@@ -21,6 +21,13 @@
     HTML.prototype.publish("clearDataOnUpdate", true, "boolean", "Clear data prior to refresh", null);
     HTML.prototype.publish("propogateClear", false, "boolean", "Propogate clear to dependent visualizations", null);
 
+    HTML.prototype.visualizations = function () {
+        if (this.marshaller) {
+            return this.marshaller.getVisualizationArray();
+        }
+        return [];
+    };    
+
     HTML.prototype.enter = function(domNode, element) {
         Grid.prototype.enter.apply(this, arguments);
         this.popupContainer = element.append("div")
