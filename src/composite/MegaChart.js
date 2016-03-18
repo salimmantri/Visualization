@@ -32,6 +32,7 @@
     MegaChart.prototype._allChartTypes = MultiChart.prototype._allChartTypes;
 
     MegaChart.prototype.publishReset();
+
     MegaChart.prototype.publishProxy("valueAxisTitle", "_valueTitle", "text");
     MegaChart.prototype.publishProxy("domainAxisTitle","_domainTitle","text");
     
@@ -42,6 +43,12 @@
     MegaChart.prototype.publish("showCSV",true,"boolean","Show/Hide CSV button", null, {tags:["Basic"]});
     
     MegaChart.prototype.publishProxy("title", "_toolbar", "title");
+    MegaChart.prototype.publishProxy("titleFontSize", "_toolbar", "fontSize");
+    MegaChart.prototype.publishProxy("titleFontColor", "_toolbar", "fontColor");
+    MegaChart.prototype.publishProxy("titleFontFamily", "_toolbar", "fontFamily");
+    MegaChart.prototype.publishProxy("titleFontBold", "_toolbar", "fontBold");
+    MegaChart.prototype.publishProxy("titleBackgroundColor", "_toolbar", "backgroundColor");
+
     MegaChart.prototype.publishProxy("chartType", "_chart", "chartType");
     MegaChart.prototype.publishProxy("chart", "_chart", "chart");
 
