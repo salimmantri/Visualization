@@ -1,0 +1,15 @@
+﻿.mdl_Surface .mdl-layout__header {
+    min-height:48px;
+}
+
+.mdl_Surface .mdl-layout__header .mdl-layout__header-row {
+    padding-left:64px;
+    height:48px;
+}
+
+.mdl_Surface .mdl-layout__header .mdl-layout__drawer-button {
+    width:32px;
+    height:32px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
