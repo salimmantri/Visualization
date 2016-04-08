@@ -173,7 +173,7 @@ gulp.task("build-amd-src", function (done) {
         appDir: "src",
         dir: cfg.distamd,
         mainConfigFile: "src/loader.js",
-        namespace: "hpccrequire",
+        namespace: "hpccsystems",
         modules: [{
             name: cfg.prefix,
             include: ["requireLib", "css", "normalize", "async", "goog", "text", "json", "propertyParser", "src/loader"],

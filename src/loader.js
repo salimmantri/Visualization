@@ -157,7 +157,7 @@
     function buildConfig(srcUrl) {
         root.hpccsystems.require.config({
             baseUrl: ".",
-            bundles: {},  //  Bundles get injected during gulp build-amd
+            bundles:{},  //  Bundles get injected during gulp build-amd
             paths: {
                 "hpcc-viz": srcUrl,
                 src: srcUrl,
@@ -222,7 +222,7 @@
             myInfo.url = document.currentScript.src;
         } else {
             var scripts = document.getElementsByTagName('script');
-            for (var i = scripts.length - 1; i > 0 ; --i) {
+            for (var i = scripts.length - 1; i >= 0 ; --i) {
                 var script = scripts[i];
                 var url = script.getAttribute.length !== undefined ? script.src : script.getAttribute('src', -1);
                 if (url.indexOf("loader.js") > 0 || url.indexOf("hpcc-viz.js") > 0) {
@@ -242,8 +242,29 @@
             };
         }
 
-        if (!root.hpccsystems.require) {
-            root.hpccsystems.require = root.require || require;
+        if (!root.hpccsystems.redirect) {
+            if (!root.hpccsystems.requirejs) root.hpccsystems.requirejs = root.requirejs || requirejs;
+            if (!root.hpccsystems.require) root.hpccsystems.require = root.require || require;
+            if (!root.hpccsystems.define) root.hpccsystems.define = root.define || define;
+            if (!root.requirejs) root.requirejs = root.hpccsystems.requirejs;
+            if (!root.require) root.require = root.hpccsystems.require;
+            if (!root.define) root.define = root.hpccsystems.define;
+            if (!root.hpccsystems.skipAutoConfig) {
+                switch (myInfo.filename) {
+                    case "loader.js":
+                        switch (root.location.hostname) {
+                            case "rawgit.com":
+                                githubConfig(myInfo.srcUrl);
+                                break;
+                            default:
+                                srcConfig(myInfo.srcUrl);
+                        }
+                        break;
+                    case "hpcc-viz.js":
+                        buildConfig(myInfo.srcUrl);
+                        break;
+                }
+            }
         }
     }());
 
@@ -294,23 +315,6 @@
                     remoteCDNConfig(srcUrl, version, callback);
                 }
             };
-
-            if (!root.hpccsystems.skipAutoConfig) {
-                switch (myInfo.filename) {
-                    case "loader.js":
-                        switch (root.location.hostname) {
-                            case "rawgit.com":
-                                githubConfig(myInfo.srcUrl);
-                                break;
-                            default:
-                                srcConfig(myInfo.srcUrl);
-                        }
-                        break;
-                    case "hpcc-viz.js":
-                        buildConfig(myInfo.srcUrl);
-                        break;
-                }
-            }
         }());
     }
 }(this));

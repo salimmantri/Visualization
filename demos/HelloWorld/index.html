@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <script src="http://rawgit.com/jrburke/requirejs/2.2.0/require.js"></script>
-    <script src="../../src/loader.js"></script>
+    <script srcX="http://rawgit.com/jrburke/requirejs/2.2.0/require.js"></script>
+    <script srcX="../../src/loader.js"></script>
     <script src="../../dist-amd/hpcc-viz.js"></script>
 </head>
 <body>
@@ -11,7 +11,7 @@
     </div>
     <script>
         var d = hpccsystems;
-        require(["src/common/TextBox"], function (TextBox) {
+        d.require(["src/common/TextBox"], function (TextBox) {
             var helloWorld = new TextBox()
                 .target("helloWorld")
                 .text("Hello\nWorld!")
