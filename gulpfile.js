@@ -77,7 +77,7 @@ function css(minify) {
 }
 
 function optimize(opts, cb) {
-  //opts.optimize = "none";
+  opts.optimize = "none";
   rjs.optimize(opts,
     function (text) { cb(null, text) },
     cb
@@ -173,6 +173,7 @@ gulp.task("build-amd-src", function (done) {
         appDir: "src",
         dir: cfg.distamd,
         mainConfigFile: "src/loader.js",
+        namespace: "hpccrequire",
         modules: [{
             name: cfg.prefix,
             include: ["requireLib", "css", "normalize", "async", "goog", "text", "json", "propertyParser", "src/loader"],

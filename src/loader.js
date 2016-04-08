@@ -244,22 +244,6 @@
 
         if (!root.hpccsystems.require) {
             root.hpccsystems.require = root.require || require;
-            if (!root.hpccsystems.skipAutoConfig) {
-                switch (myInfo.filename) {
-                    case "loader.js":
-                        switch (root.location.hostname) {
-                            case "rawgit.com":
-                                githubConfig(myInfo.srcUrl);
-                                break;
-                            default:
-                                srcConfig(myInfo.srcUrl);
-                        }
-                        break;
-                    case "hpcc-viz.js":
-                        buildConfig(myInfo.srcUrl);
-                        break;
-                }
-            }
         }
     }());
 
@@ -310,6 +294,23 @@
                     remoteCDNConfig(srcUrl, version, callback);
                 }
             };
+
+            if (!root.hpccsystems.skipAutoConfig) {
+                switch (myInfo.filename) {
+                    case "loader.js":
+                        switch (root.location.hostname) {
+                            case "rawgit.com":
+                                githubConfig(myInfo.srcUrl);
+                                break;
+                            default:
+                                srcConfig(myInfo.srcUrl);
+                        }
+                        break;
+                    case "hpcc-viz.js":
+                        buildConfig(myInfo.srcUrl);
+                        break;
+                }
+            }
         }());
     }
 }(this));

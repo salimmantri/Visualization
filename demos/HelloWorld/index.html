@@ -1,22 +1,16 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
     <meta charset="utf-8">
-    <script src="http://viz.hpccsystems.com/v1.2.2/dist-amd/hpcc-viz.js"></script>
-    <script src="http://viz.hpccsystems.com/v1.2.2/dist-amd/hpcc-bundles.js"></script>
-    <script>
-        require.config({
-            paths: {
-                "src": "http://viz.hpccsystems.com/v1.2.2/dist-amd",
-                "font-awesome": "http://viz.hpccsystems.com/v1.2.2/dist-amd/font-awesome/css/font-awesome.min"
-            }
-        });
-    </script>
+    <script src="http://rawgit.com/jrburke/requirejs/2.2.0/require.js"></script>
+    <script src="../../src/loader.js"></script>
+    <script src="../../dist-amd/hpcc-viz.js"></script>
 </head>
 <body>
     <div id="helloWorld" style="width:100%; height:100vh">
     </div>
     <script>
+        var d = hpccsystems;
         require(["src/common/TextBox"], function (TextBox) {
             var helloWorld = new TextBox()
                 .target("helloWorld")
