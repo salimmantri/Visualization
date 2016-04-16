@@ -8,6 +8,8 @@
 }(this, function (d3, HTMLWidget, I2DChart) {
     function Summary() {
         HTMLWidget.call(this);
+        I2DChart.call(this);
+
         this._tag = "div";
 
         this._drawStartPos = "center";
@@ -16,7 +18,7 @@
     }
     Summary.prototype = Object.create(HTMLWidget.prototype);
     Summary.prototype.constructor = Summary;
-    Summary.prototype.implements(I2DChart.prototype);
+    Summary.prototype.mixin(I2DChart);
     Summary.prototype._class += " chart_Summary";
 
     Summary.prototype.publish("colorFill", "#3498db", "html-color", "Fill Color", null);
@@ -27,7 +29,7 @@
     Summary.prototype.publish("fixedSize", true, "boolean", "Fix Size to Min Width/Height");
     Summary.prototype.publish("minWidth", 225, "number", "Minimum Width");
     Summary.prototype.publish("minHeight", 150, "number", "Minimum Height");
-    Summary.prototype.publish("playInterval", null, "number", "Play Interval", null, { optional: true });
+    Summary.prototype.publish("playInterval", 0, "number", "Play Interval", null, { optional: true });
 
     var playInterval = Summary.prototype.playInterval;
     Summary.prototype.playInterval = function (_) {

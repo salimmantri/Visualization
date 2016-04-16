@@ -31,12 +31,10 @@
     }
     Pie.prototype = Object.create(SVGWidget.prototype);
     Pie.prototype.constructor = Pie;
+    Pie.prototype.mixin(I2DChart);
+    Pie.prototype.mixin(ITooltip);
     Pie.prototype._class += " chart_Pie";
-    Pie.prototype.implements(I2DChart.prototype);
-    Pie.prototype.implements(ITooltip.prototype);
 
-    Pie.prototype.publish("paletteID", "default", "set", "Palette ID", Pie.prototype._palette.switch(),{tags:["Basic","Shared"]});
-    Pie.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
     Pie.prototype.publish("outerText", false, "boolean", "Sets label position inside or outside chart",null,{tags:["Basic"]});
     Pie.prototype.publish("innerRadius", 0, "number", "Sets inner pie hole radius as a percentage of the radius of the pie chart",null,{tags:["Basic"]});
 

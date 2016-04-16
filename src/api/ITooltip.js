@@ -1,13 +1,14 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "d3-tip", "../common/Widget", "css!./ITooltip"], factory);
+        define(["d3", "d3-tip", "../common/Class", "../common/PropertyExt", "css!./ITooltip"], factory);
     } else {
-        root.api_ITooltip = factory(root.d3, root.d3.tip, root.common_Widget);
+        root.api_ITooltip = factory(root.d3, root.d3.tip, root.common_Class, root.common_PropertyExt);
     }
-}(this, function (d3, d3Tip, Widget, AbsoluteSurface, TextBox) {
+}(this, function (d3, d3Tip, Class, PropertyExt) {
     function ITooltip() {
-        Widget.call(this);
+        Class.call(this);
+        PropertyExt.call(this);
 
         this.tooltipValueFormat(this.tooltipValueFormat());
 
@@ -45,7 +46,10 @@
             };
         }
     }
-    ITooltip.prototype = Object.create(Widget.prototype);
+    ITooltip.prototype = Object.create(Class.prototype);
+    ITooltip.prototype.constructor = ITooltip;
+    ITooltip.prototype.mixin(PropertyExt);
+    ITooltip.prototype._class += " api_ITooltip";
 
     ITooltip.prototype.publish("tooltipStyle", "default", "set", "Style", ["default", "none"], {});
     ITooltip.prototype.publish("tooltipValueFormat", ",.2f", "string", "Value Format", null, {});
