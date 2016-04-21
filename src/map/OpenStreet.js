@@ -15,7 +15,7 @@
 
     OpenStreet.prototype._copyrightText = "© OpenStreetMap contributors";
 
-    OpenStreet.prototype.publish("tileProvider", "OpenStreetMap", "set", "Tile Provider", ["OpenStreetMap", "OpenStreetMap Hot", "MapQuest", "MapQuest Sat", "Stamen Watercolor", "OpenCycleMap"], { tags: ["Basic", "Shared"] });
+    OpenStreet.prototype.publish("tileProvider", "OpenStreetMap", "set", "Tile Provider", ["OpenStreetMap", "OpenStreetMap Hot", "MapQuest", "MapQuest Sat", "Stamen Watercolor", "OpenCycleMap", "CartoDB Dark"], { tags: ["Basic", "Shared"] });
 
     OpenStreet.prototype.layerEnter = function (base, svgElement, domElement) {
         Layer.prototype.layerEnter.apply(this, arguments);
@@ -80,6 +80,8 @@
                         return "http://" + ["a", "b", "c"][Math.random() * 3 | 0] + ".tile.stamen.com/watercolor/" + d[2] + "/" + d[0] + "/" + d[1] + ".png";
                     case "OpenCycleMap":
                         return "http://" + ["a", "b"][Math.random() * 2 | 0] + ".tile.opencyclemap.org/cycle/" + d[2] + "/" + d[0] + "/" + d[1] + ".png";
+                    case "CartoDB Dark":
+                        return "https://cartodb-basemaps-" + ["a", "b", "c"][Math.random() * 3 | 0] + ".global.ssl.fastly.net/dark_nolabels/" + d[2] + "/" + d[0] + "/" + d[1] + ".png";
                     default:
                         return "http://" + ["a", "b", "c"][Math.random() * 3 | 0] + ".tile.openstreetmap.org/" + d[2] + "/" + d[0] + "/" + d[1] + ".png";
                 }
