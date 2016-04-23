@@ -191,6 +191,9 @@
         if (this[__meta_ + id] !== undefined && !ext.override) {
             throw id + " is already published.";
         }
+        if (this[id] !== undefined && !ext.override) {
+            //throw id + " is an internal method.";
+        }
         var meta = this[__meta_ + id] = new Meta(id, defaultValue, type, description, set, ext);
         this[id] = function (_) {
             if (!arguments.length) {
