@@ -113,8 +113,8 @@
             simple: function (callback) {
                 require(["test/DataFactory", "src/chart/Bubble"], function (DataFactory, Bubble) {
                     callback(new Bubble()
-                        .columns(DataFactory.TwoD.subjects.columns)
-                        .data(DataFactory.TwoD.subjects.data)
+                        .columns(DataFactory.ND.subjects.columns)
+                        .data(DataFactory.ND.subjects.data)
                     );
                 });
             }
@@ -190,8 +190,8 @@
             simple: function (callback) {
                 require(["test/DataFactory", "src/chart/Pie"], function (DataFactory, Pie) {
                     callback(new Pie()
-                        .columns(DataFactory.TwoD.subjects.columns)
-                        .data(DataFactory.TwoD.subjects.data)
+                        .columns(DataFactory.ND.subjects.columns)
+                        .data(DataFactory.ND.subjects.data)
                     );
                 });
             }

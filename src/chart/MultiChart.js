@@ -169,6 +169,7 @@
             if (newContent !== oldContent) {
                 var size = context.size();
                 newContent
+                    .columns(context.columns())
                     .fields(context.fields())
                     .data(context.data())
                     .size(size)

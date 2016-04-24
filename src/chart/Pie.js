@@ -13,12 +13,13 @@
 
         this.labelWidgets = {};
 
+        var context = this;
         this.d3Pie = d3.layout.pie()
             .padAngle(0.0025)
             .sort(function (a, b) {
                 return a < b ? -1 : a > b ? 1 : 0;
             })
-            .value(function (d) { return d[1]; })
+            .value(function (d) { return context.toValue(d); })
         ;
         this.d3Arc = d3.svg.arc()
             .padRadius(this.calcRadius())
@@ -74,7 +75,7 @@
         var context = this;
         this
             .tooltipHTML(function (d) {
-                return context.tooltipFormat({ label: d.data[0], value: d.data[1] });
+                return context.tooltipFormat({ label: context.toLabel(d.data), value: context.toValue(d.data) });
             })
         ;
     };
@@ -88,7 +89,7 @@
             this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
         }
         this.d3Arc.innerRadius(this.innerRadius_exists() ? this.calcRadius() * this.innerRadius() / 100 : 0);
-        var arc = element.selectAll(".arc").data(this.d3Pie(this.data()), function (d) { return d.data[0]; });
+        var arc = element.selectAll(".arc").data(this.d3Pie(this.data()), function (d) { return context.toLabel(d.data); });
 
         //  Enter  ---
         arc.enter().append("g")
@@ -96,7 +97,7 @@
             .attr("opacity", 0)
             .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
-                context.click(context.rowToObj(d.data), context.columns()[1], context._selection.selected(this));
+                context.click(context.rowToObj(d.data), context.valueColumn(), context._selection.selected(this));
             })
             .each(function (d) {
                 var element = d3.select(this);
@@ -107,14 +108,14 @@
                     .on("mouseout", arcTween(-5, 150))
                 ;
                 if (d.data.__viz_faChar) {
-                    context.labelWidgets[d.data[0]] = new FAChar()
+                    context.labelWidgets[context.toLabel(d.data)] = new FAChar()
                         .char(d.data.__viz_faChar)
                         .target(this)
                         .render()
                     ;
                 } else {
-                    context.labelWidgets[d.data[0]] = new Text()
-                        .text(d.data[0])
+                    context.labelWidgets[context.toLabel(d.data)] = new Text()
+                        .text(context.toLabel(d.data))
                         .target(this)
                         .render()
                     ;
@@ -132,7 +133,7 @@
                     var xFactor = Math.cos((d.startAngle + d.endAngle - Math.PI) / 2);
                     var yFactor = Math.sin((d.startAngle + d.endAngle - Math.PI) / 2);
 
-                    var textBBox = context.labelWidgets[d.data[0]].getBBox();
+                    var textBBox = context.labelWidgets[context.toLabel(d.data)].getBBox();
                     var textOffset = Math.abs(xFactor) > Math.abs(yFactor) ? textBBox.width : textBBox.height;
                     pos.x = xFactor * (context.calcRadius() + textOffset);
                     pos.y = yFactor * (context.calcRadius() + textOffset);
@@ -144,15 +145,15 @@
                 var element = d3.select(this);
                 element.select("path").transition()
                     .attr("d", context.d3Arc)
-                    .style("fill", function (d) { return context._palette(d.data[0]); })
+                    .style("fill", function (d) { return context._palette(context.toLabel(d.data)); })
                 ;
-                context.labelWidgets[d.data[0]]
+                context.labelWidgets[context.toLabel(d.data)]
                     .pos(pos)
                     .render()
                     .element()
                         .classed("innerLabel", !context.outerText())
                         .classed("outerLabel", context.outerText())
-                        .style("opacity", (context.outerText() || context.boxInArc(pos, context.labelWidgets[d.data[0]].getBBox(), d)) ? null : 0)
+                        .style("opacity", (context.outerText() || context.boxInArc(pos, context.labelWidgets[context.toLabel(d.data)].getBBox(), d)) ? null : 0)
                 ;
             })
         ;
@@ -165,7 +166,7 @@
 
         //  Label Lines  ---
         if (context.outerText()) {
-            var lines = element.selectAll("line").data(this.d3Pie(this.data()), function (d) { return d.data[0]; });
+            var lines = element.selectAll("line").data(this.d3Pie(this.data()), function (d) { return context.toLabel(d.data); });
             lines.enter().append("line")
               .attr("x1", 0)
               .attr("x2", 0)
