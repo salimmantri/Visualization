@@ -14,11 +14,10 @@
 
         this.labelWidgets = {};
 
-        var context = this;
         this.d3Pack = d3.layout.pack()
             .sort(function (a, b) { return a < b ? -1 : a > b ? 1 : 0; })
             .size([this.width(), this.height()])
-            .value(function (d) { return context.toValue(d); })
+            .value(function (d) { return d[1]; })
         ;
     }
     Bubble.prototype = Object.create(SVGWidget.prototype);
@@ -43,7 +42,7 @@
         var context = this;
         this
             .tooltipHTML(function (d) {
-                return context.tooltipFormat({ label: context.toLabel(d), value: context.toValue(d) });
+                return context.tooltipFormat({ label: d[0], value: d[1] });
             })
         ;
     };
@@ -56,8 +55,9 @@
             this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
         }
 
+        var mappedData = this.mappedData();
         var node = element.selectAll(".node")
-            .data(this.data().length ? this.d3Pack.nodes({ children: this.cloneData() }).filter(function (d) { return !d.children; }) : [], function (d) { return context.toLabel(d); })
+            .data(mappedData.length ? this.d3Pack.nodes({ children: mappedData }).filter(function (d) { return !d.children; }) : [], function (d) { return d[0]; })
         ;
 
         //  Enter  ---
@@ -66,7 +66,7 @@
             .attr("opacity", 0)
             .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
-                context.click(context.rowToObj(d), context.valueColumn(), context._selection.selected(this));
+                context.click(context.rowToObj(d), context.columns()[1], context._selection.selected(this));
             })
             .each(function (d) {
                 var element = d3.select(this);
@@ -76,14 +76,14 @@
                     .on("mousemove.tooltip", context.tooltip.show)
                 ;
                 if (d.__viz_faChar) {
-                    context.labelWidgets[context.toLabel(d)] = new FAChar()
+                    context.labelWidgets[d[0]] = new FAChar()
                         .char(d.__viz_faChar)
                         .target(this)
                         .render()
                     ;
                 } else {
-                    context.labelWidgets[context.toLabel(d)] = new Text()
-                        .text(context.toLabel(d))
+                    context.labelWidgets[d[0]] = new Text()
+                        .text(d[0])
                         .target(this)
                         .render()
                     ;
@@ -99,25 +99,25 @@
                 var pos = { x: d.x, y: d.y };
                 element.select("circle").transition()
                     .attr("transform", function (d) { return "translate(" + pos.x + "," + pos.y + ")"; })
-                    .style("fill", function (d) { return context._palette(context.toLabel(d)); })
+                    .style("fill", function (d) { return context._palette(d[0]); })
                     .attr("r", function (d) { return d.r; })
                     .select("title")
-                        .text(function (d) { return context.toLabel(d) + " (" + context.toValue(d) + ")"; })
+                        .text(function (d) { return d[0] + " (" + d[1] + ")"; })
                 ;
                 if (d.__viz_faChar) {
-                    context.labelWidgets[context.toLabel(d)]
+                    context.labelWidgets[d[0]]
                         .pos(pos)
                         .render()
                     ;
                 } else {
-                    var label = context.toLabel(d);
-                    var labelWidth = context.labelWidgets[context.toLabel(d)].getBBox().width;
+                    var label = d[0];
+                    var labelWidth = context.labelWidgets[d[0]].getBBox().width;
                     if (d.r * 2 < 16) {
                         label = "";
                     } else if (d.r * 2 < labelWidth) {
                         label = label[0] + "...";
                     }
-                    context.labelWidgets[context.toLabel(d)]
+                    context.labelWidgets[d[0]]
                         .pos(pos)
                         .text(label)
                         .render()

@@ -1,35 +1,15 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["../common/Class", "../common/PropertyExt", "../common/Palette"], factory);
+        define(["d3", "../common/Class", "../common/PropertyExt", "../common/Palette"], factory);
 
     } else {
-        root.api_I2DChart = factory(root.common_Class, root.common_PropertyExt, root.common_Palette);
+        root.api_I2DChart = factory(root.d3, root.common_Class, root.common_PropertyExt, root.common_Palette);
     }
-}(this, function (Class, PropertyExt, Palette) {
+}(this, function (d3, Class, PropertyExt, Palette) {
     function I2DChart() {
         Class.call(this);
         PropertyExt.call(this);
-
-        var columns = this.columns;
-        this.columns = function (_) {
-            var retVal = columns.apply(this, arguments);
-            if (arguments.length) {
-                this.labelColumnIdx = this.columns().indexOf(this.labelColumn());
-                this.valueColumnIdx = this.columns().indexOf(this.valueColumn());
-            }
-            return retVal;
-        };
-        var fields = this.fields;
-        this.fields = function (_) {
-            var retVal = fields.apply(this, arguments);
-            if (arguments.length) {
-                this.labelColumnIdx = this.columns().indexOf(this.labelColumn());
-                this.valueColumnIdx = this.columns().indexOf(this.valueColumn());
-            }
-            return retVal;
-        };
-
     }
     I2DChart.prototype = Object.create(Class.prototype);
     I2DChart.prototype.constructor = I2DChart;
@@ -40,6 +20,8 @@
 
     I2DChart.prototype.publish("labelColumn", null, "set", "Label Field", function () { return this.columns(); });
     I2DChart.prototype.publish("valueColumn", null, "set", "Value Field", function () { return this.columns(); });
+    I2DChart.prototype.publish("valueRollup", "sum", "set", "Value Field", ["sum", "mean", "median", "max", "min", "deviation", "variance"]);
+
     I2DChart.prototype.publish("paletteID", "default", "set", "Palette ID", I2DChart.prototype._palette.switch(), { tags: ["Basic", "Shared"] });
     I2DChart.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette", null, { tags: ["Intermediate", "Shared"] });
 
@@ -52,14 +34,7 @@
         if (!arguments.length && !exists(labelColumn.apply(this, arguments))) {
             this.labelColumn(this.columns()[0]);
         }
-        var retVal = labelColumn.apply(this, arguments);
-        if (arguments.length) {
-            this.labelColumnIdx = this.columns().indexOf(_);
-        }
-        return retVal;
-    };
-    I2DChart.prototype.toLabel = function (d) {
-        return d[this.labelColumnIdx];
+        return labelColumn.apply(this, arguments);
     };
 
     var valueColumn = I2DChart.prototype.valueColumn;
@@ -67,14 +42,20 @@
         if (!arguments.length && !exists(valueColumn.apply(this, arguments))) {
             this.valueColumn(this.columns()[1]);
         }
-        var retVal = valueColumn.apply(this, arguments);
-        if (arguments.length) {
-            this.valueColumnIdx = this.columns().indexOf(_);
-        }
-        return retVal;
+        return valueColumn.apply(this, arguments);
     };
-    I2DChart.prototype.toValue = function (d) {
-        return d[this.valueColumnIdx];
+
+    I2DChart.prototype.mappedData = function () {
+        var columns = this.columns();
+        var labelIdx = columns.indexOf(this.labelColumn());
+        var valueIdx = columns.indexOf(this.valueColumn());
+        var aggregator = d3[this.valueRollup()];
+        var retVal = d3.nest()
+            .key(function(d) { return d[labelIdx]})
+            .rollup(function (leaves) { return aggregator(leaves, function (d) { return d[valueIdx] }); })
+            .entries(this.data())
+        ;
+        return retVal.map(function (d) { return [d.key, d.values]; });
     };
 
     //  Events  ---
