@@ -29,6 +29,15 @@
         return d !== null && d !== undefined;
     }
 
+    I2DChart.prototype.leafValue = function (d, column, leafIdx) {
+        leafIdx = leafIdx || 0;
+        var valueIdx = this.columns().indexOf(column);
+        if (valueIdx >= 0) {
+            return d[2][leafIdx][valueIdx];
+        }
+        return undefined;
+    };
+
     var labelColumn = I2DChart.prototype.labelColumn;
     I2DChart.prototype.labelColumn = function (_) {
         if (!arguments.length && !exists(labelColumn.apply(this, arguments))) {
@@ -53,17 +62,20 @@
         var retVal = d3.nest()
             .key(function(d) { return d[labelIdx]})
             .rollup(function (leaves) {
-                return aggregator(leaves.filter(function (d) {
-                    if (isNaN(d[valueIdx])) {
-                        console.log("Expected a number:" + d);
-                        return false;
-                    }
-                    return true;
-                }), function (d) { return d[valueIdx]; });
+                return {
+                    rollup: aggregator(leaves.filter(function (d) {
+                        if (isNaN(d[valueIdx])) {
+                            console.log("Expected a number:" + d);
+                            return false;
+                        }
+                        return true;
+                    }), function (d) { return d[valueIdx]; }),
+                    leaves: leaves
+                }
             })
             .entries(this.data())
         ;
-        return retVal.map(function (d) { return [d.key, d.values]; });
+        return retVal.map(function (d) { return [d.key, d.values.rollup, d.values.leaves]; });
     };
 
     //  Events  ---

@@ -41,12 +41,12 @@
         },
         ND: {
             subjects: {
-                columns: ["Subject", "Year 1", "Year 2", "Year 3"],
+                columns: ["Subject", "Year 1", "Year 2", "Year 3", "Icon"],
                 data: [
-                    ["Geography", 75, 68, 65],
-                    ["English", 45, 55, 52],
-                    ["Math", 98, 92, 90],
-                    ["Science", 66, 60, 72]
+                    ["Geography", 75, 68, 65, "fa-map"],
+                    ["English", 45, 55, 52, "fa-book"],
+                    ["Math", 98, 92, 90, "fa-calculator"],
+                    ["Science", 66, 60, 72, "fa-flask"]
                 ]
             },
             ampolar: {

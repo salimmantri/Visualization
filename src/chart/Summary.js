@@ -24,6 +24,7 @@
     Summary.prototype.publish("colorFill", "#3498db", "html-color", "Fill Color", null);
     Summary.prototype.publish("colorStroke", "#ffffff", "html-color", "Fill Color", null);
     Summary.prototype.publish("valueIcon", "fa-briefcase", "string", "FA Char icon class");
+    Summary.prototype.publish("valueIconColumn", null, "set", "Value Field", function () { return this.columns(); }, { optional: true });
     Summary.prototype.publish("moreText", "More Info", "string", "More text");
     Summary.prototype.publish("moreIcon", "fa-info-circle", "string", "FA Char icon class");
     Summary.prototype.publish("fixedSize", true, "boolean", "Fix Size to Min Width/Height");
@@ -42,7 +43,7 @@
             if (_) {
                 this._playIntervalHandle = setInterval(function () {
                     context._playIntervalIdx++;
-                    if (context._renderCount && context.data().length) {
+                    if (context._renderCount && context.mappedData().length) {
                         context.render();
                     }
                 }, _);
@@ -58,27 +59,24 @@
         var context = this;
         this._headerDiv = this._mainDiv.append("h2")
             .on("click", function (d) {
-                context.click(context.data()[context._playIntervalIdx], context.columns()[1], true);
+                context.click(context.mappedData()[context._playIntervalIdx], context.columns()[1], true);
             })
         ;
         this._textDiv = this._mainDiv.append("div")
             .attr("class", "text")
             .on("click", function (d) {
-                context.click(context.data()[context._playIntervalIdx], context.columns()[1], true);
+                context.click(context.mappedData()[context._playIntervalIdx], context.columns()[1], true);
             })
         ;
     };
 
     Summary.prototype.update = function (domNode, element) {
         HTMLWidget.prototype.update.apply(this, arguments);
-        if (this.data().length) {
-
-        }
-        var data = this.data();
-        if (this._playIntervalIdx >= data.length) {
+        var mappedData = this.mappedData();
+        if (this._playIntervalIdx >= mappedData.length) {
             this._playIntervalIdx = 0;
         }
-        var row = this._playIntervalIdx < data.length ? data[this._playIntervalIdx] : ["", ""];
+        var row = this._playIntervalIdx < mappedData.length ? mappedData[this._playIntervalIdx] : ["", ""];
         element
             .style({
                 width: this.fixedSize() ? this.minWidth_exists() ? this.minWidth() + "px" : null : "100%",
@@ -86,7 +84,7 @@
             })
         ;
         this._mainDiv
-            .attr("class", "content bgIcon " + this.valueIcon())
+            .attr("class", "content bgIcon " + (this.leafValue(row, this.valueIconColumn()) || this.valueIcon()))
             .style({
                 "background-color": this.colorFill(),
                 "color": this.colorStroke(),
@@ -108,7 +106,7 @@
             .attr("class", "more")
             .on("click", function (d) {
                 var clickEvent = {};
-                clickEvent[context.columns()] = context.data();
+                clickEvent[context.columns()] = context.mappedData();
                 context.click(clickEvent, "more");
             })
             .each(function (d) {
