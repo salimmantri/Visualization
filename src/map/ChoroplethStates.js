@@ -42,7 +42,7 @@
     ChoroplethStates.prototype.layerUpdate = function (base) {
         Choropleth.prototype.layerUpdate.apply(this, arguments);
 
-        this.choroPaths = this._choroplethData.selectAll(".data").data(this.visible() ? this.data() : [], function (d) { return d[0]; });
+        this.choroPaths = this._choroplethData.selectAll(".data").data(this.visible() ? this.mappedData() : [], function (d) { return d[0]; });
         var context = this;
         this.choroPaths.enter().append("path")
             .attr("class", "data")

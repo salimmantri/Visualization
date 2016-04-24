@@ -52,7 +52,15 @@
         var aggregator = d3[this.valueRollup()];
         var retVal = d3.nest()
             .key(function(d) { return d[labelIdx]})
-            .rollup(function (leaves) { return aggregator(leaves, function (d) { return d[valueIdx] }); })
+            .rollup(function (leaves) {
+                return aggregator(leaves.filter(function (d) {
+                    if (isNaN(d[valueIdx])) {
+                        console.log("Expected a number:" + d);
+                        return false;
+                    }
+                    return true;
+                }), function (d) { return d[valueIdx]; });
+            })
             .entries(this.data())
         ;
         return retVal.map(function (d) { return [d.key, d.values]; });

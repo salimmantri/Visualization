@@ -17,12 +17,9 @@
     }
     WordCloud.prototype = Object.create(SVGWidget.prototype);
     WordCloud.prototype.constructor = WordCloud;
+    WordCloud.prototype.mixin(I2DChart);
+    WordCloud.prototype.mixin(ITooltip);
     WordCloud.prototype._class += " other_WordCloud";
-    WordCloud.prototype.implements(I2DChart.prototype);
-    WordCloud.prototype.implements(ITooltip.prototype);
-
-    WordCloud.prototype.publish("paletteID", "default", "set", "Palette ID", WordCloud.prototype._palette.switch(), { tags: ["Basic", "Shared"] });
-    WordCloud.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette", null, { tags: ["Intermediate", "Shared"] });
 
     WordCloud.prototype.publish("fontFamily", "Impact", "string", "Font Name", null, { tags: ["Basic"] });
     WordCloud.prototype.publish("fontSizeFrom", 6, "number", "Font Size From", null, { tags: ["Basic"] });
@@ -36,20 +33,6 @@
     WordCloud.prototype.publish("offsetX", 0, "number", "X offset", null, { tags: ["Advanced"] });
     WordCloud.prototype.publish("offsetY", 0, "number", "Y offset", null, { tags: ["Advanced"] });
     WordCloud.prototype.publish("zoom", 1, "number", "Zoom", null, { tags: ["Advanced"] });
-
-    WordCloud.prototype.data = function (_) {
-        var retVal = SVGWidget.prototype.data.apply(this, arguments);
-        if (arguments.length) {
-            this._vizData = _.map(function (row) {
-                var retVal = {};
-                for (var key in row) {
-                    retVal["__viz_" + key] = row[key];
-                }
-                return retVal;
-            });
-        }
-        return retVal;
-    };
 
     WordCloud.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
@@ -69,10 +52,23 @@
         this._cloud = new D3Cloud()
             .canvas(this._canvas)
         ;
+        this
+            .tooltipHTML(function (d) {
+                return context.tooltipFormat({ label: d.__viz_0, value: d.__viz_1 });
+            })
+        ;
     };
 
     WordCloud.prototype.update = function (domNode, element) {
         SVGWidget.prototype.update.apply(this, arguments);
+
+        var mappedData = this.mappedData().map(function (row) {
+            var retVal = {};
+            for (var key in row) {
+                retVal["__viz_" + key] = row[key];
+            }
+            return retVal;
+        });
 
         this._palette = this._palette.switch(this.paletteID());
         if (this.useClonedPalette()) {
@@ -82,13 +78,13 @@
         this.zoomed(this, [this.offsetX(), this.offsetY()], this.zoom());
 
         var context = this;
-        var extent = d3.extent(this._vizData, function (d) { return d.__viz_1; });
+        var extent = d3.extent(mappedData, function (d) { return d.__viz_1; });
         var scale = d3.scale[this.scaleMode()]().domain(extent).range([this.fontSizeFrom(), this.fontSizeTo()]);
         var angleDomain = d3.scale.linear().domain([0, context.angleCount() - 1]).range([context.angleFrom(), context.angleTo()]);
 
         this._cloud.stop()
             .size([this.width(), this.height()])
-            .words(this._vizData)
+            .words(mappedData)
             .font(this.fontFamily())
             .padding(this.padding())
             .spiral(this.spiral())
@@ -110,15 +106,8 @@
                     context.click({ label: d.__viz_0, weight: d.__viz_1 });
                 })
                 .style("opacity", 1e-6)
-                .on("mouseover.tooltip", function (d) {
-                    context.tooltipShow([d.__viz_0, d.__viz_1], context.columns(), 1);
-                })
-                .on("mouseout.tooltip", function (d) {
-                    context.tooltipShow();
-                })
-                .on("mousemove.tooltip", function (d) {
-                    context.tooltipShow([d.__viz_0, d.__viz_1], context.columns(), 1);
-                })
+                .on("mouseout.tooltip", context.tooltip.hide)
+                .on("mousemove.tooltip", context.tooltip.show)
             ;
             text
                 .style("font-size", function (d) { return scale(d.__viz_1) + "px"; })

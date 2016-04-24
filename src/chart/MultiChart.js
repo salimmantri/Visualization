@@ -70,10 +70,13 @@
         { id: "AM_GANTT", display: "Gantt (amCharts)", widgetClass: "amchart_Gantt" },
         { id: "AM_COMBO", display: "Combo (amCharts)", widgetClass: "amchart_Combo" },
     ].map(function(item) { item.family = "ND"; return item;});
+    MultiChart.prototype._choroChartTypes = [
+        { id: "CHORO_USSTATES", display: "Choroplet US States", widgetClass: "map_ChoroplethStates" }
+    ].map(function (item) { item.family = "any"; return item; });
     MultiChart.prototype._anyChartTypes = [
         { id: "TABLE", display: "Table", widgetClass: "other_Table" }
     ].map(function(item) { item.family = "any"; return item;});
-    MultiChart.prototype._allChartTypes = MultiChart.prototype._1DChartTypes.concat(MultiChart.prototype._2DChartTypes.concat(MultiChart.prototype._NDChartTypes.concat(MultiChart.prototype._anyChartTypes)));
+    MultiChart.prototype._allChartTypes = MultiChart.prototype._1DChartTypes.concat(MultiChart.prototype._2DChartTypes.concat(MultiChart.prototype._NDChartTypes.concat(MultiChart.prototype._choroChartTypes.concat(MultiChart.prototype._anyChartTypes))));
 
     MultiChart.prototype.publishReset();
     MultiChart.prototype.publish("chartType", "BUBBLE", "set", "Chart Type", MultiChart.prototype._allChartTypes.map(function (item) { return item.id; }),{tags:["Basic"]});

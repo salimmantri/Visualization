@@ -1,25 +1,26 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "topojson", "./Layer", "../common/Palette", "css!./Choropleth"], factory);
+        define(["d3", "topojson", "./Layer", "../api/I2DChart", "../common/Palette", "css!./Choropleth"], factory);
     } else {
-        root.map_Choropleth = factory(root.d3, root.topojson, root.map_Layer, root.common_Palette);
+        root.map_Choropleth = factory(root.d3, root.topojson, root.map_Layer, root.api_I2DChart, root.common_Palette);
     }
-}(this, function (d3, topojson, Layer, Palette) {
+}(this, function (d3, topojson, Layer, I2DChart, Palette) {
     function Choropleth() {
         Layer.call(this);
+        I2DChart.call(this);
 
         this._dataMap = {};
         this._path = d3.select(null);
     }
     Choropleth.prototype = Object.create(Layer.prototype);
     Choropleth.prototype.constructor = Choropleth;
+    Choropleth.prototype.mixin(I2DChart);
     Choropleth.prototype._class += " map_Choropleth";
 
     Choropleth.prototype._palette = Palette.rainbow("default");
 
-    Choropleth.prototype.publish("paletteID", "YlOrRd", "set", "Palette ID", Choropleth.prototype._palette.switch(), { tags: ["Basic", "Shared"] });
-    Choropleth.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette", null, { tags: ["Intermediate", "Shared"] });
+    Choropleth.prototype.publish("paletteID", "YlOrRd", "set", "Palette ID", Choropleth.prototype._palette.switch(), { tags: ["Basic", "Shared"], override: true });
 
     Choropleth.prototype.publish("opacity", 1.0, "number", "Opacity", null, { tags: ["Advanced"] });
 
@@ -28,27 +29,6 @@
     Choropleth.prototype.publish("meshStrokeWidth", 0.25, "number", "Stroke Width");
     Choropleth.prototype.publish("internalOnly", false, "boolean", "Internal mesh only");
     Choropleth.prototype.publish("autoScaleMode", "mesh", "set", "Auto Scale", ["none", "mesh", "data"], { tags: ["Basic"], override: true });
-
-    Choropleth.prototype.data = function (_) {
-        var retVal = Layer.prototype.data.apply(this, arguments);
-        if (arguments.length) {
-            this._dataMap = {};
-            this._dataMinWeight = null;
-            this._dataMaxWeight = null;
-
-            var context = this;
-            this.data().forEach(function (item) {
-                context._dataMap[item[0]] = item;
-                if (!context._dataMinWeight || item[1] < context._dataMinWeight) {
-                    context._dataMinWeight = item[1];
-                }
-                if (!context._dataMaxWeight || item[1] > context._dataMaxWeight) {
-                    context._dataMaxWeight = item[1];
-                }
-            });
-        }
-        return retVal;
-    };
 
     Choropleth.prototype.getDataBounds = function () {
         var bbox = this._choroplethData.node().getBBox();
@@ -94,7 +74,6 @@
 
     Choropleth.prototype.layerUpdate = function (base, forcePath) {
         Layer.prototype.layerUpdate.apply(this, arguments);
-
         this._palette = this._palette.switch(this.paletteID());
         if (this.useClonedPalette()) {
             this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
@@ -105,6 +84,21 @@
             delete this._prevProjection;
             return;
         }
+
+        this._dataMap = {};
+        this._dataMinWeight = null;
+        this._dataMaxWeight = null;
+
+        var context = this;
+        this.mappedData().forEach(function (item) {
+            context._dataMap[item[0]] = item;
+            if (!context._dataMinWeight || item[1] < context._dataMinWeight) {
+                context._dataMinWeight = item[1];
+            }
+            if (!context._dataMaxWeight || item[1] > context._dataMaxWeight) {
+                context._dataMaxWeight = item[1];
+            }
+        });
 
         if (forcePath || this._prevProjection !== base.projection() || this._prevInternalOnly !== this.internalOnly()) {
             this._choropleth
