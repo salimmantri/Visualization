@@ -15,11 +15,6 @@
 
         this._selected = null;
         this._selections = [];
-        
-        this._dataUpdated = 0;
-        this._prevDataUpdated = -1;
-        this._columnsUpdated = 0;
-        this._prevColumnsUpdated = -1;
     }
     CommonFunnel.prototype = Object.create(HTMLWidget.prototype);
     CommonFunnel.prototype.constructor = CommonFunnel;
@@ -46,7 +41,6 @@
     CommonFunnel.prototype.publish("selectionColor", "#f00", "html-color", "Font Color",null,{tags:["Basic"]});
 
     CommonFunnel.prototype.updateChartOptions = function() {
-
         this._chart.startDuration = this.startDuration();
         this._chart.rotate = this.flip();
 
@@ -72,17 +66,14 @@
         if(this.reverseDataSorting()){
             sortingMethod = function(a,b){ return a[1] < b[1] ? 1 : -1; };
         }
-        this.data().sort(sortingMethod);
+        this._mappedData = this.mappedData();
+        this._mappedData.sort(sortingMethod);
 
         // DataProvider
-        if (this._dataUpdated > this._prevDataUpdated || this._columnsUpdated > this._prevColumnsUpdated) {
-            this._chart.dataProvider = this.formatData(this.data());
-        }
-        this._prevDataUpdated = this._dataUpdated;
-        this._prevColumnsUpdated = this._columnsUpdated;
+        this._chart.dataProvider = this.formatData(this._mappedData);
 
         // Color Palette
-        this._chart.colors = this.data().map(function (row) {
+        this._chart.colors = this._mappedData.map(function (row) {
             return this._palette(row[0]);
         }, this);
 
@@ -153,7 +144,7 @@
 
             e.chart.validateData();
 
-            context.click(context.rowToObj(context.data()[e.dataItem.index]), context.columns()[1], context._selected !== null);
+            context.click(context.rowToObj(context._mappedData[e.dataItem.index]), context.columns()[1], context._selected !== null);
         });
     };
 
@@ -177,7 +168,6 @@
     CommonFunnel.prototype.render = function(callback) {
         return HTMLWidget.prototype.render.apply(this, arguments);
     };
-
 
     CommonFunnel.prototype.postUpdate = function (domNode, element) {
         var context = this;
@@ -226,13 +216,6 @@
             }
             this._chart.validateNow();
         }
-    };
-
-    CommonFunnel.prototype.data = function(_) {
-        if (arguments.length) {
-            this._dataUpdated++;
-        }
-        return HTMLWidget.prototype.data.apply(this, arguments);
     };
 
     return CommonFunnel;

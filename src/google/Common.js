@@ -56,8 +56,9 @@
 
     Common.prototype.formatData = function () {
         var data = null;
-        if (this.data().length) {
-            data = [this.columns()].concat(this.data().map(function (row, row_idx) {
+        var mappedData = this.mappedData();
+        if (mappedData.length) {
+            data = [this.columns()].concat(mappedData.map(function (row, row_idx) {
                 return row.map(function (cell, idx) {
                     if (idx > 0) {
                         if (isNaN(cell)) {
@@ -145,7 +146,7 @@
             var selectedItem = context._chart.getSelection()[0];
             if (selectedItem) {
                 context._selection = {
-                    data: context.rowToObj(context.data()[selectedItem.row]),
+                    data: context.rowToObj(context.mappedData()[selectedItem.row]),
                     column: context.columns()[selectedItem.column] || null
                 };
             } else {

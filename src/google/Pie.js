@@ -39,7 +39,7 @@
     Pie.prototype.getChartOptions = function () {
         var retVal = Common2D.prototype.getChartOptions.apply(this, arguments);
 
-        retVal.colors = this.data().map(function (row) {
+        retVal.colors = this.mappedData().map(function (row) {
             return this._palette(row[0]);
         }, this);
 
@@ -81,7 +81,7 @@
     };
 
     Pie.prototype.getNumSlices = function () {
-        return this.data().length;
+        return this.mappedData().length;
     };
 
     function initSlices(num) {

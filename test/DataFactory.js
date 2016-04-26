@@ -43,7 +43,7 @@
             subjects: {
                 columns: ["Subject", "Year 1", "Year 2", "Year 3", "Icon"],
                 data: [
-                    ["Geography", 75, 68, 65, "fa-map"],
+                    ["Geography", 175, 6, 100, "fa-map"],
                     ["English", 45, 55, 52, "fa-book"],
                     ["Math", 98, 92, 90, "fa-calculator"],
                     ["Science", 66, 60, 72, "fa-flask"]
