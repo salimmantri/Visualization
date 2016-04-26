@@ -56,10 +56,11 @@
 
     Common.prototype.formatData = function () {
         var data = null;
+        var mappedColumns = this.mappedColumns();
         var mappedData = this.mappedData();
         if (mappedData.length) {
-            data = [this.columns()].concat(mappedData.map(function (row, row_idx) {
-                return row.map(function (cell, idx) {
+            data = [mappedColumns].concat(mappedData.map(function (row, row_idx) {
+                return row.filter(function (cell, idx) { return idx < mappedColumns.length; }).map(function (cell, idx) {
                     if (idx > 0) {
                         if (isNaN(cell)) {
                             console.log("Invalid Data:  " + cell + " (" + row_idx + ", " + idx + ")");

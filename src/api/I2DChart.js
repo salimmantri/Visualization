@@ -54,6 +54,10 @@
         return valueColumn.apply(this, arguments);
     };
 
+    I2DChart.prototype.mappedColumns = function () {
+        return [this.labelColumn(), this.valueColumn()];
+    },
+
     I2DChart.prototype.mappedData = function () {
         var columns = this.columns();
         var labelIdx = columns.indexOf(this.labelColumn());
