@@ -188,10 +188,14 @@
     };
 
     PropertyExt.prototype.publish = function (id, defaultValue, type, description, set, ext) {
+        ext = ext || {};
         if (this[__meta_ + id] !== undefined && !ext.override) {
             throw id + " is already published.";
         }
         var meta = this[__meta_ + id] = new Meta(id, defaultValue, type, description, ext);
+        if (meta.ext.internal) {
+            this[__private_ + id] = true;
+        }
         this[id] = function (_) {
             if (!arguments.length) {
                 if (this[id + "_disabled"]()) return this[id + "_default"]();

@@ -17,6 +17,7 @@
         this.type(opt.type || "");
         this.mask(opt.mask || null);
         this.format(opt.format || null);
+        this._version = 0;
     }
     Field.prototype = Object.create(Class.prototype);
     Field.prototype.constructor = Field;
@@ -61,6 +62,7 @@
                     };
                     break;
             }
+            this._version++;
         }
         return retVal;
     };
@@ -71,6 +73,7 @@
         var retVal = origMask.apply(this, arguments);
         if (arguments.length) {
             this._maskTransformer = this.formatter(_);
+            this._version++;
         }
         return retVal;
     };
@@ -81,6 +84,7 @@
         var retVal = origFormat.apply(this, arguments);
         if (arguments.length) {
             this._formatTransformer = this.formatter(_);
+            this._version++;
         }
         return retVal;
     };
@@ -146,6 +150,9 @@
         Class.call(this);
         PropertyExt.call(this);
 
+        this._fieldsVersionArr = [];
+        this._fieldsVersion = 0;
+        this._dataVersion = 0;
         this.clear();
     }
     Grid.prototype = Object.create(Class.prototype);
@@ -154,10 +161,12 @@
     Grid.prototype._class += " common_Database.Grid";
 
     Grid.prototype.publish("fields", [], "propertyArray", "Fields");
+    Grid.prototype.publish("dataVersion", 0, "number", "Data Version", null, { internal: true });
 
     Grid.prototype.clear = function () {
         this.fields([]);
         this._data = [];
+        this._dataVersion++;
         return this;
     };
 
@@ -183,6 +192,21 @@
         return fieldsOrig.call(this, clone ? _.map(function (d) { return d.clone(); }) : _);
     };
 
+    Grid.prototype.fieldsVersion = function () {
+        var fieldsVersionArr = this.fields().map(function (d) {
+            return d._version;
+        });
+        if (fieldsVersionArr.length !== this._fieldsVersionArr.length) {
+            this._fieldsVersion++;
+        } else if (fieldsVersionArr.some(function (d, idx) {
+            return d !== this._fieldsVersionArr[idx];
+        }, this)) {
+            this._fieldsVersion++;
+        }
+        this._fieldsVersionArr = fieldsVersionArr;
+        return this._fieldsVersion;
+    };
+
     Grid.prototype.fieldByLabel = function (_, ignoreCase) {
         return this.fields().filter(function (field, idx) { field.idx = idx; return ignoreCase ? field.label().toLowerCase() === _.toLowerCase() : field.label() === _; })[0];
     };
@@ -190,6 +214,7 @@
     Grid.prototype.data = function (_, clone) {
         if (!arguments.length) return this._data;
         this._data = clone ? _.map(function (d) { return d.map(function (d2) { return d2; }); }) : _;
+        this._dataVersion++;
         return this;
     };
 
@@ -218,6 +243,7 @@
             this.fields(_.map(function (d) { return new Field().label(d); }));
         } else {
             this._data[row - 1] = _;
+            this._dataVersion++;
         }
         return this;
     };
@@ -226,6 +252,7 @@
         if (!arguments.length) return [this.row(0)].concat(this._data);
         this.row(0, _[0]);
         this._data = _.filter(function (row, idx) { return idx > 0; });
+        this._dataVersion++;
         return this;
     };
 
@@ -237,6 +264,7 @@
                 this.fields()[col] = new Field().label(_[0]);
             } else {
                 this._data[idx - 1][col] = d;
+                this._dataVersion++;
             }
         }, this);
         return this;
@@ -246,6 +274,7 @@
         if (arguments.length < 2) return this._data.map(function (row, idx) { return row[col]; });
         _.forEach(function (d, idx) {
             this._data[idx][col] = d;
+            this._dataVersion++;
         }, this);
         return this;
     };
@@ -267,6 +296,7 @@
             this.fields()[col] = new Field().label(_);
         } else {
             this._data[row][col] = _;
+            this._dataVersion++;
         }
         return this;
     };
@@ -412,6 +442,45 @@
                 return retVal;
             });
         }
+    };
+
+    //  Views  ---
+    function View(datagrid) {
+        this._datagrid = datagrid;
+        this._version = 0;
+    }
+    View.prototype.version = function () {
+        return this._version;
+    };
+    View.prototype.datagrid = function () {
+        return this._datagrid;
+    };
+    View.prototype.refresh = function () {
+        var dataVersion = this._datagrid.dataVersion();
+        var fieldsVersion = this._datagrid.fieldsVersion();
+        if (this._prevDataVersion !== dataVersion || this._prevFieldsVersion !== fieldsVersion) {
+            this._calcView();
+            this._version++;
+            this._prevDataVersion = dataVersion;
+            this._prevFieldsVersion = fieldsVersion;
+        }
+        return this;
+    };
+    View.prototype._calcView = function () {
+        this.columns = this._datagrid.legacyColumns();
+        this.data = this._datagrid.legacyData();
+        this.fields = this._datagrid.fields();
+        this.parsedData = this._datagrid.parsedData();
+        this.formattedData = this._datagrid.formattedData();
+        return this;
+    };
+
+    Grid.prototype.view = function (calcView) {
+        var retVal = new View(this);
+        if (calcView) {
+            View.prototype._calcView = calcView;
+        }
+        return retVal;
     };
 
     //  Nesting  ---
