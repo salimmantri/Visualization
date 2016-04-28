@@ -96,11 +96,11 @@
     };
 
     XYAxis.prototype.parsedData = function () {
-        return this.data().map(function (row) {
+        return this.mappedData().map(function (row) {
             return row.map(function (cell, idx) {
                 if (idx === 0) {
                     return this.parseData(cell);
-                } if (idx >= this.columns().length) {
+                } if (idx >= this.mappedColumns().length) {
                     return cell;
                 }
                 return this.parseValue(cell);
@@ -175,7 +175,7 @@
     };
 
     XYAxis.prototype.brushMoved = SVGWidget.prototype.debounce(function brushed() {
-        var selected = this.data().filter(function (d) {
+        var selected = this.mappedData().filter(function (d) {
             var pos = d[0];
             if (this.xAxisType() ==="ordinal") {
                 pos = this.domainAxis.d3Scale(pos) + (this.domainAxis.d3Scale.rangeBand ? this.domainAxis.d3Scale.rangeBand() / 2 : 0);
@@ -283,7 +283,7 @@
 
         this.domainAxis
             .orientation(isHorizontal ? "bottom" : "left")
-            .title(this.columns()[0])
+            .title(this.mappedColumns()[0])
         ;
         this.valueAxis
             .orientation(isHorizontal ? "left" : "bottom")
@@ -297,7 +297,7 @@
         //  Update Domain  ---
         switch (this.xAxisType()) {
             case "ordinal":
-                this.domainAxis.ordinals(this.data().map(function (d) { return d[0]; }));
+                this.domainAxis.ordinals(this.mappedData().map(function (d) { return d[0]; }));
                 break;
             default:
                 var domainMin = this.xAxisDomainLow() ? this.xAxisDomainLow() : this.domainAxis.parseInvert(d3.min(this.parsedData(), function (data) {
@@ -315,11 +315,12 @@
                 break;
         }
 
+        var mappedColumns = context.mappedColumns();
         var min = this.yAxisDomainLow() ? this.yAxisDomainLow() : this.valueAxis.parseInvert(d3.min(this.parsedData(), function (data) {
-            return d3.min(data.filter(function (cell, i) { return i > 0 && context.columns()[i] && context.columns()[i].indexOf("__") !== 0 && cell !== null; }), function (d) { return d instanceof Array ? d[0] : d; });
+            return d3.min(data.filter(function (cell, i) { return i > 0 && mappedColumns[i] && mappedColumns[i].indexOf("__") !== 0 && cell !== null; }), function (d) { return d instanceof Array ? d[0] : d; });
         }));
         var max = this.yAxisDomainHigh() ? this.yAxisDomainHigh() : this.valueAxis.parseInvert(d3.max(this.parsedData(), function (data) {
-            return d3.max(data.filter(function (cell, i) { return i > 0 && context.columns()[i] && context.columns()[i].indexOf("__") !== 0 && cell !== null; }), function (d) { return d instanceof Array ? d[1] : d; });
+            return d3.max(data.filter(function (cell, i) { return i > 0 && mappedColumns[i] && mappedColumns[i].indexOf("__") !== 0 && cell !== null; }), function (d) { return d instanceof Array ? d[1] : d; });
         }));
         this.valueAxis
             .low(min)
@@ -448,8 +449,8 @@
                     .y(context.height() - context.xAxisFocusHeight() / 2)
                     .width(context.width())
                     .height(context.xAxisFocusHeight())
-                    .columns(context.columns())
-                    .data(context.data())
+                    .columns(context.mappedColumns())
+                    .data(context.mappedData())
                     .render()
                 ;
                 syncAxis();

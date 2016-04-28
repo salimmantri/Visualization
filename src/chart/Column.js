@@ -19,17 +19,15 @@
     Column.prototype.implements(INDChart.prototype);
     Column.prototype.implements(ITooltip.prototype);
 
-    Column.prototype.publish("paletteID", "default", "set", "Palette ID", Column.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Column.prototype.publish("stacked", false, "boolean", "Stacked Bars", null, { tags: ["Basic"] });
     Column.prototype.publish("stackedOpacity", 0.66, "number", "Fill Stacked Opacity", null, { tags: ["Basic"] });
-    Column.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Column.prototype.enter = function (domNode, element) {
         XYAxis.prototype.enter.apply(this, arguments);
         var context = this;
         this
             .tooltipHTML(function (d) {
-                return context.tooltipFormat({ label: d.row[0], series: context.columns()[d.idx], value: d.row[d.idx] });
+                return context.tooltipFormat({ label: d.row[0], series: context.mappedColumns()[d.idx], value: d.row[d.idx] });
             })
         ;
     };
@@ -56,13 +54,14 @@
                 break;
         }
 
+        var mappedColumns = this.mappedColumns();
         var columnScale = d3.scale.ordinal()
-            .domain(context.columns().filter(function (d, idx) { return idx > 0; }))
+            .domain(mappedColumns.filter(function (d, idx) { return idx > 0; }))
             .rangeRoundBands(isHorizontal ? [0, dataLen] : [dataLen, 0])
         ;
 
         var column = this.svgData.selectAll(".dataRow")
-            .data(this.data())
+            .data(this.mappedData())
         ;
 
         column.enter().append("g")
@@ -74,9 +73,9 @@
             .each(function (dataRow, i) {
                 var element = d3.select(this);
 
-                var columnRect = element.selectAll("rect").data(dataRow.filter(function (d, i) { return i < context.columns().length; }).map(function (d, i) {
+                var columnRect = element.selectAll("rect").data(dataRow.filter(function (d, i) { return i < mappedColumns.length; }).map(function (d, i) {
                     return {
-                        column: context.columns()[i],
+                        column: mappedColumns[i],
                         row: dataRow,
                         value: d,
                         idx: i

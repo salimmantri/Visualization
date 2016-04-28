@@ -20,13 +20,11 @@
     Scatter.prototype.implements(INDChart.prototype);
     Scatter.prototype.implements(ITooltip.prototype);
 
-    Scatter.prototype.publish("paletteID", "default", "set", "Palette ID", Scatter.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Scatter.prototype.publish("pointShape", "cross", "set", "Shape of the data points", ["circle", "rectangle", "cross"]);
     Scatter.prototype.publish("pointSize", 6, "number", "Point Size");
     Scatter.prototype.publish("interpolate", "", "set", "Interpolate Data", ["", "linear", "step", "step-before", "step-after", "basis", "bundle", "cardinal", "monotone"]);
     Scatter.prototype.publish("interpolateFill", false, "boolean", "Fill Interpolation");
     Scatter.prototype.publish("interpolateFillOpacity", 0.66, "number", "Fill Interpolation Opacity");
-    Scatter.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Scatter.prototype.xPos = function (d) {
         return this.orientation() === "horizontal" ? this.dataPos(d.label) : this.valuePos(d.value);
@@ -41,7 +39,7 @@
         var context = this;
         this
             .tooltipHTML(function (d) {
-                return context.tooltipFormat({ label: d.label, series: context.columns()[d.colIdx], value: d.value });
+                return context.tooltipFormat({ label: d.label, series: context.mappedColumns()[d.colIdx], value: d.value });
             })
         ;
     };
@@ -70,11 +68,12 @@
             }
         }
 
-        var data = this.flattenData().map(function (d) {
+        var mappedColumns = this.mappedColumns();
+        var mappedData = this.mappedData();
+        var data = this.flattenData(mappedData, this.mappedColumns()).map(function (d) {
             d.shape = mapShape(context.pointShape());
             return d;
         });
-
         var points = this.svgData.selectAll(".point").data(data, function (d, idx) { return d.shape + "_" + idx; });
         points.enter().append("g")
             .attr("class", "point")
@@ -87,7 +86,7 @@
                     .on("mousemove.tooltip", context.tooltip.show)
                     .call(context._selection.enter.bind(context._selection))
                     .on("click", function (d, idx) {
-                        context.click(context.rowToObj(context.data()[d.rowIdx]), context.columns()[d.colIdx], context._selection.selected(this));
+                        context.click(context.rowToObj(mappedData[d.rowIdx]), mappedColumns[d.colIdx], context._selection.selected(this));
                     })
                 ;
                 element
@@ -113,7 +112,7 @@
                             .attr("y", function (d) { return context.yPos(d) - context.pointSize() / 2; })
                             .attr("width", context.pointSize())
                             .attr("height", context.pointSize())
-                            .style("fill", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
+                            .style("fill", function (d, idx) { return context._palette(mappedColumns[d.colIdx]); })
                         ;
                         break;
                     case "circle":
@@ -121,7 +120,7 @@
                             .attr("cx", function (d) { return context.xPos(d); })
                             .attr("cy", function (d) { return context.yPos(d); })
                             .attr("r", context.pointSize() / 2)
-                            .style("fill", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
+                            .style("fill", function (d, idx) { return context._palette(mappedColumns[d.colIdx]); })
                         ;
                         break;
                     case "path":
@@ -132,7 +131,7 @@
                                     "M" + (context.xPos(d) - context.pointSize() / 2) + " " + (context.yPos(d) + context.pointSize() / 2) + " " +
                                     "L" + (context.xPos(d) + context.pointSize() / 2) + " " + (context.yPos(d) - context.pointSize() / 2);
                                 })
-                            .style("stroke", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
+                            .style("stroke", function (d, idx) { return context._palette(mappedColumns[d.colIdx]); })
                         ;
                         break;
                 }
@@ -142,7 +141,7 @@
             .remove()
         ;
 
-        var areas = this.svgData.selectAll(".area").data(this.columns().filter(function (d, idx) { return context.interpolate() && context.interpolateFill() && idx > 0; }));
+        var areas = this.svgData.selectAll(".area").data(mappedColumns.filter(function (d, idx) { return context.interpolate() && context.interpolateFill() && idx > 0; }));
         areas.enter().append("path")
             .attr("class", "area")
         ;
@@ -168,12 +167,12 @@
                 .attr("d", area(data.filter(function (d2) { return d2.colIdx === idx + 1; })))
                 .style("opacity", context.interpolateFillOpacity())
                 .style("stroke", "none")
-                .style("fill", function (d, i) { return d3.hsl(context._palette(context.columns()[idx + 1])).brighter(); })
+                .style("fill", function (d, i) { return d3.hsl(context._palette(mappedColumns[idx + 1])).brighter(); })
             ;
         });
         areas.exit().remove();
 
-        var lines = this.svgData.selectAll(".line").data(this.columns().filter(function (d, idx) { return context.interpolate() && idx > 0; }));
+        var lines = this.svgData.selectAll(".line").data(mappedColumns.filter(function (d, idx) { return context.interpolate() && idx > 0; }));
         lines.enter().append("path")
             .attr("class", "line")
         ;
@@ -187,7 +186,7 @@
             var data2 = data.filter(function (d2) { return d2.colIdx === idx + 1; });
             element
                 .attr("d", line(data2))
-                .style("stroke", function (d, i) { return context._palette(context.columns()[idx + 1]); })
+                .style("stroke", function (d, i) { return context._palette(mappedColumns[idx + 1]); })
                 .style("fill", "none")
             ;
         });

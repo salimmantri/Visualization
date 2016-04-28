@@ -135,10 +135,12 @@
         return this.data().map(function (row) { return row.slice(0); });
     };
 
-    Widget.prototype.flattenData = function () {
+    Widget.prototype.flattenData = function (data, columns) {
+        data = data || this.data();
+        columns = columns || this.columns();
         var retVal = [];
-        this.data().forEach(function (row, rowIdx) {
-            this.columns().filter(function (col, idx) { return idx > 0; }).forEach(function (col, idx) {
+        data.forEach(function (row, rowIdx) {
+            columns.filter(function (col, idx) { return idx > 0; }).forEach(function (col, idx) {
                 var val = row[idx + 1];
                 if (val) {
                     var newItem = {
