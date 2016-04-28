@@ -109,19 +109,12 @@
         },
         Table: {
             simple: function (callback) {
-                require(["test/DataFactory", "src/other/Table"], function (DataFactory, Table) {
+                require(["test/DataFactory", "src/other/Table2"], function (DataFactory, Table) {
                     var table = new Table()
-                        .columns(["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"])
-                        .data([["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]])
+                        .columns(DataFactory.Table.large.columns)
+                        .data(DataFactory.Table.large.data)
                     ;
                     callback(table);
-                    setTimeout(function () {
-                        table
-                            .columns(DataFactory.Table.simple.columns)
-                            .data(DataFactory.Table.simple.data)
-                            .render()
-                        ;
-                    }, 1000);
                 });
             },
             widget: function (callback) {
