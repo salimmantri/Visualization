@@ -85,6 +85,21 @@
                     callback(graph);
                 });
             }
+        },
+        Sankey: {
+            simple: function (callback) {
+                require(["test/DataFactory", "src/graph/Sankey"], function (DataFactory, Sankey) {
+                    callback(new Sankey()
+                        .columns(DataFactory.Sample.DataBreach.columns)
+                        .data(DataFactory.Sample.DataBreach.data)
+                        .sourceColumns([
+                            new Sankey.prototype.Column().label("Covered Entity Type"),
+                            new Sankey.prototype.Column().label("Type of Breach"),
+                            new Sankey.prototype.Column().label("Location of Information")
+                        ])
+                    );
+                });
+            }
         }
     };
 }));

@@ -209,6 +209,19 @@
                         .data(DataFactory.ND.subjects.data)
                     );
                 });
+            },
+            table: function (callback) {
+                require(["test/DataFactory", "src/chart/MultiChart"], function (DataFactory, MultiChart) {
+                    var chart = new MultiChart()
+                        .chartType("TABLE")
+                        .chartTypeDefaults({
+                            pagination: true
+                        })
+                        .columns(DataFactory.Sample.DataBreach.columns)
+                        .data(DataFactory.Sample.DataBreach.data)
+                    ;
+                    callback(chart);
+                });
             }
         },
         MultiChartSurface: {
