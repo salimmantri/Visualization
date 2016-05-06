@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "topojson", "./Layer", "./Utility", "../common/Palette", "../common/Utility", "css!./Pins"], factory);
+        define(["./Layer", "../common/Palette", "../common/Utility", "css!./Pins"], factory);
     } else {
-        root.map_Pins = factory(root.d3, root.topojson, root.map_Layer, root.map_Utility, root.common_Palette, root.common_Utility);
+        root.map_Pins = factory(root.map_Layer, root.common_Palette, root.common_Utility);
     }
-}(this, function (d3, topojson, Layer, Utility, Palette, CommonUtility) {
+}(this, function (Layer, Palette, Utility) {
     function Pins() {
         Layer.call(this);
     }
@@ -22,7 +22,7 @@
         Layer.prototype.layerEnter.apply(this, arguments);
 
         this._pinsTransform = svgElement;
-        this._selection = new CommonUtility.SimpleSelection(this._pinsTransform);
+        this._selection = new Utility.SimpleSelection(this._pinsTransform);
         this.pinsPaths = d3.select(null);
     };
 
