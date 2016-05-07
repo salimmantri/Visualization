@@ -27,19 +27,18 @@
         var min = Infinity,
             max = -Infinity;
 
-        var data = [];
-        this.data().forEach(function (row) {
-            var e = Math.floor(row[0] - 1),
-                r = Math.floor(row[1] - 1),
-                s = Math.floor(row[2]),
-                d = data[e];
-            if (!d) 
-                d = data[e] = [s];
-            else 
-                d.push(s);
-            if (s > max) max = s;
-            if (s < min) min = s;
+        var view = this._db.rollupView(["Expt"]);
+        var dataLabel = [];
+        var data = view.entries().map(function (d) {
+            return d.values.map(function (row) {
+                dataLabel.push(d.key);
+                if (row[2] > max) max = row[2];
+                if (row[2] < min) min = row[2];
+                return row[2];
+            });
         });
+
+        this.valueScale.domain([min, max]);
 
         this._d3Box
             .whiskers(iqr(1.5))
@@ -53,19 +52,8 @@
         ;
         boxplots
             .attr("transform", function (d, idx) { return "translate(" + (context.dataScale.rangeBand() / 2 + context.dataScale(idx + 1)) + "," + margin.top + ")"; })
-            .call(this._d3Box);
+            .call(context._d3Box);
         ;
-        function randomize(d) {
-            if (!d.randomizer) d.randomizer = randomizer(d);
-            return d.map(d.randomizer);
-        }
-
-        function randomizer(d) {
-            var k = d3.max(d) * .02;
-            return function (d) {
-                return Math.max(min, Math.min(max, d + k * (Math.random() - .5)));
-            };
-        }
 
         // Returns a function to compute the interquartile range.
         function iqr(k) {
