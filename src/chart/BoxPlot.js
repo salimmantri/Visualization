@@ -28,7 +28,6 @@
             max = -Infinity;
 
         var data = [];
-        var dataLabel = [];
         this.data().forEach(function (row) {
             var e = Math.floor(row[0] - 1),
                 r = Math.floor(row[1] - 1),
