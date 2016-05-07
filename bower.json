@@ -44,6 +44,7 @@
     "d3-cloud": "~1.2.1",
     "amcharts3": "~3.18.0",
     "simpleheat": "https://raw.githubusercontent.com/mourner/simpleheat/v0.3.0/simpleheat.js",
+    "javascript-auto-complete": "*",
     "es6-promise": "~3.0.2"
   },
   "resolutions": {
