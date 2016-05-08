@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "../common/PropertyExt", "./XYAxis", "../api/INDChart", "../api/ITooltip", "../common/Palette", "d3-box", "css!./BoxPlot"], factory);
+        define(["d3", "../common/SVGWidget", "../common/PropertyExt", "./Scatter", "../api/INDChart", "../api/ITooltip", "../common/Palette", "d3-box", "css!./BoxPlot"], factory);
     } else {
         root.chart_HexBin = factory(root.d3, root.common_SVGWidget, root.common_PropertyExt, root.chart_XYAxis, root.api_INDChart, root.api_ITooltip, root.common_Palette);
     }
@@ -38,9 +38,17 @@
     BoxPlot.prototype.columns = function (_) {
         var retVal = this.origColumns.apply(this, arguments);
         if (!arguments.length) {
-            return ["Series", "Values"];
+            var sourceColumns = this.sourceColumns().filter(function (col) { return col.label(); });
+            var label = "";
+            sourceColumns.forEach(function (col, idx) {
+                if (idx > 0) {
+                    label += "/";
+                }
+                label += col.label();
+            }, this);
+            return [label, this.aggregateColumn()];
         }
-        return retVal;
+        return retVal; 
     };
 
     var origData = XYAxis.prototype.data;
@@ -84,34 +92,36 @@
 
         this._d3Box
             .whiskers(iqr(1.5))
-            .width(50)//this.dataScale.rangeBand())
+            .width(this.dataScale.rangeBand())
             .height(height)
             .domain(this.valueScale.domain())
         ;
-        var boxplots = element.selectAll(".boxPlotSVG").data(data, function (d) { return d.key; });
+        if (this._prevColumn0 !== context.columns()[0]) {
+            this._prevColumn0 !== context.columns()[0];
+            this.svgData.selectAll(".boxPlotSVG").remove();
+        }
+        var boxplots = this.svgData.selectAll(".boxPlotSVG").data(data, function (d, idx) { return d.key; });
         boxplots.enter().append("g")
             .attr("class", "boxPlotSVG")
         ;
         boxplots
             .each(function (dataRow, idx) {
                 var element = d3.select(this);
-                var boxplot = element.selectAll(".boxPlot").data([dataRow.values.map(function (row) { return row[1]; })]);
-                var rect = boxplot.enter().append("g")
+                var boxplot = element.selectAll(".boxPlot").data([dataRow.values.map(function (row) { return row[1]; })], function (d) { return data[idx].key; });
+                boxplot.enter().append("g")
                     .attr("class", "boxPlot")
-                    .append("rect")
+                    //.append("rect")
                 ;
-                //boxplot.call(context._d3Box);
-                boxplot.exit().remove();
+                boxplot.call(context._d3Box);
                 var bbox = this.getBBox();
-                /*
+                boxplot.exit().remove();
                 element
                     .attr("transform", function (d) {
-                        return "translate(" + (context.dataScale.rangeBand() / 2 + context.dataPos(data[idx].key) - bbox.width / 2) + "," + margin.top + ")";
+                        return "translate(" + (context.dataPos(data[idx].key) - dataLen / 2) + "," + margin.top + ")";
                     })
                 ;
-                */
-                rect
-                    .attr("x", context.dataPos(data[idx].key))
+                boxplot.select("rectxxx")
+                    .attr("x", 0)
                     .attr("y", 0)
                     .attr("width", dataLen)
                     .attr("height", height)
