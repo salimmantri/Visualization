@@ -1,12 +1,5 @@
 "use strict";
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["../common/SVGWidget", "css!./SVGTemplate"], factory);
-    } else {
-        root.template_SVGTemplate = factory(root.common_SVGWidget);
-    }
-}(this, function (SVGWidget) {
-    function SVGTemplate(target) {
+     function SVGTemplate(target) {
         SVGWidget.call(this);
     }
     SVGTemplate.prototype = Object.create(SVGWidget.prototype);

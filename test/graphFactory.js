@@ -85,6 +85,17 @@
                     callback(graph);
                 });
             }
+        },
+        Sankey: {
+            simple: function (callback) {
+                require(["test/DataFactory", "src/graph/Sankey"], function (DataFactory, Sankey) {
+                    var widget = new Sankey()
+                        .columns(DataFactory.Sample.DataBreach.columns)
+                        .data(DataFactory.Sample.DataBreach.data)
+                    ;
+                    callback(widget);
+                });
+            }
         }
     };
 }));
