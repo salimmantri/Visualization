@@ -70,7 +70,8 @@
         { id: "AM_COMBO", display: "Combo (amCharts)", widgetClass: "amchart_Combo" },
     ].map(function(item) { item.family = "ND"; return item;});
     MultiChart.prototype._anyChartTypes = [
-        { id: "TABLE", display: "Table", widgetClass: "other_Table" }
+        { id: "TABLE", display: "Table", widgetClass: "other_Table" },
+        { id: "SANKEY", display: "Sankey", widgetClass: "graph_Sankey" }
     ].map(function(item) { item.family = "any"; return item;});
     MultiChart.prototype._allChartTypes = MultiChart.prototype._1DChartTypes.concat(MultiChart.prototype._2DChartTypes.concat(MultiChart.prototype._NDChartTypes.concat(MultiChart.prototype._anyChartTypes)));
 
