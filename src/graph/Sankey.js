@@ -31,6 +31,8 @@
 
     Sankey.prototype.publish("paletteID", "default", "set", "Palette ID", Sankey.prototype._palette.switch());
     Sankey.prototype.publish("sourceColumns", [], "propertyArray", "Source Columns", null, { autoExpand: Column });
+    Sankey.prototype.publish("vertexWidth", 36, "number", "Vertex Width");
+    Sankey.prototype.publish("vertexPadding", 40, "number", "Vertex Padding");
 
     Sankey.prototype.sankeyData = function () {
         var vertexIndex = {};
@@ -79,10 +81,7 @@
     Sankey.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
 
-        this._sankey = d3.sankey()
-            .nodeWidth(36)
-            .nodePadding(40)
-        ;
+        this._sankey = d3.sankey();
 
         this._path = this._sankey.link();
     };
@@ -95,6 +94,8 @@
         var sankeyData = this.sankeyData();
         this._sankey
             .size([this.width(), this.height()])
+            .nodeWidth(this.vertexWidth())
+            .nodePadding(this.vertexPadding())
             .nodes(sankeyData.vertices)
             .links(sankeyData.edges)
             .layout(32)
@@ -127,9 +128,14 @@
             .attr("class", "node")
             .each(function (d) {
                 var gElement = d3.select(this);
-                gElement.append("rect");
+                gElement.append("rect")
+                ;
                 gElement.append("text");
             })
+            .on("click", function (d, idx) {
+                context.click(d.name, "", true);
+            })
+            /*
             .call(
                 d3.behavior.drag()
                     .origin(function (d) { return d; })
@@ -138,6 +144,7 @@
                     })
                     .on("drag", dragmove)
                 )
+                */
         ;
 
         node
@@ -200,6 +207,11 @@
 
     Sankey.prototype.exit = function (domNode, element) {
         SVGWidget.prototype.exit.apply(this, arguments);
+    };
+
+    Sankey.prototype.click = function (row, col, sel) {
+        console.log(row + ", " + col + ", " + sel)
+        var d = 0;
     };
 
     return Sankey;
