@@ -1,0 +1,8 @@
+.other_UnorderedList ul {
+    padding-left: 24px;
+}
+
+.other_UnorderedList .dataRow {
+    list-style-type: disc;
+}
+
