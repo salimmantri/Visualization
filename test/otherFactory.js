@@ -267,12 +267,6 @@
                     callback(new UnorderedList()
                         .columns(["Col A", "ChildDataset", "Col C"])
                         .data([
-                            ["GJS0", [["CHILD101", [["aaa", [
-                            ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
-                            ]], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
-                        ])
-                        /*
-                        .data([
                             ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
                             ["GJS0", [["CHILD201", [
                             ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
@@ -297,7 +291,6 @@
                             ["GJS0", [["CHILDa01", 7], ["CHILDe02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
                             ["GJS0", [["CHILDc01", 7], ["CHILDd02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
                         ])
-                        */
                     );
                 });
             }

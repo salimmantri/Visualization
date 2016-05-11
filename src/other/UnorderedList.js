@@ -23,33 +23,32 @@
 
     UnorderedList.prototype.update = function (domNode, element) {
         HTMLWidget.prototype.update.apply(this, arguments);
+        d3.select(domNode.parentNode).style("overflow", "auto");
         this.updateArray(element, this.data(), 0);
     };
 
-    UnorderedList.prototype.updateArray = function (element, arr, depth) {
-        var data = arr instanceof Array ? [arr] : [];
-        var innerUL = element.selectAll("ul[data-depth='" + depth + "']").data(data);
-        innerUL.enter().append("ul")
+    UnorderedList.prototype.updateArray = function (element, _, depth) {
+        var ul = element.selectAll("ul").data(_ instanceof Array ? [_] : []);
+        ul.enter().append("ul")
             .attr("data-depth", depth)
         ;
+
+        var li = ul.selectAll("ul[data-depth='" + depth + "'] > .dataRow").data(_);
+        li.enter().append("li")
+            .attr("class", "dataRow")
+        ;
         var context = this;
-        innerUL.each(function (d) {
-            var element = d3.select(this);
-            var inner = element.selectAll('ul[data-depth="' + depth + '"] > .dataRow').data(d);
-            inner.enter().append("li")
-                .attr("class", "dataRow")
-            ;
-            inner
-                .text(function (row) {
-                    return row[0] + " - " + depth;
-                })
-                .each(function (row) {
-                    context.updateArray(d3.select(this), row[1], depth + 1);
-                })
-            ;
-            inner.exit().remove();
-        });
-        innerUL.exit().remove()
+        li
+            .text(function (row) {
+                return row[0] + " - " + depth;
+            })
+            .each(function (row) {
+                context.updateArray(d3.select(this), row[1], depth + 1);
+            })
+        ;
+        li.exit().remove();
+
+        ul.exit().remove()
     }
 
     UnorderedList.prototype.exit = function (domNode, element) {
