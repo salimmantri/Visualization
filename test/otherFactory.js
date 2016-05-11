@@ -167,6 +167,28 @@
                 });
             }
         },
+        NestedTable: {
+            simple: function (callback) {
+                require(["test/DataFactory", "src/other/NestedTable"], function (DataFactory, NestedTable) {
+                    callback(new NestedTable()
+                        .columns(["Subject", "Year 1", { label: "Year2", columns: ["Subject", "Year 1", "Year 2", "Year 3"], properties: {aaaa: "bbb" } }, "Year 3"])
+                        .data([
+                                ["Geography", 75, [["Geography", 75, 68, 65],
+                                                ["English", 45, 55, 52],
+                                                ["Math", 98, 92, 90],
+                                                ["Science", 66, 60, 72]], 65],
+                                ["English", 45, [], 52],
+                                ["Math", 98, [["Geography", 75, 68, 65],
+                                                ["English", 45, 55, 52],
+                                                ["Science", 66, 60, 72]], 90],
+                                ["Science", 66, [["Geography", 75, 68, 65],
+                                                ["Math", 98, 92, 90],
+                                                ["Science", 66, 60, 72]], 72]
+                        ])
+                    );
+                });
+            }
+        },
         Toolbar: {
             simple: function (callback) {
                 require(["test/DataFactory", "src/composite/MegaChart", "src/form/Select"], function (DataFactory, MegaChart, Select) {
@@ -236,6 +258,47 @@
                     }
                     w.data(arr);
                     callback(w);
+                });
+            }
+        },
+        UnorderedList: {
+            simple: function (callback) {
+                require(["src/other/UnorderedList"], function (UnorderedList) {
+                    callback(new UnorderedList()
+                        .columns(["Col A", "ChildDataset", "Col C"])
+                        .data([
+                            ["GJS0", [["CHILD101", [["aaa", [
+                            ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
+                            ]], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
+                        ])
+                        /*
+                        .data([
+                            ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD201", [
+                            ["GJS0", [["CHILD101", [["aaa", "bbb"], ["ccc", "ddd"]], 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD201", 7], ["CHILDm02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD301", 7], ["CHILDl02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD401", 7], ["CHILDk02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD501", 7], ["CHILDj02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD601", 7], ["CHILDi02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD701", 7], ["CHILDh02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD801", 7], ["CHILDg02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD901", 7], ["CHILDf02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILDa01", 7], ["CHILDe02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILDc01", 7], ["CHILDd02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
+                            ]], ["CHILDm02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD301", 7], ["CHILDl02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD401", 7], ["CHILDk02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD501", 7], ["CHILDj02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD601", 7], ["CHILDi02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD701", 7], ["CHILDh02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD801", 7], ["CHILDg02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILD901", 7], ["CHILDf02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILDa01", 7], ["CHILDe02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+                            ["GJS0", [["CHILDc01", 7], ["CHILDd02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
+                        ])
+                        */
+                    );
                 });
             }
         }
