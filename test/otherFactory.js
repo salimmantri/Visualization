@@ -238,6 +238,38 @@
                     callback(w);
                 });
             }
+        },
+        UnorderedList: {
+        	simple: function (callback) {
+        		require(["src/other/UnorderedList"], function (UnorderedList) {
+        			callback(new UnorderedList()
+        			   .columns(["Col A", "ChildDataset", "Col C"])
+        			   .data([
+        			          ["GJS0", [["CHILD101", 7], ["CHILDn02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD201", 7], ["CHILDm02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD301", 7], ["CHILDl02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD401", 7], ["CHILDk02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD501", 7], ["CHILDj02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD601", 7], ["CHILDi02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD701", 7], ["CHILDh02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD801", 7], ["CHILDg02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILD901", 7], ["CHILDf02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILDa01", 7], ["CHILDe02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7],
+        			          ["GJS0", [["CHILDc01", 7], ["CHILDd02", 7], ["CHILD003", 7], ["CHILD004", 7]], 7]
+                             ])
+                     );
+        		});
+        	}
+        },
+        CalendarHeatMap: {
+            simple: function (callback) {
+                require(["test/DataFactory", "src/other/CalendarHeatMap"], function (DataFactory, CalendarHeatMap) {
+                    callback(new CalendarHeatMap()
+                        .columns([])
+                        .data(DataFactory.CalendarHeatMap.simple.data)
+                    );
+                });
+            }
         }
     };
 }));
